@@ -1,1 +1,1 @@
-//g
+//g init mush
