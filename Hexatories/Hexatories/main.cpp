@@ -68,9 +68,6 @@ void _update_fps_counter(GLFWwindow* window) {
 		double fps = (double)frame_count / elapsed_seconds;
 		char tmp[128];
 
-		GLint m_viewport[4];
-		glGetIntegerv(GL_VIEWPORT, m_viewport);
-
 		sprintf_s(tmp, "Hexatories @ fps: %.2f", fps);
 		glfwSetWindowTitle(window, tmp);
 		frame_count = 0;
