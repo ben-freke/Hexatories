@@ -33,6 +33,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Shaders\test_fs.glsl" />
+    <None Include="Shaders\test_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Textures.h">
