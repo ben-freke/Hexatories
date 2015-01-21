@@ -3,7 +3,7 @@
 #include <stdarg.h>
 #include "Log.h"
 
-#define LOG_FILE "gl.log"
+#define LOG_FILE "Debug\\gl.log"
 
 void restart_log() {
 	FILE *file;
@@ -14,7 +14,7 @@ void restart_log() {
 	}
 
 	time_t now = time(NULL);
-	char* date = NULL;
+	char date[26];
 	ctime_s(date, 26, &now);
 
 	fprintf(file, "LOG_FILE log. local time %s\n", date);
@@ -26,7 +26,7 @@ void log(const char* message, ...) {
 	va_list argptr;
 
 	FILE *file;
-	fopen_s(&file, LOG_FILE, "w");
+	fopen_s(&file, LOG_FILE, "a");
 
 	if (!file) {
 		return;

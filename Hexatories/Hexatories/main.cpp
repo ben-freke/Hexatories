@@ -55,6 +55,8 @@ GLFWwindow* initWindow(void) {
 
 int main(void) {
 
+	restart_log();
+
 	// Initialize the library 
 	if (!glfwInit())
 		return -1;
@@ -66,6 +68,8 @@ int main(void) {
 		return -1;
 	}
 
+	glDepthFunc(GL_NEVER);	//Renders in order drawn (last drawn on top)
+
 	// Make the window's context current
 	glfwMakeContextCurrent(window);
 
@@ -73,15 +77,28 @@ int main(void) {
 
 	if (glewInit() != GLEW_OK) {
 		glfwTerminate();
-		fprintf(stderr, "GLEW Failed to initalise");
+		log("GLEW failed to initialise\n");
 		return -1;
 	}
 
 	HexMap map;
 
+	GLuint vs = compileVShader("test_vs");
+	GLuint fs = compileFShader("test_fs");
+
+	if (vs == 0 || fs == 0) {
+		log("Shader compile error\n");
+		glfwTerminate();
+		return -1;
+	}
+
+	GLuint prog = createProgram(vs, fs);
+
 	glViewport(142, 0, 740, 740);	// Basically changes the section of the window we draw to
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	HexTile tile;
+	tile.initTile(0, 0);
+
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window))
@@ -89,7 +106,11 @@ int main(void) {
 		_update_fps_counter(window);
 
 		// Render here 
+		glUseProgram(0);
 		map.drawMap();
+
+		glUseProgram(prog);
+		tile.drawTile();
 
 		// Swap front and back buffers 
 		glfwSwapBuffers(window);
