@@ -12,7 +12,7 @@ unsigned char *loadBMP(const char *imagepath, unsigned int &width, unsigned int 
 	// Actual RGB data
 	unsigned char * data;
 
-	FILE * file;
+	FILE *file;
 	fopen_s(&file, imagepath, "rb");
 	if (!file) return NULL;
 
