@@ -22,7 +22,6 @@ string readGLSL(const char *path) {
 		string line;
 		while (getline(file, line)) {
 			codeString = codeString + line + "\n";
-			log("Read line %s\n", line.c_str());
 		}
 
 		file.close();
@@ -58,7 +57,7 @@ GLuint compileVShader(const char *path) {
 
 	string code = readGLSL(path);
 	const char *vs_code = code.c_str();
-	log("Code: %s\n", vs_code);
+	log("Code:\n %s\n", vs_code);
 
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vs, 1, &vs_code, NULL);
@@ -74,7 +73,7 @@ GLuint compileFShader(const char *path) {
 
 	string code = readGLSL(path);
 	const char *fs_code = code.c_str();
-	log("Code: %s\n", fs_code);
+	log("Code:\n %s\n", fs_code);
 
 	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fs, 1, &fs_code, NULL);
@@ -92,6 +91,18 @@ GLuint createProgram(GLuint vs, GLuint fs) {
 	glAttachShader(shader_program, fs);
 	glAttachShader(shader_program, vs);
 	glLinkProgram(shader_program);
+
+	int params = -1;
+	glGetProgramiv(shader_program, GL_LINK_STATUS, &params);
+	if (GL_TRUE != params) {
+		int max_length = 2048;
+		int actual_length = 0;
+		char plog[2048];
+		glGetProgramInfoLog(shader_program, max_length, &actual_length, plog);
+		log("program info log for GL index %u:\n%s", shader_program, plog);
+
+		return shader_program;
+	}
 
 	return shader_program;
 }

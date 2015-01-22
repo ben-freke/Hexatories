@@ -2,5 +2,5 @@
 #define __TEXTURES_H
 
 	// Make sure to delete the returned char *
-	unsigned char *loadBMP(const char *imagepath, unsigned int &outWidth, unsigned int &outHeight);
+	unsigned char *loadBMP(const char *imagepath, int &outWidth, int &outHeight);
 #endif

@@ -1,7 +1,6 @@
 #include <GL\glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include "Textures.h"
 #include "Log.h"
 #include "Shaders.h"
 #include "HexMap.h"
@@ -33,8 +32,8 @@ void _update_fps_counter(GLFWwindow* window) {
 
 GLFWwindow* initWindow(void) {
 
+	//glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
 	GLFWwindow* window = NULL;
 
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());	// Get screen resolution
@@ -83,35 +82,15 @@ int main(void) {
 
 	HexMap map;
 
-	GLuint vs = compileVShader("test_vs");
-	GLuint fs = compileFShader("test_fs");
-
-	if (vs == 0 || fs == 0) {
-		log("Shader compile error\n");
-		glfwTerminate();
-		return -1;
-	}
-
-	GLuint prog = createProgram(vs, fs);
-
 	glViewport(142, 0, 740, 740);	// Basically changes the section of the window we draw to
-
-	HexTile tile;
-	tile.initTile(0, 0);
-
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window))
 	{
 		_update_fps_counter(window);
 
-		// Render here 
-		glUseProgram(0);
 		map.drawMap();
-
-		glUseProgram(prog);
-		tile.drawTile();
-
+		
 		// Swap front and back buffers 
 		glfwSwapBuffers(window);
 

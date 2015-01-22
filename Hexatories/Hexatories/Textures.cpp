@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Textures.h"
+#include "Log.h"
 
-unsigned char *loadBMP(const char *imagepath, unsigned int &width, unsigned int &height) {
+unsigned char *loadBMP(const char *imagepath, int &width, int &height) {
 
 	// Data read from the header of the BMP file
 	unsigned char header[54];

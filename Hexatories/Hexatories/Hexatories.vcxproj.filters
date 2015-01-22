@@ -18,9 +18,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Textures.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -30,11 +27,19 @@
     <ClCompile Include="HexMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Textures.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Shaders\test_fs.glsl" />
-    <None Include="Shaders\test_vs.glsl" />
+    <None Include="Maps\map.mp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Shaders\mapColour_fs.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="Shaders\mapColour_vs.glsl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Textures.h">

@@ -18,9 +18,10 @@
     <ClCompile Include="Textures.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Maps\map.mp" />
     <None Include="packages.config" />
-    <None Include="Shaders\test_fs.glsl" />
-    <None Include="Shaders\test_vs.glsl" />
+    <None Include="Shaders\mapColour_fs.glsl" />
+    <None Include="Shaders\mapColour_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HexMap.h" />
