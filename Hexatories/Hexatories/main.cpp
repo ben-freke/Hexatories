@@ -11,24 +11,11 @@
 // (C) Group 16
 
 //This is the input test
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	double xValue = NULL;
-	double yValue = NULL;
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
 
-		glfwGetCursorPos(window, &xValue, &yValue);
-
-		std::string s = "X = " + (std::to_string((int)xValue)) + " Y = " + (std::to_string((int)yValue)) + "\n";
-		char const *pchar = s.c_str();
-
-		std::printf(pchar);
-	}
-
-}
+int counter = 0;
 
 int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
-/** 
+/**
 
 This function tests if an XY coordinate is in a given shape
 nvert is the number of verticies in the given shape
@@ -47,6 +34,7 @@ textx and testy are the XY locations in the shape to be tested (i.e. the mouse l
 	return c;
 }
 
+
 void checkCursor(GLFWwindow* window){
 	double xValue = NULL;
 	double yValue = NULL;
@@ -56,17 +44,45 @@ void checkCursor(GLFWwindow* window){
 	The GLFW function stores the XY positions in the locations of these variables
 	**/
 
-	float vertx[] = { 100, 200 };
-	float verty[] = { 100, 200 };
+	float vertx[] = { 100, 200, 100, 200 };
+	float verty[] = { 100, 100, 200, 200 };
 	//Sets the verticies XY array for a square (i.e. from point 100,100 to point 200,200)
 
+
+
 	if (pnpoly(4, vertx, verty, (float)xValue, (float)yValue)){
+		std::string locationString = "X: " + std::to_string(xValue) + " Y: " + std::to_string(yValue) + " is correct\n";
+		char const *pchar = locationString.c_str();
 		//Runs the pnpoly function to test if the mouse is in the square. Will return true or false
-		std::printf("X marks the spot");
-		//If in square, print.
+		std::printf(pchar);
+		counter++;
+		//If in square, print.s
 	}
-	
+
 }
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	double xValue = NULL;
+	double yValue = NULL;
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
+
+		glfwGetCursorPos(window, &xValue, &yValue);
+
+		std::string s = "X = " + (std::to_string((int)xValue)) + " Y = " + (std::to_string((int)yValue)) + "\n";
+		char const *pchar = s.c_str();
+
+		std::printf(pchar);
+	}
+
+	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS){
+
+		checkCursor(window);
+	}
+
+}
+
+
+
 
 void _update_fps_counter(GLFWwindow* window) {
 
@@ -155,12 +171,14 @@ int main(void) {
 
 		map.drawMap();
 		
+		checkCursor(window);
+
 		// Swap front and back buffers 
 		glfwSwapBuffers(window);
 
 		// Poll for and process events 
 		glfwPollEvents();
-		checkCursor(window);
+		//checkCursor(window);
 	}
 
 	glfwTerminate();
