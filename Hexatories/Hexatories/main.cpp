@@ -27,6 +27,47 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 }
 
+int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
+/** 
+
+This function tests if an XY coordinate is in a given shape
+nvert is the number of verticies in the given shape
+vertx is an array of x verticies in the shape
+verty is an array of y verticies in the shape
+textx and testy are the XY locations in the shape to be tested (i.e. the mouse location)
+
+**/
+{
+	int i, j, c = 0;
+	for (i = 0, j = nvert - 1; i < nvert; j = i++) {
+		if (((verty[i]>testy) != (verty[j]>testy)) &&
+			(testx < (vertx[j] - vertx[i]) * (testy - verty[i]) / (verty[j] - verty[i]) + vertx[i]))
+			c = !c;
+	}
+	return c;
+}
+
+void checkCursor(GLFWwindow* window){
+	double xValue = NULL;
+	double yValue = NULL;
+	glfwGetCursorPos(window, &xValue, &yValue);
+	/**
+	xValue and yValue are variables to store the location of the mouse when the function is called.
+	The GLFW function stores the XY positions in the locations of these variables
+	**/
+
+	float vertx[] = { 100, 200 };
+	float verty[] = { 100, 200 };
+	//Sets the verticies XY array for a square (i.e. from point 100,100 to point 200,200)
+
+	if (pnpoly(4, vertx, verty, (float)xValue, (float)yValue)){
+		//Runs the pnpoly function to test if the mouse is in the square. Will return true or false
+		std::printf("X marks the spot");
+		//If in square, print.
+	}
+	
+}
+
 void _update_fps_counter(GLFWwindow* window) {
 
 	static double previous_seconds = glfwGetTime();
@@ -119,6 +160,7 @@ int main(void) {
 
 		// Poll for and process events 
 		glfwPollEvents();
+		checkCursor(window);
 	}
 
 	glfwTerminate();
