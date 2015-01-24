@@ -4,6 +4,8 @@
 #include "Log.h"
 #include "Shaders.h"
 #include "HexMap.h"
+#include "inputs.h"
+
 
 
 
@@ -12,76 +14,16 @@
 
 //This is the input test
 
-int counter = 0;
+inputs hexInputs;
 
-int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
-/**
-
-This function tests if an XY coordinate is in a given shape
-nvert is the number of verticies in the given shape
-vertx is an array of x verticies in the shape
-verty is an array of y verticies in the shape
-textx and testy are the XY locations in the shape to be tested (i.e. the mouse location)
-
-**/
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	int i, j, c = 0;
-	for (i = 0, j = nvert - 1; i < nvert; j = i++) {
-		if (((verty[i]>testy) != (verty[j]>testy)) &&
-			(testx < (vertx[j] - vertx[i]) * (testy - verty[i]) / (verty[j] - verty[i]) + vertx[i]))
-			c = !c;
-	}
-	return c;
-}
-
-
-void checkCursor(GLFWwindow* window){
-	double xValue = NULL;
-	double yValue = NULL;
-	glfwGetCursorPos(window, &xValue, &yValue);
-	/**
-	xValue and yValue are variables to store the location of the mouse when the function is called.
-	The GLFW function stores the XY positions in the locations of these variables
-	**/
-
-	float vertx[] = { 100, 200, 100, 200 };
-	float verty[] = { 100, 100, 200, 200 };
-	//Sets the verticies XY array for a square (i.e. from point 100,100 to point 200,200)
-
-
-
-	if (pnpoly(4, vertx, verty, (float)xValue, (float)yValue)){
-		std::string locationString = "X: " + std::to_string(xValue) + " Y: " + std::to_string(yValue) + " is correct\n";
-		char const *pchar = locationString.c_str();
-		//Runs the pnpoly function to test if the mouse is in the square. Will return true or false
-		std::printf(pchar);
-		counter++;
-		//If in square, print.s
-	}
-
+	hexInputs.mouseClick(window, button, action);
 }
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	double xValue = NULL;
-	double yValue = NULL;
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
-
-		glfwGetCursorPos(window, &xValue, &yValue);
-
-		std::string s = "X = " + (std::to_string((int)xValue)) + " Y = " + (std::to_string((int)yValue)) + "\n";
-		char const *pchar = s.c_str();
-
-		std::printf(pchar);
-	}
-
-	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS){
-
-		checkCursor(window);
-	}
-
+	hexInputs.keyPress(window, key, action);
 }
-
-
 
 
 void _update_fps_counter(GLFWwindow* window) {
@@ -156,8 +98,12 @@ int main(void) {
 		log("GLEW failed to initialise\n");
 		return -1;
 	}
-
+	
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	/**
+	This sets key presses and mouse clicks to their assigned functions above.
+	**/
 
 
 	HexMap map;
@@ -171,7 +117,7 @@ int main(void) {
 
 		map.drawMap();
 		
-		checkCursor(window);
+		//checkCursor(window);
 
 		// Swap front and back buffers 
 		glfwSwapBuffers(window);

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HexMap.cpp" />
+    <ClCompile Include="inputs.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shaders.cpp" />
@@ -25,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HexMap.h" />
+    <ClInclude Include="inputs.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="Textures.h" />
