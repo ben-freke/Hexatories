@@ -13,8 +13,18 @@
 //This is the input test
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (action == GLFW_PRESS)
-		std::printf("Key Pressed");
+	double xValue = NULL;
+	double yValue = NULL;
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
+
+		glfwGetCursorPos(window, &xValue, &yValue);
+
+		std::string s = "X = " + (std::to_string((int)xValue)) + " Y = " + (std::to_string((int)yValue)) + "\n";
+		char const *pchar = s.c_str();
+
+		std::printf(pchar);
+	}
+
 }
 
 void _update_fps_counter(GLFWwindow* window) {
