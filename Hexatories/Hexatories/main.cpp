@@ -5,8 +5,17 @@
 #include "Shaders.h"
 #include "HexMap.h"
 
+
+
 //this is a test 5/3
 // (C) Group 16
+
+//This is the input test
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (action == GLFW_PRESS)
+		std::printf("Key Pressed");
+}
 
 void _update_fps_counter(GLFWwindow* window) {
 
@@ -53,7 +62,7 @@ GLFWwindow* initWindow(void) {
 }
 
 int main(void) {
-
+	std::printf("Begin");
 	restart_log();
 
 	// Initialize the library 
@@ -67,6 +76,7 @@ int main(void) {
 		return -1;
 	}
 
+
 	glDepthFunc(GL_NEVER);	//Renders in order drawn (last drawn on top)
 
 	// Make the window's context current
@@ -79,6 +89,9 @@ int main(void) {
 		log("GLEW failed to initialise\n");
 		return -1;
 	}
+
+	glfwSetKeyCallback(window, key_callback);
+
 
 	HexMap map;
 
