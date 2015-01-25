@@ -32,7 +32,7 @@ void log(const char* message, ...) {
 		return;
 	}
 
-	va_start(argptr, message);
+	va_start(argptr, message);	// Variable argument number
 	vfprintf(file, message, argptr);
 	va_end(argptr);
 

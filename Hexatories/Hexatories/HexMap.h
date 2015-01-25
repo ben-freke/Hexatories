@@ -5,19 +5,43 @@
 #ifndef __HEXMAP_H
 #define __HEXMAP_H
 
+	/*
+		Currently only contains function to calculate the positions of a certain hex tiles vertices.
+	*/
 	class HexTile {
 	public:
+		/*
+			Calculate vertex position. Also includes the colour of each vertex.
+			Usage:
+			HexTile.initTile(xPos, yPos, vertexArray, currentPositionInVertexArray, tileColourType);
+			It appends the tiles vertices to the end of the passed array.
+		*/
 		void initTile(int, int, GLfloat *, int, int);
 	};
 
+	/*
+		Currently contains functionality to generate the entire vbo of the hexmap and draw it.
+		Also allows user designed maps to be read from file.
+	*/
 	class HexMap {
-		GLuint vao, vbo, ebo, progCol;
-		GLfloat verts[63960];
-		short indices[25584];
-		HexTile myHex;
+		/*
+			vao - attribute array for the whole map.
+			progCol - the program containing the various required shaders.
+		*/
+		GLuint vao, progCol;
+		/*
+			Returns the string containing map data to interpret. Really needs reworking.
+			Usage: string map = mapFromFile("BeachMap");
+		*/
 		std::string mapFromFile(const char *path);
 	public:
+		/*
+			Calculate all the vertices of the hexmap, set up the vao and link the program.
+		*/
 		HexMap();
+		/*
+			Just draws the map currently.
+		*/
 		void drawMap();
 	};
 

@@ -3,43 +3,59 @@
 #include "Textures.h"
 #include "Log.h"
 
-unsigned char *loadBMP(const char *imagepath, int &width, int &height) {
+unsigned char *loadBMP(const char *imagePath, int &width, int &height) {
 
-	// Data read from the header of the BMP file
+	/*
+		header - the bitmap header
+	*/
 	unsigned char header[54];
-	unsigned int dataPos;
-	unsigned int imageSize;
-
-	// Actual RGB data
-	unsigned char * data;
 
 	FILE *file;
-	fopen_s(&file, imagepath, "rb");
-	if (!file) return NULL;
+	fopen_s(&file, imagePath, "rb");
 
-	// Read the header
-	// If less than 54 byes are read, problem
-	if (fread(header, 1, 54, file) != 54) return NULL;
+	if (!file) {
+		log("Invalid bitmap filepath: %s\n", imagePath);
+		return NULL;
+	}
 
-	// A BMP files always begins with "BM"
-	if (header[0] != 'B' || header[1] != 'M') printf("Not a correct BMP file\n");
+	/*
+		If we read less that 54 bytes then the header is corrupt at the very least, ABORT ABORT
+	*/
+	if (fread(header, 1, 54, file) != 54) {
+		log("Read less than 54 bytes from: %s\n", imagePath);
+		return NULL;
+	}
+	/*
+		The following ensure from the header that we have the right type of bmp.
+	*/
+	if (header[0] != 'B' || header[1] != 'M') {
+		log("Header invalid, corrupt bmp: %s\n", imagePath);
+	}
+	
+	if (*(int*)&(header[0x1E]) != 0) {
+		log("Not a rgb bitmap: %s\n", imagePath);
+		return NULL;
+	}
 
-	// Make sure this is a 24bpp file
-	if (*(int*)&(header[0x1E]) != 0) return NULL;
-	if (*(int*)&(header[0x1C]) != 24) return NULL;
+	if (*(int*)&(header[0x1C]) != 24) {
+		log("Not a 24bpp bitmap: %s\n", imagePath);
+		return NULL;
+	}
 
-	dataPos = *(int*)&(header[0x0A]);
-	imageSize = *(int*)&(header[0x22]);
+	/*
+		Get stuff from the header.
+	*/
+	unsigned int imageSize = *(int*)&(header[0x22]);
 	width = *(int*)&(header[0x12]);
 	height = *(int*)&(header[0x16]);
 
-	// If corrupt BMP
-	if (imageSize == 0) imageSize = width * height * 3; // 3 : one byte for each Red, Green and Blue component
-	if (dataPos == 0) dataPos = 54; // The BMP header is done that way
+	/*
+		imageSize being 0 doesn't mean we have a corrupt bmp, but we do need it.
+	*/
+	if (imageSize == 0) imageSize = width * height * 3; // 3 - one byte for each rgb component
 
-	data = new unsigned char[imageSize];
+	unsigned char *data = new unsigned char[imageSize];
 
-	// Read pixels from the file into the buffer
 	fread(data, 1, imageSize, file);
 
 	fclose(file);
