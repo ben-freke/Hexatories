@@ -64,51 +64,6 @@ void HexTile::initTile(int xc, int yc, GLfloat vboArray[], int pos, int type) {
 	}
 }
 
-bool HexMap::pointToTile(double mouseX, double mouseY, int &gridX, int &gridY) {
-
-	/*
-		Offsets
-	*/
-	mouseX = mouseX - 152;	
-	mouseY = mouseY - 28;
-
-	/*
-		Bounds check
-	*/
-	if (mouseX < 0 || mouseX > 740 || mouseY > 740) return false;
-
-	/*
-		Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
-	*/
-	int rectX = (int) mouseX / 18;
-	int rectY = (int) (mouseY - ((rectX % 2) * 11)) / 22;
-
-	/*
-		Mouse position relative to the current box
-	*/
-	mouseX -= 18 * rectX;
-	mouseY -= 22 * rectY + ((rectX % 2) * 11);
-
-	/*
-		Inequality, test if we are in the main tile of this rectangle or the two smaller sections.
-		If we are, grid co ords are rect co ords, otherwise x is -1 and y is rect +1/0/-1
-	*/
-	if (mouseX > 12 * abs(0.5 - mouseY / 22)) {
-		gridX = rectX;
-		gridY = rectY;
-	} else {
-		gridX = rectX - 1;
-		gridY = rectY - (gridX % 2) + ((mouseY > 11) ? 1 : 0);
-	}
-
-	/*
-		Final bounds test
-	*/
-	if (gridX < 0 || gridX > 39 || gridY < 0 || gridY > 32) return false;
-
-	return true;
-}
-
 HexMap::HexMap() {
 	/*
 		pos - start position in vertex array
@@ -245,4 +200,50 @@ string HexMap::mapFromFile(const char *path) {
 		return mapString;
 	}
 	return mapString;
+}
+
+bool pointToTile(double mouseX, double mouseY, int &gridX, int &gridY) {
+
+	/*
+	Offsets
+	*/
+	mouseX = mouseX - 152;
+	mouseY = mouseY - 28;
+
+	/*
+	Bounds check
+	*/
+	if (mouseX < 0 || mouseX > 740 || mouseY > 740) return false;
+
+	/*
+	Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
+	*/
+	int rectX = (int)mouseX / 18;
+	int rectY = (int)(mouseY - ((rectX % 2) * 11)) / 22;
+
+	/*
+	Mouse position relative to the current box
+	*/
+	mouseX -= 18 * rectX;
+	mouseY -= 22 * rectY + ((rectX % 2) * 11);
+
+	/*
+	Inequality, test if we are in the main tile of this rectangle or the two smaller sections.
+	If we are, grid co ords are rect co ords, otherwise x is -1 and y is rect +1/0/-1
+	*/
+	if (mouseX > 12 * abs(0.5 - mouseY / 22)) {
+		gridX = rectX;
+		gridY = rectY;
+	} else {
+		gridX = rectX - 1;
+		gridY = rectY - (gridX % 2) + ((mouseY > 11) ? 1 : 0);
+	}
+
+	/*
+	Final bounds test
+	*/
+	if (gridX < 0 || gridX > 39 || gridY < 0 || gridY > 32) return false;
+
+	std::printf("x: %d, y: %d\n", gridX, gridY);
+	return true;
 }

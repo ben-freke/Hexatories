@@ -19,9 +19,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		log("MouseX: %f, MouseY: %f\n", xValue, yValue);
 		
 		int gridX, gridY;
-
-		HexMap h;
-		h.pointToTile(xValue, yValue, gridX, gridY);
+		pointToTile(xValue, yValue, gridX, gridY);
 	}
 }
 
@@ -103,7 +101,7 @@ int main(void) {
 
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	HexMap map;
 
 	double xValue = NULL;
