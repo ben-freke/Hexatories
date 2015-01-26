@@ -9,15 +9,14 @@ void HexTile::initTile(int xc, int yc, GLfloat vboArray[], int pos, int type) {
 
 	/*
 		Default vertex array. These are adjusted for each hex based on its grid position.
-		Didn't write down how I got these values, much trial and error.
 	*/
 	GLfloat verts[] = {
-		-0.98125f, 0.964375f,		// left
-		-0.96875f, 0.940625f,		// bottom left
-		-0.94375f, 0.940625f,		// bottom right
-		-0.93125f, 0.964375f,		// right
-		-0.94375f, 0.988125f,		// top right
-		-0.96875f, 0.988125f,		// top left
+		152, 729,
+		158, 718,
+		170, 718,
+		176, 729,
+		170, 740,
+		158, 740,
 	};
 	
 	/*
@@ -56,13 +55,58 @@ void HexTile::initTile(int xc, int yc, GLfloat vboArray[], int pos, int type) {
 	*/
 	for (int i = 0; i < 30; i += 5) {
 
-		vboArray[pos + i] = verts[(int)(i / 2.5)] + (0.0375f * xc);	// Calculate the x pos of the current tile and store it.
-		vboArray[pos + i + 1] = verts[(int)(i / 2.5) + 1] - (0.0475f * yc + 0.02375f * xoff); // Calculate the y pos and store it.
+		vboArray[pos + i] = verts[(int)(i / 2.5)] + (18 * xc);	// Calculate the x pos of the current tile and store it.
+		vboArray[pos + i + 1] = verts[(int)(i / 2.5) + 1] - (22 * yc + 11 * xoff); // Calculate the y pos and store it.
 
 		for (int j = colPos; j < colPos + 3; j++) {	// Loops through the colour array, appending your selected colour to the end of each vertex.
 			vboArray[pos + i + 2 + (j % 3)] = types[j];
 		}
 	}
+}
+
+bool HexMap::pointToTile(double mouseX, double mouseY, int &gridX, int &gridY) {
+
+	/*
+		Offsets
+	*/
+	mouseX = mouseX - 152;	
+	mouseY = mouseY - 28;
+
+	/*
+		Bounds check
+	*/
+	if (mouseX < 0 || mouseX > 740 || mouseY > 740) return false;
+
+	/*
+		Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
+	*/
+	int rectX = mouseX / 18;
+	int rectY = (mouseY - ((rectX % 2) * 11)) / 22;
+
+	/*
+		Mouse position relative to the current box
+	*/
+	mouseX -= 18 * rectX;
+	mouseY -= 22 * rectY + ((rectX % 2) * 11);
+
+	/*
+		Inequality, test if we are in the main tile of this rectangle or the two smaller sections.
+		If we are, grid co ords are rect co ords, otherwise x is -1 and y is rect +1/0/-1
+	*/
+	if (mouseX > 12 * abs(0.5 - mouseY / 22)) {
+		gridX = rectX;
+		gridY = rectY;
+	} else {
+		gridX = rectX - 1;
+		gridY = rectY - (gridX % 2) + ((mouseY > 11) ? 1 : 0);
+	}
+
+	/*
+		Final bounds test
+	*/
+	if (gridX < 0 || gridX > 39 || gridY < 0 || gridY > 32) return false;
+
+	std::printf("x: %d, y: %d\n", gridX, gridY);
 }
 
 HexMap::HexMap() {
@@ -83,8 +127,8 @@ HexMap::HexMap() {
 		myHex - just to use the initHex function, needs reordering but we'll see what we do with the class structures.
 		vbo, ebo - self explanatory, can be freed at function end.
 	*/
-	GLfloat verts[63960];
-	short indices[25584];
+	GLfloat verts[39600];
+	short indices[15840];
 	HexTile myHex;
 	GLuint vbo, ebo;
 
@@ -92,7 +136,7 @@ HexMap::HexMap() {
 		Sets up the default map if the one loaded from file isn't correct in some way. Just fills a string with "map" and 2132 zeros.
 	*/
 	if (mapCode.empty()) {
-		string defaultMap(2132, '0');
+		string defaultMap(2003, '0');
 		mapCode.append("map");
 		mapCode.append(defaultMap);
 	}
@@ -102,8 +146,8 @@ HexMap::HexMap() {
 	/*
 		Loops through each tile getting its vertex information.
 	*/
-	for (int x = 0; x < 52; x++) {
-		for (int y = 0; y < 41; y++) {
+	for (int x = 0; x < 40; x++) {
+		for (int y = 0; y < 33; y++) {
 			
 			tileType = mapCode.at(3 + currTile) - '0';	// Gets the tile colour number.
 			if (tileType > 2) tileType = 0;	// If it's invalid set to default.

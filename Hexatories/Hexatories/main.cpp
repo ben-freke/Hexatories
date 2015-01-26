@@ -8,8 +8,29 @@
 //this is a test 5/3
 // (C) Group 16
 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	double xValue = NULL;
+	double yValue = NULL;
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		
+		glfwGetCursorPos(window, &xValue, &yValue);
+
+		log("MouseX: %f, MouseY: %f\n", xValue, yValue);
+		
+		int gridX, gridY;
+
+		HexTile myHex;
+		myHex.pointToTile(xValue, yValue, gridX, gridY);
+	}
+}
+
 void _update_fps_counter(GLFWwindow* window) {
 
+	double xValue = NULL;
+	double yValue = NULL;
+	glfwGetCursorPos(window, &xValue, &yValue);
+	
 	static double previous_seconds = glfwGetTime();
 	static int frame_count;
 	double current_seconds = glfwGetTime();
@@ -80,14 +101,23 @@ int main(void) {
 		return -1;
 	}
 
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	HexMap map;
 
-	glViewport(142, 0, 740, 740);	// Basically changes the section of the window we draw to
+	double xValue = NULL;
+	double yValue = NULL;
+
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window))
 	{
-		_update_fps_counter(window);
+		char tmp[128];
+
+		glfwGetCursorPos(window, &xValue, &yValue);
+		sprintf_s(tmp, "Hexatories @ %.0f, %.0f", xValue, yValue);
+		glfwSetWindowTitle(window, tmp);
 
 		map.drawMap();
 		
