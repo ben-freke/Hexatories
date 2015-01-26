@@ -80,8 +80,8 @@ bool HexMap::pointToTile(double mouseX, double mouseY, int &gridX, int &gridY) {
 	/*
 		Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
 	*/
-	int rectX = mouseX / 18;
-	int rectY = (mouseY - ((rectX % 2) * 11)) / 22;
+	int rectX = (int) mouseX / 18;
+	int rectY = (int) (mouseY - ((rectX % 2) * 11)) / 22;
 
 	/*
 		Mouse position relative to the current box
@@ -106,7 +106,7 @@ bool HexMap::pointToTile(double mouseX, double mouseY, int &gridX, int &gridY) {
 	*/
 	if (gridX < 0 || gridX > 39 || gridY < 0 || gridY > 32) return false;
 
-	std::printf("x: %d, y: %d\n", gridX, gridY);
+	return true;
 }
 
 HexMap::HexMap() {

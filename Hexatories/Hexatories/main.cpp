@@ -20,8 +20,8 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		
 		int gridX, gridY;
 
-		HexTile myHex;
-		myHex.pointToTile(xValue, yValue, gridX, gridY);
+		HexMap h;
+		h.pointToTile(xValue, yValue, gridX, gridY);
 	}
 }
 
