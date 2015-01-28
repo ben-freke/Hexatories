@@ -101,21 +101,22 @@ int main(void) {
 
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	HexMap map;
 
 	double xValue = NULL;
 	double yValue = NULL;
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window))
 	{
+
 		char tmp[128];
 
-		glfwGetCursorPos(window, &xValue, &yValue);
-		sprintf_s(tmp, "Hexatories @ %.0f, %.0f", xValue, yValue);
-		glfwSetWindowTitle(window, tmp);
+		_update_fps_counter(window);
 
 		map.drawMap();
 		

@@ -25,15 +25,17 @@
 	*/
 	class HexMap {
 		/*
-			vao - attribute array for the whole map.
-			progCol - the program containing the various required shaders.
+			vaoCol - attribute array for the coloured tiles.
+
+			progCol - the program containing the various required shaders for the tiles.
+			progTex - shaders for black wireframe overlay texture
 		*/
-		GLuint vao, progCol;
+		GLuint vaoCol, vaoTex, progCol, progTex;
 		/*
 			Returns the string containing map data to interpret. Really needs reworking.
 			Usage: string map = mapFromFile("BeachMap");
 		*/
-		std::string mapFromFile(const char *path);
+		std::string mapFromFile(const char *);
 	public:
 		/*
 			Calculate all the vertices of the hexmap, set up the vao and link the program.

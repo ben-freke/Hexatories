@@ -1,6 +1,7 @@
 #include <fstream>
 #include "HexMap.h"
 #include "Shaders.h"
+#include "Textures.h"
 #include "log.h"
 
 using namespace std;
@@ -85,7 +86,6 @@ HexMap::HexMap() {
 	GLfloat verts[39600];
 	short indices[15840];
 	HexTile myHex;
-	GLuint vbo, ebo;
 
 	/*
 		Sets up the default map if the one loaded from file isn't correct in some way. Just fills a string with "map" and 2132 zeros.
@@ -121,11 +121,10 @@ HexMap::HexMap() {
 	/*
 		Set up the program for drawing the map.
 	*/
-	GLuint vs, fs;
+	GLuint vs, fs, vboCol, eboCol, vboTex, eboTex, tboTex;
 	vs = compileVShader("mapColour_vs");
 	fs = compileFShader("mapColour_fs");
 	progCol = createProgram(vs, fs);
-
 	/*
 		Sets up all the vertex attribute stuff. In order of code blocks:
 
@@ -135,16 +134,22 @@ HexMap::HexMap() {
 		Define position variable for shader.
 		Define colour variable for shader.
 		Unbind vao.
-	*/
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
 
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		repeat first 3
+		texture stuff
+		position variable
+		texture position variable
+		unbind vao
+	*/
+	glGenVertexArrays(1, &vaoCol);
+	glBindVertexArray(vaoCol);
+
+	glGenBuffers(1, &vboCol);
+	glBindBuffer(GL_ARRAY_BUFFER, vboCol);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glGenBuffers(1, &eboCol);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboCol);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	GLint posAttrib = glGetAttribLocation(progCol, "position");
@@ -155,13 +160,58 @@ HexMap::HexMap() {
 	glEnableVertexAttribArray(colAttrib);
 	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
+	vs = compileVShader("mapTex_vs");
+	fs = compileFShader("mapTex_fs");
+	progTex = createProgram(vs, fs);
+
+	glGenVertexArrays(1, &vaoTex);
+	glBindVertexArray(vaoTex);
+
+	GLfloat vertsTex[] = {
+		152, 740, 0, 0,
+		878, 740, 1, 0,
+		878, 0, 1, 1,
+		152, 0, 0, 1,
+	};
+
+	glGenBuffers(1, &vboTex);
+	glBindBuffer(GL_ARRAY_BUFFER, vboTex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertsTex), vertsTex, GL_STATIC_DRAW);
+
+	short rectIndices[] = {
+		0, 1, 2,
+		2, 3, 0,
+	};
+
+	glGenBuffers(1, &eboTex);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboTex);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectIndices), rectIndices, GL_STATIC_DRAW);
+
+	loadBMP("wireframe.bmp", tboTex);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tboTex);
+
+	posAttrib = glGetAttribLocation(progTex, "position");
+	glEnableVertexAttribArray(posAttrib);
+	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+
+	GLint texAttrib = glGetAttribLocation(progTex, "tex_coord");
+	glEnableVertexAttribArray(texAttrib);
+	glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+
 	glBindVertexArray(0);
 }
 
 void HexMap::drawMap() {
-	glBindVertexArray(vao);
+
+	glBindVertexArray(vaoCol);
 	glUseProgram(progCol);
-	glDrawElements(GL_TRIANGLES, 63960, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, 15840, GL_UNSIGNED_SHORT, 0);
+
+	glBindVertexArray(vaoTex);
+	glUseProgram(progTex);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+
 }
 
 string HexMap::mapFromFile(const char *path) {

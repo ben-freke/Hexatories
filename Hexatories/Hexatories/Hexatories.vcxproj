@@ -27,10 +27,14 @@
     <ClInclude Include="HexMap.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Shaders.h" />
+    <ClInclude Include="SOIL.h" />
     <ClInclude Include="Textures.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\wireframe.bmp" />
+    <Library Include="lib\SOIL.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="wireframe.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{79D3D328-00D0-4E43-AAB4-3C61E0181CC3}</ProjectGuid>
@@ -71,7 +75,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SOIL.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Ben\Source\Repos\Hexatories\Hexatories\Hexatories\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
