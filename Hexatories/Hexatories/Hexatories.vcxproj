@@ -22,6 +22,8 @@
     <None Include="packages.config" />
     <None Include="Shaders\mapColour_fs.glsl" />
     <None Include="Shaders\mapColour_vs.glsl" />
+    <None Include="Shaders\mapTex_fs.glsl" />
+    <None Include="Shaders\mapTex_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HexMap.h" />
@@ -76,7 +78,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SOIL.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Ben\Source\Repos\Hexatories\Hexatories\Hexatories\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

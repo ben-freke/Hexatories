@@ -45,6 +45,12 @@
     <None Include="Shaders\mapColour_vs.glsl">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="Shaders\mapTex_fs.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="Shaders\mapTex_vs.glsl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HexMap.h">
