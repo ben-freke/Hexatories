@@ -18,6 +18,10 @@
     <ClCompile Include="Textures.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="audio\libraries\libsndfile-1.dll" />
+    <None Include="audio\libraries\openal32.dll" />
+    <None Include="audio\libraries\sfml-audio-d-2.dll" />
+    <None Include="audio\libraries\sfml-system-d-2.dll" />
     <None Include="Maps\map.mp" />
     <None Include="packages.config" />
     <None Include="Shaders\mapColour_fs.glsl" />
@@ -37,6 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="wireframe.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="audio\sound.wav" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{79D3D328-00D0-4E43-AAB4-3C61E0181CC3}</ProjectGuid>
@@ -74,11 +81,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)\lib\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SOIL.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-audio-d.lib;sfml-system-d.lib;SOIL.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\lib\SFML\include;$(ProjectDir)\lib\SFML\lib;$(ProjectDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
