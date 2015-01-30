@@ -13,7 +13,8 @@ public:
 
 	int playAudio(char* filename);
 	void fadeInAudio(int time);
-	void audioFadeThread(int time);
+	void fadeOutAudio(int time);
+	void audioFadeThread(int time, int type);
 
 	
 };
