@@ -80,9 +80,8 @@ int main(void) {
 	Audio gameMusic;
 	Audio swordClang;
 	gameMusic.playAudio("sound.wav");
-	//swordClang.playAudio("swords.wav");
-
-	gameMusic.fadeOutAudio(10);
+	swordClang.playAudio("swords.wav");
+	swordClang.fadeInAudio(10);
 	
 	
 	
