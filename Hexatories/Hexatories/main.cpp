@@ -13,15 +13,6 @@
 //this is a test 5/3
 // (C) Group 16
 
-int playAudio(){
-	sf::SoundBuffer buffer;
-	buffer.loadFromFile("Sound.wav");
-	sf::Sound sound;
-	sound.setBuffer(buffer);
-	sound.play();
-	return 0;
-}
-
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	double xValue = NULL;
@@ -87,7 +78,13 @@ GLFWwindow* initWindow(void) {
 
 int main(void) {
 	Audio gameMusic;
+	Audio swordClang;
 	gameMusic.playAudio("sound.wav");
+	swordClang.playAudio("swords.wav");
+
+	gameMusic.fadeInAudio(3);
+	
+	
 	
 
 	restart_log();

@@ -101,5 +101,8 @@
     <Media Include="audio\sound.wav">
       <Filter>Resource Files</Filter>
     </Media>
+    <Media Include="swords.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
   </ItemGroup>
 </Project>
