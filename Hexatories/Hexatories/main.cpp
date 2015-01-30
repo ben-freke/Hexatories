@@ -19,7 +19,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		log("MouseX: %f, MouseY: %f\n", xValue, yValue);
 		
 		int gridX, gridY;
-		pointToTile(xValue, yValue, gridX, gridY);
+		HexMap::pointToTile(xValue, yValue, gridX, gridY);
 	}
 }
 

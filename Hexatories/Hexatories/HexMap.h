@@ -45,12 +45,11 @@
 			Just draws the map currently.
 		*/
 		void drawMap();
+		/*
+			Converts mouse point to x and y of tile in the map.
+			Return true if in the grid.
+		*/
+		static bool pointToTile(double, double, int &, int &);
 	};
-
-	/*
-	Converts mouse point to x and y of tile in the map.
-	Return true if in the grid.
-	*/
-	bool pointToTile(double, double, int &, int &);
 
 #endif
