@@ -12,7 +12,8 @@
 
 //this is a test 5/3
 // (C) Group 16
-
+Audio gameMusic;
+Audio swordClang;
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	double xValue = NULL;
@@ -20,11 +21,17 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		
 		glfwGetCursorPos(window, &xValue, &yValue);
+		
+		
 
 		log("MouseX: %f, MouseY: %f\n", xValue, yValue);
 		
 		int gridX, gridY;
 		HexMap::pointToTile(xValue, yValue, gridX, gridY);
+		if (gridX == 17 && gridY == 16){
+			swordClang.playAudio("swords.wav");
+
+		}
 	}
 }
 
@@ -77,11 +84,10 @@ GLFWwindow* initWindow(void) {
 }
 
 int main(void) {
-	Audio gameMusic;
-	Audio swordClang;
+	
 	gameMusic.playAudio("sound.wav");
-	swordClang.playAudio("swords.wav");
-	swordClang.fadeInAudio(10);
+	gameMusic.fadeInAudio(5);
+
 	
 	
 	
