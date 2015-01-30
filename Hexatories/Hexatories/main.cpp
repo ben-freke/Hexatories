@@ -4,18 +4,22 @@
 #include "Log.h"
 #include "Shaders.h"
 #include "HexMap.h"
+#include "Audio.h"
 #include <SFML/Audio.hpp>
 #include <SFML/Audio/Sound.hpp>
+#include <thread>
 
 
 //this is a test 5/3
 // (C) Group 16
 
-void playTestSound(){
-
-
-
-	
+int playAudio(){
+	sf::SoundBuffer buffer;
+	buffer.loadFromFile("Sound.wav");
+	sf::Sound sound;
+	sound.setBuffer(buffer);
+	sound.play();
+	return 0;
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -82,6 +86,9 @@ GLFWwindow* initWindow(void) {
 }
 
 int main(void) {
+	Audio gameMusic;
+	gameMusic.playAudio("sound.wav");
+	
 
 	restart_log();
 
@@ -121,11 +128,7 @@ int main(void) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-	sf::SoundBuffer buffer;
-	buffer.loadFromFile("sound.wav");
-	sf::Sound sound;
-	sound.setBuffer(buffer);
-	sound.play();
+	
 	
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window))

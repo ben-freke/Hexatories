@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Audio.cpp" />
     <ClCompile Include="HexMap.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="main.cpp" />
@@ -30,6 +31,7 @@
     <None Include="Shaders\mapTex_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Audio.h" />
     <ClInclude Include="HexMap.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Shaders.h" />
