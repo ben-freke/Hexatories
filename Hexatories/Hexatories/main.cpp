@@ -1,36 +1,34 @@
-#include <GL\glew.h>
-#include <GLFW/glfw3.h>
 #include <stdio.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <SFML/Audio.hpp>
+#include <SFML/Audio/Sound.hpp>
 #include "Log.h"
 #include "Shaders.h"
 #include "HexMap.h"
 #include "Audio.h"
-#include <SFML/Audio.hpp>
-#include <SFML/Audio/Sound.hpp>
-#include <thread>
-
 
 //this is a test 5/3
 // (C) Group 16
 Audio gameMusic;
 Audio swordClang;
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+
 	double xValue = NULL;
 	double yValue = NULL;
+
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		
 		glfwGetCursorPos(window, &xValue, &yValue);
-		
-		
 
 		log("MouseX: %f, MouseY: %f\n", xValue, yValue);
 		
 		int gridX, gridY;
 		HexMap::pointToTile(xValue, yValue, gridX, gridY);
-		if (gridX == 17 && gridY == 16){
-			swordClang.playAudio("swords.wav");
 
+		if (gridX == 17 && gridY == 16) {
+			swordClang.playAudio("swords.wav");
 		}
 	}
 }
@@ -88,10 +86,6 @@ int main(void) {
 	gameMusic.playAudio("sound.wav");
 	gameMusic.fadeInAudio(5);
 
-	
-	
-	
-
 	restart_log();
 
 	// Initialize the library 
@@ -129,14 +123,9 @@ int main(void) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-	
-	
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window))
 	{
-		
-		char tmp[128];
 
 		_update_fps_counter(window);
 
@@ -150,5 +139,6 @@ int main(void) {
 	}
 
 	glfwTerminate();
+
 	return 0;
 }
