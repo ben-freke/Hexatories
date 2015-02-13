@@ -26,3 +26,8 @@ However, having began implementing the turn based system
 
 Thus:
 	- Battle timings will be removed, and I will implement a FIFO Stack to run all actions at the end of a turn
+	
+
+BS:
+We'll need to see actions as they happen, having them happen at the end of a turn won't work.
+Eg the user could attack a territory (have no idea how many attackers they lost/if they won) and then want to reinforce it but can't until the next turn
