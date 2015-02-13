@@ -40,7 +40,7 @@ bool HexMap::initMap(Territory *ter) {
 
 	setupVAO(tileVerts, indices);
 
-	//setupTerritories(mapCode, mapPos, ter);
+	setupTerritories(mapCode, mapPos, ter);
 	return true;
 }
 
@@ -51,8 +51,8 @@ void HexMap::setupTerritories(int *mapCode, int mapPos, Territory *ter) {
 	int terrCount = mapCode[mapPos++];
 	ter = new Territory[terrCount];
 
-	vector<int> tiles;
-	int tile;
+	vector<tile_t> tiles;
+	int tileNum;
 	int tilesInTerr;
 
 	/*
@@ -64,10 +64,9 @@ void HexMap::setupTerritories(int *mapCode, int mapPos, Territory *ter) {
 
 		for (int j = 0; j < tilesInTerr; j++) {
 
-			tile = mapCode[mapPos++];
-
-			tiles.push_back(tile / 33);
-			tiles.push_back(tile % 33);
+			tileNum = mapCode[mapPos++];
+			
+			tiles.push_back({ tileNum / 33, tileNum % 33 });
 		}
 
 		ter[i].initTerritory(tiles, tilesInTerr);
