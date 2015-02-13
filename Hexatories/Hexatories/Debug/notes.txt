@@ -1,0 +1,11 @@
+In Territory.cpp:
+setAttack/defense should be relative (eg, calling it with +10 would add 10, rather than setting it to 10)
+
+In Actions.cpp
+srand should only be called once overall, not sure if it's thread safe
+All the warnings, some floats (like difference in attackTerritory) should probably be ints?
+Honestly not sure if we should use threads there, we don't need to be doing anything while an attack is taking place
+Also do we really want it to wait on a battle for any real amount of time? There's not going to be an animation or anything, is the sound playing not enough?
+repeated code
+
+Make methods in actions static, we don't need an instance of the class

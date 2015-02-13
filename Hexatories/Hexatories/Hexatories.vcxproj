@@ -52,6 +52,9 @@
     <Media Include="audio\sound.wav" />
     <Media Include="swords.wav" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Debug\notes.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{79D3D328-00D0-4E43-AAB4-3C61E0181CC3}</ProjectGuid>
     <RootNamespace>Hexatories</RootNamespace>
