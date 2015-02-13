@@ -87,7 +87,7 @@ GLFWwindow* initWindow(void) {
 }
 
 int main(void) {
-	//gameMusic.playAudio("sound.wav");
+	gameMusic.playAudio("sound.wav");
 	gameMusic.fadeInAudio(0);
 	
 	Territory testTerritory1;
@@ -97,6 +97,7 @@ int main(void) {
 
 	defaultActions.attack(testTerritory1, testTerritory2, 0);
 		
+
 
 	restart_log();
 
