@@ -1,3 +1,4 @@
+BS:
 In Territory.cpp:
 setAttack/defense should be relative (eg, calling it with +10 would add 10, rather than setting it to 10)
 
@@ -9,3 +10,19 @@ Also do we really want it to wait on a battle for any real amount of time? There
 repeated code
 
 Make methods in actions static, we don't need an instance of the class
+
+
+
+BF:
+Agree with your comments, I will:
+	- Sort out variable types (e.g. float and int)
+	- Call Srand once and use it to generate all random numbers
+
+However with regard to battles:
+	- My thinking was that a dialouge box with a progress bar would come up on the screen 
+
+However, having began implementing the turn based system
+	- User should find out if they have one the battle at the end of the turn
+
+Thus:
+	- Battle timings will be removed, and I will implement a FIFO Stack to run all actions at the end of a turn
