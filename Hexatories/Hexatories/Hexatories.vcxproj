@@ -12,10 +12,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="HexMap.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shaders.cpp" />
+    <ClCompile Include="Territory.cpp" />
     <ClCompile Include="Textures.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -25,17 +27,17 @@
     <None Include="audio\libraries\sfml-system-d-2.dll" />
     <None Include="Maps\map.mp" />
     <None Include="packages.config" />
-    <None Include="Shaders\mapColour_fs.glsl" />
-    <None Include="Shaders\mapColour_vs.glsl" />
-    <None Include="Shaders\mapTex_fs.glsl" />
-    <None Include="Shaders\mapTex_vs.glsl" />
+    <None Include="Shaders\map_fs.glsl" />
+    <None Include="Shaders\map_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="HexMap.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="SOIL.h" />
+    <ClInclude Include="Territory.h" />
     <ClInclude Include="Textures.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,231 +1,270 @@
 #include <fstream>
 #include "HexMap.h"
+#include "Log.h"
 #include "Shaders.h"
 #include "Textures.h"
-#include "log.h"
 
 using namespace std;
 
-void HexTile::initTile(int xc, int yc, GLfloat vboArray[], int pos, int type) {
+#pragma region defaultVertsCols
 
-	/*
-		Default vertex array. These are adjusted for each hex based on its grid position.
-	*/
-	GLfloat verts[] = {
-		152, 729,
-		158, 718,
-		170, 718,
-		176, 729,
-		170, 740,
-		158, 740,
-	};
-	
-	/*
-		The colour values for each tile. RGB, but rather than 0-255 it's 0.0f - 1.0f.
-		To convert RGB value to modulated value use the following formula:
-		modVal = colVal / 255;
-		Round to 3 d.p. for simplicity.
-	*/
-	GLfloat types[] = {
-		0.722f, 0.584f, 0.243f,		// sand
-		0.243f, 0.38f, 0.722f,		// water
-		0.251f, 0.659f, 0.259f,		// grass
-	};
+const GLfloat HexMap::defTileVerts[] = {
+	152, 729,	//left
+	158, 718,	//bottom left
+	170, 718,	//bottom right
+	176, 729,	//right
+	170, 740,	//top right
+	158, 740,	//top left
+};
 
-	/*
-		xoff - either 1 or 0 depending on your x value. Needed as every other column is lower down (look at the map if confused).
-		colPos - the start position in the types array of your selected colour. e.g. if type was 1 (water) colPos would be 3.
-	*/
-	int xoff = xc % 2;
-	int colPos = type * 3;
+const GLfloat HexMap::cols[] = {
+	182, 149, 62,	// sand
+	62, 97, 182,	// water
+	64, 168, 66,	// grass
+};
+#pragma endregion
 
-	/*
-		Each vertex has 5 floats which define it. x, y, r, g, b.
-		Goes through each of the vertices (of which there are 6, 6 * 5 = 30) defining their floats.
-	
-		i will always be a multiple of 5, for the 5 floats per vertex.
-		pos is the first free position in the array (the end of the array).
-		Therefore using pos + i + x allows you to define these floats individually and per vertex.
+bool HexMap::initMap(Territory *ter) {
 
-		e.g. 
-		pos + i = x position of the current tile
-		pos + i + 1 = y position of the current tile
-
-		note: i / 2.5 will increase by 2 each loop, and is used for the x/y positions from the verts array.
-		Cast is needed just for the compiler to not throw a fit.
-	*/
-	for (int i = 0; i < 30; i += 5) {
-
-		vboArray[pos + i] = verts[(int)(i / 2.5)] + (18 * xc);	// Calculate the x pos of the current tile and store it.
-		vboArray[pos + i + 1] = verts[(int)(i / 2.5) + 1] - (22 * yc + 11 * xoff); // Calculate the y pos and store it.
-
-		for (int j = colPos; j < colPos + 3; j++) {	// Loops through the colour array, appending your selected colour to the end of each vertex.
-			vboArray[pos + i + 2 + (j % 3)] = types[j];
-		}
+	int *mapCode = HexMap::mapFromFile("map");
+	if (mapCode == NULL) {
+		log("Invalid map\n");
+		return false;
 	}
+
+	vector<GLfloat> tileVerts;
+	vector<GLushort>indices;
+
+	int mapPos = getAllTiles(mapCode, tileVerts, indices);
+	addOverlay(tileVerts, indices);
+
+	setupVAO(tileVerts, indices);
+
+	//setupTerritories(mapCode, mapPos, ter);
+	return true;
 }
 
-HexMap::HexMap() {
+void HexMap::setupTerritories(int *mapCode, int mapPos, Territory *ter) {
 	/*
-		pos - start position in vertex array
-		currTile - the current tile not in columns/rows. For instance the 3rd tile in the 2nd column would be (1 * 41 + 3). 41 being the column height.
-		baseIndices - the draw order for the hex tile vertices. Needs to be specified for each tile, hence "base".
+	Gets the total amount of territories and requests that much space from memory.
 	*/
-	int pos = 0;
-	int currTile = 0;
-	short baseIndices[] = { 0, 1, 5, 1, 2, 5, 2, 4, 5, 2, 3, 4 };
+	int terrCount = mapCode[mapPos++];
+	ter = new Territory[terrCount];
 
-	string mapCode = mapFromFile("map");
-
-	/*
-		verts - the vertices for all tiles. Includes colour information.
-		indices - the draw order for all vertices.
-		myHex - just to use the initHex function, needs reordering but we'll see what we do with the class structures.
-		vbo, ebo - self explanatory, can be freed at function end.
-	*/
-	GLfloat verts[39600];
-	short indices[15840];
-	HexTile myHex;
+	vector<int> tiles;
+	int tile;
+	int tilesInTerr;
 
 	/*
-		Sets up the default map if the one loaded from file isn't correct in some way. Just fills a string with "map" and 2132 zeros.
+	Loops through each territory, finds how many tiles in each and loops through each of those. Adds all tiles to an array and then passes that to the territory init.
 	*/
-	if (mapCode.empty()) {
-		string defaultMap(2003, '0');
-		mapCode.append("map");
-		mapCode.append(defaultMap);
-	}
+	for (int i = 0; i < terrCount; i++) {
 
-	int tileType;
+		tilesInTerr = mapCode[mapPos++];
 
-	/*
-		Loops through each tile getting its vertex information.
-	*/
-	for (int x = 0; x < 40; x++) {
-		for (int y = 0; y < 33; y++) {
-			
-			tileType = mapCode.at(3 + currTile) - '0';	// Gets the tile colour number.
-			if (tileType > 2) tileType = 0;	// If it's invalid set to default.
+		for (int j = 0; j < tilesInTerr; j++) {
 
-			myHex.initTile(x, y, verts, pos, tileType);
+			tile = mapCode[mapPos++];
 
-			for (int i = 0; i < 12; i++) {	// Set up the vertex draw order for the current tile.
-				indices[currTile * 12 + i] = baseIndices[i] + 6 * currTile;
-			}
-
-			currTile++;
-			pos += 30;
+			tiles.push_back(tile / 33);
+			tiles.push_back(tile % 33);
 		}
+
+		ter[i].initTerritory(tiles, tilesInTerr);
 	}
-	
+
+	delete[] mapCode;
+#pragma endregion
+}
+
+void HexMap::setupVAO(vector<GLfloat> verts, vector<GLushort> indices) {
+
 	/*
-		Set up the program for drawing the map.
+	Vertex shader, fragment shader
 	*/
-	GLuint vs, fs, vboCol, eboCol, vboTex, eboTex, tboTex;
-	vs = compileVShader("mapColour_vs");
-	fs = compileFShader("mapColour_fs");
-	progCol = createProgram(vs, fs);
+	GLuint vs, fs, vboMap, eboMap, tboMap;
+
 	/*
-		Sets up all the vertex attribute stuff. In order of code blocks:
+	Sets up all the vertex attribute stuff. In order of code blocks:
 
-		Define and bind vao.
-		Define and bind vbo. (Vertex information)
-		Define and bind ebo. (Draw order)
-		Define position variable for shader.
-		Define colour variable for shader.
-		Unbind vao.
-
-		repeat first 3
-		texture stuff
-		position variable
-		texture position variable
-		unbind vao
+	Define and bind vao.
+	Define and bind vbo. (Vertex information)
+	Define and bind ebo. (Draw order)
+	Load texture.
+	Load program.
+	Define position variable for shader.
+	Define colour variable for shader.
+	Define texture variable for shader.
+	Unbind vao.
 	*/
-	glGenVertexArrays(1, &vaoCol);
-	glBindVertexArray(vaoCol);
+	glGenVertexArrays(1, &vaoMap);
+	glBindVertexArray(vaoMap);
 
-	glGenBuffers(1, &vboCol);
-	glBindBuffer(GL_ARRAY_BUFFER, vboCol);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glGenBuffers(1, &vboMap);
+	glBindBuffer(GL_ARRAY_BUFFER, vboMap);
+	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW);
 
-	glGenBuffers(1, &eboCol);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboCol);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glGenBuffers(1, &eboMap);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboMap);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
 
-	GLint posAttrib = glGetAttribLocation(progCol, "position");
-	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
-	
-	GLint colAttrib = glGetAttribLocation(progCol, "colour");
-	glEnableVertexAttribArray(colAttrib);
-	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-
-	vs = compileVShader("mapTex_vs");
-	fs = compileFShader("mapTex_fs");
-	progTex = createProgram(vs, fs);
-
-	glGenVertexArrays(1, &vaoTex);
-	glBindVertexArray(vaoTex);
-
-	GLfloat vertsTex[] = {
-		152, 740, 0, 0,
-		878, 740, 1, 0,
-		878, 0, 1, 1,
-		152, 0, 0, 1,
-	};
-
-	glGenBuffers(1, &vboTex);
-	glBindBuffer(GL_ARRAY_BUFFER, vboTex);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertsTex), vertsTex, GL_STATIC_DRAW);
-
-	short rectIndices[] = {
-		0, 1, 2,
-		2, 3, 0,
-	};
-
-	glGenBuffers(1, &eboTex);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboTex);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectIndices), rectIndices, GL_STATIC_DRAW);
-
-	loadBMP("wireframe.bmp", tboTex);
+	loadBMP("wireframe.png", tboMap);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tboTex);
+	glBindTexture(GL_TEXTURE_2D, tboMap);
 
-	posAttrib = glGetAttribLocation(progTex, "position");
+	vs = compileVShader("map_vs");
+	fs = compileFShader("map_fs");
+	progMap = createProgram(vs, fs);
+
+	GLint posAttrib = glGetAttribLocation(progMap, "position");
 	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
 
-	GLint texAttrib = glGetAttribLocation(progTex, "tex_coord");
+	GLint colAttrib = glGetAttribLocation(progMap, "colour");
+	glEnableVertexAttribArray(colAttrib);
+	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+
+	GLint texAttrib = glGetAttribLocation(progMap, "tex_coord");
 	glEnableVertexAttribArray(texAttrib);
-	glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+	glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
 
 	glBindVertexArray(0);
 }
 
-void HexMap::drawMap() {
+void HexMap::addOverlay(vector<GLfloat> &verts, vector<GLushort> &indices) {
 
-	glBindVertexArray(vaoCol);
-	glUseProgram(progCol);
-	glDrawElements(GL_TRIANGLES, 15840, GL_UNSIGNED_SHORT, 0);
+	/*
+	The vertices of the corners of the map (for the wireframe overlay).
+	Beneath is the indices for the draw order of the triangles that make up this rectangle.
+	*/
+	GLfloat vertsTex[] = {
+		152, 740, 0, 0, 0, 0, 0,
+		878, 740, 0, 0, 0, 1, 0,
+		878, 0, 0, 0, 0, 1, 1,
+		152, 0, 0, 0, 0, 0, 1,
+	};
 
-	glBindVertexArray(vaoTex);
-	glUseProgram(progTex);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+	GLushort rectIndices[] = {
+		0, 1, 2,
+		2, 3, 0,
+	};
 
+	/*
+	Adds these vertices to the end of the vbo and the indices to the ebo.
+	*/
+	for (int i = 0; i < 6; i++) {
+		int vertCount = verts.size() / 7;
+		indices.push_back(vertCount + rectIndices[i]);
+	}
+
+	for (int i = 0; i < 28; i++) {
+		verts.push_back(vertsTex[i]);
+	}
 }
 
-string HexMap::mapFromFile(const char *path) {
+int HexMap::getAllTiles(int *mapCode, vector<GLfloat> &verts, vector<GLushort> &indices) {
+#pragma region vars
+	/*
+	currTile - the current tile not in columns/rows. For instance the 3rd tile in the 2nd column would be (1 * 33 + 3). 41 being the column height.
+	mapPos - how far through the map data we are (in terms of array elements)
+	colCount - to count how many tiles to colour each time.
+	colType - the current colour.
+	baseIndices - the draw order for the hex tile vertices. Needs to be specified for each tile, hence "base".
+	*/
+	int currTile = 0;
+	int mapPos = 2;
+	int colCount = mapCode[0];
+	int colType = mapCode[1];
+
+	GLushort baseIndices[] = { 0, 1, 5, 1, 2, 5, 2, 4, 5, 2, 3, 4 };
+
+#pragma endregion
+
+#pragma region initTilesTerrs
+	/*
+	Loops through each tile generating its vertex information and initialising them.
+	*/
+	for (int x = 0; x < 40; x++) {
+		for (int y = 0; y < 33; y++) {
+
+			/*
+			Goes through colCount tiles making each of them colour colType, when this is true the colCount is incremented and colType changed.
+			*/
+			while (currTile == colCount) {
+				colCount += mapCode[mapPos++];
+				colType = mapCode[mapPos++];
+			}
+
+			HexMap::calcTileVerts(x, y, colType, verts);
+
+			for (int i = 0; i < 12; i++) {	// Set up the vertex draw order for the current tile.
+				indices.push_back(baseIndices[i] + 6 * currTile);
+			}
+
+			currTile++;
+		}
+	}
+	return mapPos;
+}
+
+void HexMap::drawMap() {
+
+	glBindVertexArray(vaoMap);
+
+	glUseProgram(progMap);
+	glDrawElements(GL_TRIANGLES, 15846, GL_UNSIGNED_SHORT, 0);
+
+	glBindVertexArray(0);
+}
+
+void HexMap::calcTileVerts(int x, int y, int col, vector<GLfloat> &vboArray) {
+
+	/*
+	xoff - either 1 or 0 depending on your x value. Needed as every other column is lower down (look at the map if confused).
+	colPos - the start position in the types array of your selected colour. e.g. if type was 1 (water) colPos would be 3.
+	*/
+	int xoff = x % 2;
+	int colPos = col * 3;
+
+	/*
+	Each vertex has 7 floats which define it. x, y, r, g, b, texX, texY.
+	Goes through each of the vertices (of which there are 6, 6 * 7 = 42) defining their floats.
+
+	i will always be a multiple of 7, for the 7 floats per vertex.
+
+	note: i / 3.5 will increase by 2 each loop, and is used for the x/y positions from the verts array.
+	Cast is needed just for the compiler to not throw a fit.
+	*/
+	for (int i = 0; i < 42; i += 7) {
+
+		vboArray.push_back(defTileVerts[(int)(i / 3.5)] + (18 * x));	// Calculate the x pos of the current tile and store it.
+		vboArray.push_back(defTileVerts[(int)(i / 3.5) + 1] - (22 * y + 11 * xoff));	// Calculate the y pos and store it.
+
+		for (int j = colPos; j < colPos + 3; j++) {		// Loops through the colour array, appending your selected colour to the end of each vertex.
+			vboArray.push_back(cols[j]);
+		}
+
+		/*
+		Invalid texture coords so the shader knows what's up
+		*/
+		for (int j = 0; j < 2; j++) {
+			vboArray.push_back(-1);
+		}
+	}
+}
+
+int *HexMap::mapFromFile(const char *path) {
 	string mapString;
 
 	/*
-		Sets up your filepath for you, because I'm nice like that.
+	Sets up your filepath for you, because I'm nice like that.
 	*/
 	string filePath = "Maps\\";
 	filePath.append(path);
 	filePath.append(".mp");
 
 	/*
-		Opens your file for reading. Look up fstream if confused. Basically allows for simpler file handling.
+	Opens your file for reading. Look up fstream if confused. Basically allows for simpler file handling.
 	*/
 	ifstream file(filePath);
 
@@ -234,52 +273,72 @@ string HexMap::mapFromFile(const char *path) {
 		string line;
 		getline(file, line);	// No loop needed, all maps are one long line (at least right now).
 		mapString.append(line);
-		
+
 		file.close();
 
 	} else {
 		log("Failed to load file: %s\n", filePath.c_str());
-		return mapString;
+		return NULL;
 	}
 	/*
-		Ensure the first 3 chars are "map"
+	Ensure the first 3 chars are "map"
 	*/
 	if (mapString.compare(0, 3, "map")) {
 		log("Not a valid map: %s\n", filePath.c_str());
 		mapString.clear();
-		return mapString;
+		return NULL;
 	}
-	return mapString;
+
+	mapString.erase(0, 3);	// Remove "map"
+
+	vector<string> subStrings;
+	int delPos;
+
+	while (!mapString.empty()) {
+
+		delPos = mapString.find(",");
+		subStrings.push_back(mapString.substr(0, delPos));
+		mapString.erase(0, delPos + 1);
+
+	}
+
+	int *mapCode = new int[subStrings.size()];
+
+	for (unsigned int i = 0; i < subStrings.size(); i++) {
+		mapCode[i] = atoi(subStrings[i].c_str());
+	}
+
+	return mapCode;
 }
 
 bool HexMap::pointToTile(double mouseX, double mouseY, int &gridX, int &gridY) {
 
 	/*
-		Offsets
+	Offsets
 	*/
 	mouseX = mouseX - 152;
 	mouseY = mouseY - 28;
 
 	/*
-		Bounds check
+	Bounds check
 	*/
 	if (mouseX < 0 || mouseX > 740 || mouseY > 740) return false;
 
 	/*
-		Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
+	Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
 	*/
 	int rectX = (int)mouseX / 18;
 	int rectY = (int)(mouseY - ((rectX % 2) * 11)) / 22;
 
 	/*
-		Mouse position relative to the current box
+	Mouse position relative to the current box
 	*/
 	mouseX -= 18 * rectX;
 	mouseY -= 22 * rectY + ((rectX % 2) * 11);
 
 	/*
-		Inequality, test if we are in the main tile of this rectangle or the two smaller sections.
-		If we are, grid co ords are rect co ords, otherwise x is -1 and y is rect +1/0/-1
+	Inequality, test if we are in the main tile of this rectangle or the two smaller sections.
+	If we are, grid co ords are rect co ords, otherwise x is -1 and y is rect +1/0/-1
 	*/
 	if (mouseX > 12 * abs(0.5 - mouseY / 22)) {
 		gridX = rectX;
@@ -290,7 +349,7 @@ bool HexMap::pointToTile(double mouseX, double mouseY, int &gridX, int &gridY) {
 	}
 
 	/*
-		Final bounds test
+	Final bounds test
 	*/
 	if (gridX < 0 || gridX > 39 || gridY < 0 || gridY > 32) return false;
 

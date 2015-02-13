@@ -1,55 +1,60 @@
+#include <vector>
+#include <string>
 #include <GL\glew.h>
 #include <GLFW/glfw3.h>
-#include <string>
+#include "Territory.h"
 
 #ifndef __HEXMAP_H
 #define __HEXMAP_H
 
+class HexMap {
+
+	GLuint vaoMap, progMap;
 	/*
-		Currently only contains function to calculate the positions of a certain hex tiles vertices.
+		Default vertex array. These are adjusted for each hex based on its grid position.
 	*/
-	class HexTile {
-	public:
-		/*
-			Calculate vertex position. Also includes the colour of each vertex.
-			Usage:
-			HexTile.initTile(xPos, yPos, vertexArray, currentPositionInVertexArray, tileColourType);
-			It appends the tiles vertices to the end of the passed array.
-		*/
-		void initTile(int, int, GLfloat *, int, int);
-	};
+	static const GLfloat defTileVerts[];
 
 	/*
-		Currently contains functionality to generate the entire vbo of the hexmap and draw it.
-		Also allows user designed maps to be read from file.
+		The colour values for each tile. RGB.
 	*/
-	class HexMap {
-		/*
-			vaoCol - attribute array for the coloured tiles.
+	static const GLfloat cols[];
 
-			progCol - the program containing the various required shaders for the tiles.
-			progTex - shaders for black wireframe overlay texture
-		*/
-		GLuint vaoCol, vaoTex, progCol, progTex;
-		/*
-			Returns the string containing map data to interpret. Really needs reworking.
-			Usage: string map = mapFromFile("BeachMap");
-		*/
-		std::string mapFromFile(const char *);
-	public:
-		/*
-			Calculate all the vertices of the hexmap, set up the vao and link the program.
-		*/
-		HexMap();
-		/*
-			Just draws the map currently.
-		*/
-		void drawMap();
-		/*
-			Converts mouse point to x and y of tile in the map.
-			Return true if in the grid.
-		*/
-		static bool pointToTile(double, double, int &, int &);
-	};
+public:
 
+	bool initMap(Territory *);
+
+	void setupTerritories(int *, int, Territory *);
+
+	void setupVAO(std::vector<GLfloat>, std::vector<GLushort>);
+
+	void addOverlay(std::vector<GLfloat> &, std::vector<GLushort> &);
+
+	int getAllTiles(int *, std::vector<GLfloat> &, std::vector<GLushort> &);
+
+	/*
+	Just draws the map & grid currently.
+	*/
+	void drawMap();
+
+	/*
+	Calculate vertex position. Also includes the colour of each vertex.
+	Usage:
+	HexTile.initTile(xPos, yPos, col, vertsArray);
+	It appends the tiles vertices to the end of the passed array.
+	*/
+	static void calcTileVerts(int, int, int, std::vector<GLfloat> &);
+
+	/*
+	Returns the string containing map data to interpret. Really needs reworking.
+	Usage: string map = mapFromFile("BeachMap");
+	*/
+	static int *mapFromFile(const char *);
+
+	/*
+	Converts mouse point to x and y of tile in the map.
+	Return true if in the grid.
+	*/
+	static bool pointToTile(double, double, int &, int &);
+};
 #endif

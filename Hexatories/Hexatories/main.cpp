@@ -1,15 +1,17 @@
 #include <stdio.h>
+#include <string>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <SFML/Audio.hpp>
 #include <SFML/Audio/Sound.hpp>
 #include "Log.h"
 #include "Shaders.h"
+#include "Game.h"
 #include "HexMap.h"
 #include "Audio.h"
 
-//this is a test 5/3
 // (C) Group 16
+
 Audio gameMusic;
 Audio swordClang;
 
@@ -82,8 +84,7 @@ GLFWwindow* initWindow(void) {
 }
 
 int main(void) {
-	
-	gameMusic.playAudio("sound.wav");
+	//gameMusic.playAudio("sound.wav");
 	gameMusic.fadeInAudio(5);
 
 	restart_log();
@@ -114,11 +115,12 @@ int main(void) {
 
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	HexMap map;
-
-	double xValue = NULL;
-	double yValue = NULL;
+	Territory *territories = NULL;
+	Game game;
+	if (!game.initGame(territories)) {
+		log("Game init failed\n");
+		return -1;
+	}
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -129,7 +131,7 @@ int main(void) {
 
 		_update_fps_counter(window);
 
-		map.drawMap();
+		game.draw();
 		
 		// Swap front and back buffers 
 		glfwSwapBuffers(window);

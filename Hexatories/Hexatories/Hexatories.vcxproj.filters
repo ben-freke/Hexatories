@@ -42,13 +42,19 @@
     <ClCompile Include="Shaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HexMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Textures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Audio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Territory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HexMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -66,26 +72,17 @@
     <None Include="audio\libraries\sfml-system-d-2.dll">
       <Filter>Source Files\libs\SFML</Filter>
     </None>
-    <None Include="Shaders\mapColour_fs.glsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="Shaders\mapColour_vs.glsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="Shaders\mapTex_fs.glsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="Shaders\mapTex_vs.glsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
     <None Include="Maps\map.mp">
       <Filter>Resource Files\Maps</Filter>
     </None>
+    <None Include="Shaders\map_fs.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\map_vs.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HexMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -99,6 +96,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Territory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HexMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
