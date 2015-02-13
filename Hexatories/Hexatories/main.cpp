@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string>
+#include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <SFML/Audio.hpp>
@@ -9,11 +10,13 @@
 #include "Game.h"
 #include "HexMap.h"
 #include "Audio.h"
+#include "Actions.h"
 
 // (C) Group 16
 
 Audio gameMusic;
 Audio swordClang;
+Actions defaultActions;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 
@@ -84,8 +87,17 @@ GLFWwindow* initWindow(void) {
 }
 
 int main(void) {
-	//gameMusic.playAudio("sound.wav");
-	gameMusic.fadeInAudio(5);
+	gameMusic.playAudio("sound.wav");
+	gameMusic.fadeInAudio(0);
+	
+	Territory testTerritory1;
+	testTerritory1.setDefenseScore(100);
+	Territory testTerritory2;
+	testTerritory2.setAttackScore(100);
+
+	defaultActions.attack(testTerritory1, testTerritory2, 0);
+		
+
 
 	restart_log();
 

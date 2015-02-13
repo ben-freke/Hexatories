@@ -65,7 +65,6 @@ void HexMap::setupTerritories(int *mapCode, int mapPos, Territory *ter) {
 		for (int j = 0; j < tilesInTerr; j++) {
 
 			tileNum = mapCode[mapPos++];
-			
 			tiles.push_back({ tileNum / 33, tileNum % 33 });
 		}
 

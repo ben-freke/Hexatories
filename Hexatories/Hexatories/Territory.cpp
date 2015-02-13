@@ -37,3 +37,19 @@ void Territory::setupTiles(vector<tile_t> innerTiles) {
 		}
 	}
 }
+
+int Territory::getAttackScore(){
+	return troopsAttack;
+}
+
+void Territory::setAttackScore(int value){
+	troopsAttack = value;
+}
+
+int Territory::getDefenseScore(){
+	return troopsDefense;
+}
+
+void Territory::setDefenseScore(int value){
+	troopsDefense =  value;
+}
