@@ -1,4 +1,3 @@
-#include <vector>
 #include "Game.h"
 #include "Shaders.h"
 #include "Textures.h"
@@ -6,7 +5,7 @@
 
 using namespace std;
 
-bool Game::initGame(Territory *territories) {
+bool Game::initGame(vector<Territory> &territories) {
 
 	if (!map.initMap(territories))
 		return false;

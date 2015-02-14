@@ -24,14 +24,14 @@ class Territory {
 
 	std::vector<tile_t> tiles, border;
 	int size;
-	int populationNo, troopsAttack, troopsDefense, territoryID, owner = 0;
+	int populationNo, troopsAttack, troopsDefense, territoryID, owner;
 	bool farmBuilt, bankBuilt = false;
 
 	void setupTiles(std::vector<tile_t>);
 
 public:
 
-	void initTerritory(std::vector<tile_t>, int);
+	void initTerritory(std::vector<tile_t>, int, int);
 
 	int getAttackScore();
 
@@ -43,7 +43,7 @@ public:
 
 	void setupBorderTiles();
 
-	void getBorderVBO();
+	void getBorderVBO(std::vector<GLint> &, std::vector<GLushort> &);
 
 };
 #endif

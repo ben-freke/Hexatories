@@ -13,24 +13,26 @@ class HexMap {
 	/*
 		Default vertex array. These are adjusted for each hex based on its grid position.
 	*/
-	static const GLfloat defTileVerts[];
+	static const GLint defTileVerts[];
 
 	/*
 		The colour values for each tile. RGB.
 	*/
-	static const GLfloat cols[];
+	static const GLint cols[];
+
+	GLint uniforms[4];
 
 public:
 
-	bool initMap(Territory *);
+	bool initMap(std::vector<Territory> &);
 
-	void setupTerritories(int *, int, Territory *);
+	int setupTerritories(int *, int, std::vector<Territory> &);
 
-	void setupVAO(std::vector<GLfloat>, std::vector<GLushort>);
+	void setupVAO(std::vector<GLint>, std::vector<GLushort>);
 
-	void addOverlay(std::vector<GLfloat> &, std::vector<GLushort> &);
+	void addOverlay(std::vector<GLint> &, std::vector<GLushort> &);
 
-	int getAllTiles(int *, std::vector<GLfloat> &, std::vector<GLushort> &);
+	int getAllTiles(int *, std::vector<GLint> &, std::vector<GLushort> &);
 
 	/*
 	Just draws the map & grid currently.
@@ -43,7 +45,7 @@ public:
 	HexTile.initTile(xPos, yPos, col, vertsArray);
 	It appends the tiles vertices to the end of the passed array.
 	*/
-	static void calcTileVerts(int, int, int, std::vector<GLfloat> &);
+	static void calcTileVerts(int, int, int, std::vector<GLint> &);
 
 	/*
 	Returns the string containing map data to interpret. Really needs reworking.

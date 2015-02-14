@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string>
+#include <vector>
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -13,6 +14,7 @@
 #include "Actions.h"
 
 // (C) Group 16
+using namespace std;
 
 Audio gameMusic;
 Audio swordClang;
@@ -87,7 +89,7 @@ GLFWwindow* initWindow(void) {
 }
 
 int main(void) {
-	gameMusic.playAudio("sound.wav");
+	/*gameMusic.playAudio("sound.wav");
 	gameMusic.fadeInAudio(0);
 	
 	Territory testTerritory1;
@@ -96,7 +98,7 @@ int main(void) {
 	testTerritory2.setAttackScore(100);
 
 	defaultActions.attack(testTerritory1, testTerritory2, 0);
-		
+		*/
 
 
 	restart_log();
@@ -127,7 +129,7 @@ int main(void) {
 
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-	Territory *territories = NULL;
+	vector<Territory> territories;
 	Game game;
 	if (!game.initGame(territories)) {
 		log("Game init failed\n");

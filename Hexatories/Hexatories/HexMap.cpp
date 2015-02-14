@@ -6,25 +6,7 @@
 
 using namespace std;
 
-#pragma region defaultVertsCols
-
-const GLfloat HexMap::defTileVerts[] = {
-	152, 729,	//left
-	158, 718,	//bottom left
-	170, 718,	//bottom right
-	176, 729,	//right
-	170, 740,	//top right
-	158, 740,	//top left
-};
-
-const GLfloat HexMap::cols[] = {
-	182, 149, 62,	// sand
-	62, 97, 182,	// water
-	64, 168, 66,	// grass
-};
-#pragma endregion
-
-bool HexMap::initMap(Territory *ter) {
+bool HexMap::initMap(vector<Territory> &ter) {
 
 	int *mapCode = HexMap::mapFromFile("map");
 	if (mapCode == NULL) {
@@ -32,33 +14,39 @@ bool HexMap::initMap(Territory *ter) {
 		return false;
 	}
 
-	vector<GLfloat> tileVerts;
-	vector<GLushort>indices;
+	vector<GLint> tileVerts;
+	vector<GLushort> indices;
 
 	int mapPos = getAllTiles(mapCode, tileVerts, indices);
 	addOverlay(tileVerts, indices);
 
+	int terrCount = setupTerritories(mapCode, mapPos, ter);
+	
+	for (int i = 0; i < terrCount; i++) {
+		ter[i].getBorderVBO(tileVerts, indices);
+	}
+
 	setupVAO(tileVerts, indices);
 
-	setupTerritories(mapCode, mapPos, ter);
 	return true;
 }
 
-void HexMap::setupTerritories(int *mapCode, int mapPos, Territory *ter) {
+int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 	/*
 	Gets the total amount of territories and requests that much space from memory.
 	*/
 	int terrCount = mapCode[mapPos++];
-	ter = new Territory[terrCount];
 
 	vector<tile_t> tiles;
 	int tileNum;
 	int tilesInTerr;
-
+	Territory territory;
 	/*
 	Loops through each territory, finds how many tiles in each and loops through each of those. Adds all tiles to an array and then passes that to the territory init.
 	*/
 	for (int i = 0; i < terrCount; i++) {
+
+		ter.push_back(territory);
 
 		tilesInTerr = mapCode[mapPos++];
 
@@ -67,20 +55,20 @@ void HexMap::setupTerritories(int *mapCode, int mapPos, Territory *ter) {
 			tileNum = mapCode[mapPos++];
 			tiles.push_back({ tileNum / 33, tileNum % 33 });
 		}
-
-		ter[i].initTerritory(tiles, tilesInTerr);
+		
+		ter[i].initTerritory(tiles, tilesInTerr, 0);
 	}
 
 	delete[] mapCode;
-#pragma endregion
+	return terrCount;
 }
 
-void HexMap::setupVAO(vector<GLfloat> verts, vector<GLushort> indices) {
+void HexMap::setupVAO(vector<GLint> verts, vector<GLushort> indices) {
 
 	/*
 	Vertex shader, fragment shader
 	*/
-	GLuint vs, fs, vboMap, eboMap, tboMap;
+	GLuint vs, fs, vboMap, eboMap;
 
 	/*
 	Sets up all the vertex attribute stuff. In order of code blocks:
@@ -100,46 +88,68 @@ void HexMap::setupVAO(vector<GLfloat> verts, vector<GLushort> indices) {
 
 	glGenBuffers(1, &vboMap);
 	glBindBuffer(GL_ARRAY_BUFFER, vboMap);
-	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLint), verts.data(), GL_STATIC_DRAW);
 
 	glGenBuffers(1, &eboMap);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboMap);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
 
+	GLuint tboWhite, tboBlue, tboRed, tboMap;
+
+	loadBMP("whiteBorder.png", tboWhite);
+	loadBMP("blueBorder.png", tboBlue);
+	loadBMP("redBorder.png", tboRed);
 	loadBMP("wireframe.png", tboMap);
+
 	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tboWhite);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, tboBlue);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, tboRed);
+
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, tboMap);
+
+	glActiveTexture(GL_TEXTURE0);
 
 	vs = compileVShader("map_vs");
 	fs = compileFShader("map_fs");
 	progMap = createProgram(vs, fs);
+	
+	uniforms[0] = glGetUniformLocation(progMap, "white_tex");
+	uniforms[1] = glGetUniformLocation(progMap, "blue_tex");
+	uniforms[2] = glGetUniformLocation(progMap, "red_tex");
+	uniforms[3] = glGetUniformLocation(progMap, "map_tex");
 
 	GLint posAttrib = glGetAttribLocation(progMap, "position");
 	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(posAttrib, 2, GL_INT, GL_FALSE, 8 * sizeof(GLint), 0);
 
 	GLint colAttrib = glGetAttribLocation(progMap, "colour");
 	glEnableVertexAttribArray(colAttrib);
-	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+	glVertexAttribPointer(colAttrib, 3, GL_INT, GL_FALSE, 8 * sizeof(GLint), (void*)(2 * sizeof(GLint)));
 
 	GLint texAttrib = glGetAttribLocation(progMap, "tex_coord");
 	glEnableVertexAttribArray(texAttrib);
-	glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
+	glVertexAttribPointer(texAttrib, 3, GL_INT, GL_FALSE, 8 * sizeof(GLint), (void*)(5 * sizeof(GLint)));
 
 	glBindVertexArray(0);
 }
 
-void HexMap::addOverlay(vector<GLfloat> &verts, vector<GLushort> &indices) {
+void HexMap::addOverlay(vector<GLint> &verts, vector<GLushort> &indices) {
 
 	/*
 	The vertices of the corners of the map (for the wireframe overlay).
 	Beneath is the indices for the draw order of the triangles that make up this rectangle.
 	*/
-	GLfloat vertsTex[] = {
-		152, 740, 0, 0, 0, 0, 0,
-		878, 740, 0, 0, 0, 1, 0,
-		878, 0, 0, 0, 0, 1, 1,
-		152, 0, 0, 0, 0, 0, 1,
+	GLint vertsTex[] = {
+		152, 740, 0, 0, 0, 0, 0, 3, 
+		878, 740, 0, 0, 0, 1, 0, 3,
+		878, 0, 0, 0, 0, 1, 1, 3,
+		152, 0, 0, 0, 0, 0, 1, 3,
 	};
 
 	GLushort rectIndices[] = {
@@ -151,16 +161,16 @@ void HexMap::addOverlay(vector<GLfloat> &verts, vector<GLushort> &indices) {
 	Adds these vertices to the end of the vbo and the indices to the ebo.
 	*/
 	for (int i = 0; i < 6; i++) {
-		int vertCount = verts.size() / 7;
+		int vertCount = verts.size() / 8;
 		indices.push_back(vertCount + rectIndices[i]);
 	}
 
-	for (int i = 0; i < 28; i++) {
+	for (int i = 0; i < 32; i++) {
 		verts.push_back(vertsTex[i]);
 	}
 }
 
-int HexMap::getAllTiles(int *mapCode, vector<GLfloat> &verts, vector<GLushort> &indices) {
+int HexMap::getAllTiles(int *mapCode, vector<GLint> &verts, vector<GLushort> &indices) {
 #pragma region vars
 	/*
 	currTile - the current tile not in columns/rows. For instance the 3rd tile in the 2nd column would be (1 * 33 + 3). 41 being the column height.
@@ -210,12 +220,34 @@ void HexMap::drawMap() {
 	glBindVertexArray(vaoMap);
 
 	glUseProgram(progMap);
-	glDrawElements(GL_TRIANGLES, 15846, GL_UNSIGNED_SHORT, 0);
+
+	for (int i = 0; i < 4; i++)
+		glUniform1i(uniforms[i], i);
+
+	glDrawElements(GL_TRIANGLES, 15906, GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(0);
 }
 
-void HexMap::calcTileVerts(int x, int y, int col, vector<GLfloat> &vboArray) {
+#pragma region defaultVertsCols
+
+const GLint HexMap::defTileVerts[] = {
+	152, 729,	//left
+	158, 718,	//bottom left
+	170, 718,	//bottom right
+	176, 729,	//right
+	170, 740,	//top right
+	158, 740,	//top left
+};
+
+const GLint HexMap::cols[] = {
+	182, 149, 62,	// sand
+	62, 97, 182,	// water
+	64, 168, 66,	// grass
+};
+#pragma endregion
+
+void HexMap::calcTileVerts(int x, int y, int col, vector<GLint> &vboArray) {
 
 	/*
 	xoff - either 1 or 0 depending on your x value. Needed as every other column is lower down (look at the map if confused).
@@ -245,7 +277,7 @@ void HexMap::calcTileVerts(int x, int y, int col, vector<GLfloat> &vboArray) {
 		/*
 		Invalid texture coords so the shader knows what's up
 		*/
-		for (int j = 0; j < 2; j++) {
+		for (int j = 0; j < 3; j++) {
 			vboArray.push_back(-1);
 		}
 	}
