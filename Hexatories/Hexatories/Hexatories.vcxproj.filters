@@ -131,6 +131,15 @@
     <Image Include="wireframe.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
+    <Image Include="blueBorder.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="redBorder.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="whiteBorder.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Debug\notes.txt">
