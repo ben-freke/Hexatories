@@ -6,7 +6,7 @@
 #define __TERRITORY_H
 
 struct tile_t {
-	int x, y;
+	int x, y, terrNo;
 };
 
 struct findTile {
@@ -20,24 +20,23 @@ struct findTile {
 	}
 };
 
+bool operator==(const tile_t &tile1, const tile_t &tile2);
+
 class Territory {
 
 	std::vector<tile_t> tiles, border;
-	int size;
-	int populationNo, troopsAttack, troopsDefense, territoryID;
+
+	int populationNo, troopsAttack, troopsDefense, size, owner, vboPos, colour;
 	bool farmBuilt, bankBuilt = false;
+
 	void setupTiles(std::vector<tile_t>);
-
-private:
-
-
 
 public:
 
-	int owner;
-
 	void initTerritory(std::vector<tile_t>, int, int);
 	
+	void setColour(int);
+
 	int getOwner();
 
 	void setOwner(int newOwner);
@@ -57,6 +56,8 @@ public:
 	void setupBorderTiles();
 
 	void getBorderVBO(std::vector<GLint> &, std::vector<GLushort> &);
+
+	void updateBorderVBO(std::vector<GLint> &);
 
 };
 #endif

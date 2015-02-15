@@ -1,4 +1,5 @@
 #include <fstream>
+#include <algorithm>
 #include "HexMap.h"
 #include "Log.h"
 #include "Shaders.h"
@@ -14,7 +15,6 @@ bool HexMap::initMap(vector<Territory> &ter) {
 		return false;
 	}
 
-	vector<GLint> tileVerts;
 	vector<GLushort> indices;
 
 	int mapPos = getAllTiles(mapCode, tileVerts, indices);
@@ -31,6 +31,18 @@ bool HexMap::initMap(vector<Territory> &ter) {
 	return true;
 }
 
+void HexMap::updateVAO() {
+	glBindVertexArray(vaoMap);
+	glBindBuffer(GL_ARRAY_BUFFER, vboMap);
+	glBufferData(GL_ARRAY_BUFFER, tileVerts.size() * sizeof(GLint), tileVerts.data(), GL_STATIC_DRAW);
+	glBindVertexArray(0);
+}
+
+void HexMap::updateVBO(Territory ter) {
+	ter.updateBorderVBO(tileVerts);
+	updateVAO();
+}
+
 int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 	/*
 	Gets the total amount of territories and requests that much space from memory.
@@ -41,6 +53,8 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 	int tileNum;
 	int tilesInTerr;
 	Territory territory;
+	tile_t currTile;
+
 	/*
 	Loops through each territory, finds how many tiles in each and loops through each of those. Adds all tiles to an array and then passes that to the territory init.
 	*/
@@ -53,7 +67,9 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 		for (int j = 0; j < tilesInTerr; j++) {
 
 			tileNum = mapCode[mapPos++];
-			tiles.push_back({ tileNum / 33, tileNum % 33 });
+			currTile = { tileNum / 33, tileNum % 33, i };
+			tiles.push_back(currTile);
+			allTiles.push_back(currTile);
 		}
 		
 		ter[i].initTerritory(tiles, tilesInTerr, owner);
@@ -69,7 +85,7 @@ void HexMap::setupVAO(vector<GLint> verts, vector<GLushort> indices) {
 	/*
 	Vertex shader, fragment shader
 	*/
-	GLuint vs, fs, vboMap, eboMap;
+	GLuint vs, fs, eboMap;
 
 	/*
 	Sets up all the vertex attribute stuff. In order of code blocks:
@@ -139,10 +155,10 @@ void HexMap::addOverlay(vector<GLint> &verts, vector<GLushort> &indices) {
 	Beneath is the indices for the draw order of the triangles that make up this rectangle.
 	*/
 	GLint vertsTex[] = {
-		152, 740, 0, 0, 0, 0, 0, 3, 
-		878, 740, 0, 0, 0, 1, 0, 3,
-		878, 0, 0, 0, 0, 1, 1, 3,
-		152, 0, 0, 0, 0, 0, 1, 3,
+		152, 740, 0, 0, 0, 0, 0, 4, 
+		878, 740, 0, 0, 0, 1, 0, 4,
+		878, 0, 0, 0, 0, 1, 1, 4,
+		152, 0, 0, 0, 0, 0, 1, 4,
 	};
 
 	GLushort rectIndices[] = {
@@ -235,7 +251,7 @@ const GLint HexMap::defTileVerts[] = {
 
 const GLint HexMap::cols[] = {
 	182, 149, 62,	// sand
-	62, 97, 182,	// water
+	23, 49, 122,	// water
 	64, 168, 66,	// grass
 };
 #pragma endregion
@@ -334,7 +350,7 @@ int *HexMap::mapFromFile(const char *path) {
 	return mapCode;
 }
 
-bool HexMap::pointToTile(double mouseX, double mouseY, int &gridX, int &gridY) {
+tile_t HexMap::pointToTile(double mouseX, double mouseY) {
 
 	/*
 	Offsets
@@ -342,10 +358,13 @@ bool HexMap::pointToTile(double mouseX, double mouseY, int &gridX, int &gridY) {
 	mouseX = mouseX - 152;
 	mouseY = mouseY - 28;
 
+	int gridX, gridY;
+
+	tile_t nullTile = { -1, -1, -1 };
 	/*
 	Bounds check
 	*/
-	if (mouseX < 0 || mouseX > 740 || mouseY > 740) return false;
+	if (mouseX < 0 || mouseX > 740 || mouseY > 740) return nullTile;
 
 	/*
 	Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
@@ -374,8 +393,7 @@ bool HexMap::pointToTile(double mouseX, double mouseY, int &gridX, int &gridY) {
 	/*
 	Final bounds test
 	*/
-	if (gridX < 0 || gridX > 39 || gridY < 0 || gridY > 32) return false;
+	if (gridX < 0 || gridX > 39 || gridY < 0 || gridY > 32) return nullTile;
 
-	std::printf("x: %d, y: %d\n", gridX, gridY);
-	return true;
+	return (*find_if(allTiles.begin(), allTiles.end(), findTile(gridX, gridY)));
 }

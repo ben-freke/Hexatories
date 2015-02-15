@@ -9,6 +9,7 @@ void Territory::initTerritory(vector<tile_t> innerTiles, int tileCount, int own)
 
 	size = tileCount;
 	owner = own;
+	colour = own;
 	setupTiles(innerTiles);
 }
 
@@ -39,13 +40,21 @@ void Territory::setupTiles(vector<tile_t> innerTiles) {
 	}
 }
 
+void Territory::setColour(int newCol) {
+	if (newCol != -1) {
+		colour = newCol;
+	} else {
+		colour = owner;
+	}
+}
+
 void Territory::getBorderVBO(vector<GLint> &vertices, vector<GLushort> &indices) {
 
 	array<GLint, 32> defVerts = {
-		152, 740, 0, 0, 0, 0, 0, owner,
-		878, 740, 0, 0, 0, 1, 0, owner,
-		878, 0, 0, 0, 0, 1, 1, owner,
-		152, 0, 0, 0, 0, 0, 1, owner,
+		152, 740, 0, 0, 0, 0, 0, colour,
+		878, 740, 0, 0, 0, 1, 0, colour,
+		878, 0, 0, 0, 0, 1, 1, colour,
+		152, 0, 0, 0, 0, 0, 1, colour,
 	};
 
 	GLushort rectIndices[] = {
@@ -53,6 +62,7 @@ void Territory::getBorderVBO(vector<GLint> &vertices, vector<GLushort> &indices)
 		2, 3, 0,
 	};
 
+	vboPos = vertices.size() + 7;
 	int baseIndex = (vertices.size() / 8);
 
 	int x, y, xoff;
@@ -86,6 +96,13 @@ void Territory::getBorderVBO(vector<GLint> &vertices, vector<GLushort> &indices)
 
 }
 
+void Territory::updateBorderVBO(vector<GLint> &verts) {
+	for (unsigned int i = 0; i < border.size(); i++) {
+		for (int j = 0; j < 4; j++)
+			verts[vboPos + (32 * i) + (8 * j)] = colour;
+	}
+}
+
 int Territory::getOwner(){
 	return owner;
 }
@@ -116,4 +133,8 @@ void Territory::setDefenseScore(int value){
 
 void Territory::resetDefense(){
 	troopsDefense = 1;
+}
+
+bool operator==(const tile_t &tile1, const tile_t &tile2) {
+	return ((tile1.x == tile2.x) && (tile1.y == tile2.y));
 }
