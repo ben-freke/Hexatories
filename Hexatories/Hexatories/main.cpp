@@ -92,8 +92,7 @@ GLFWwindow* initWindow(void) {
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	Territory* territory1 = &testTerritory1;
-	Territory* territory2 = &testTerritory2;
+
 
 	if (key == GLFW_KEY_E && action == GLFW_PRESS){
 		defaultActions.attack(testTerritory1, testTerritory2);
