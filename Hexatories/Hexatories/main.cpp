@@ -122,7 +122,7 @@ int main(void) {
 	testTerritory2.setAttackScore(100);
 	testTerritory2.setOwner(2);
 
-
+	srand(time(NULL));
 
 
 	restart_log();

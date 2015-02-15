@@ -25,7 +25,6 @@ bool Actions::attack(Territory &territoryX, Territory &territoryY){
 				//Check the user actually has someone to attack with.
 				attackFlag = true;
 				int difference = territoryY.getAttackScore() - territoryX.getDefenseScore();
-				std::srand(std::time(0)); // use current time as seed for random generator
 				int randomFactors = std::rand() % 40 - 20;
 				difference = difference + randomFactors;
 				actionMusic.playAudio("swords.wav");
@@ -81,7 +80,7 @@ bool Actions::attack(Territory &territoryX, Territory &territoryY){
 	else{
 		std::cout << "You have already attacked a territory in this turn.\n";
 	}
-
+	return false;
 	
 }
 
