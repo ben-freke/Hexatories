@@ -9,10 +9,9 @@ class Actions {
 	bool attackFlag, moveFlag;
 public:
 	
-	void attackTerritory(Territory territoryX, Territory territoryY, int owner);
 	bool testClearPath(Territory territoryX, Territory territoryY);
 	void increaseTurn();
-	bool attack(Territory territoryX, Territory territoryY, int owner);
+	bool attack(Territory &territoryX, Territory &territoryY);
 };
 
 #endif
