@@ -6,7 +6,7 @@
 #include "Audio.h"
 class Actions {
 	int turnNo;
-	static bool attackFlag, moveFlag;
+	bool attackFlag, moveFlag;
 public:
 	
 	bool testClearPath(Territory territoryX, Territory territoryY);

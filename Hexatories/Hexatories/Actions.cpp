@@ -24,7 +24,7 @@ bool Actions::attack(Territory &territoryX, Territory &territoryY){
 			if (territoryY.getAttackScore() > 0){
 				//Check the user actually has someone to attack with.
 				attackFlag = true;
-				float difference = territoryY.getAttackScore() - territoryX.getDefenseScore();
+				int difference = territoryY.getAttackScore() - territoryX.getDefenseScore();
 				std::srand(std::time(0)); // use current time as seed for random generator
 				int randomFactors = std::rand() % 40 - 20;
 				difference = difference + randomFactors;
