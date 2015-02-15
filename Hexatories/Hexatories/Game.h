@@ -14,6 +14,7 @@
 class Game {
 
 	HexMap map;
+	int score, gold;
 
 public:
 	/*

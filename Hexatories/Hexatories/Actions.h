@@ -5,8 +5,10 @@
 #include <chrono> 
 #include "Audio.h"
 class Actions {
-public:
 	int turnNo;
+	bool attackFlag, moveFlag;
+public:
+	
 	void attackTerritory(Territory territoryX, Territory territoryY, int owner);
 	bool testClearPath(Territory territoryX, Territory territoryY);
 	void increaseTurn();

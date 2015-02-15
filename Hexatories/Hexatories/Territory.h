@@ -37,9 +37,13 @@ public:
 
 	void setAttackScore(int value);
 
+	void resetAttack();
+
 	int getDefenseScore();
 
 	void setDefenseScore(int value);
+
+	void resetDefense();
 
 	void setupBorderTiles();
 

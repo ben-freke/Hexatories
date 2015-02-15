@@ -91,7 +91,11 @@ int Territory::getAttackScore(){
 }
 
 void Territory::setAttackScore(int value){
-	troopsAttack = value;
+	troopsAttack = troopsAttack + value;
+}
+
+void Territory::resetAttack(){
+	troopsAttack = 0;
 }
 
 int Territory::getDefenseScore(){
@@ -99,5 +103,9 @@ int Territory::getDefenseScore(){
 }
 
 void Territory::setDefenseScore(int value){
-	troopsDefense =  value;
+	troopsDefense = troopsDefense + value;
+}
+
+void Territory::resetDefense(){
+	troopsDefense = 1;
 }
