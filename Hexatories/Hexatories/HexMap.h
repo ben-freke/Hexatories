@@ -9,11 +9,11 @@
 
 class HexMap {
 
-	GLuint vaoMap, progMap;
 	/*
 		Default vertex array. These are adjusted for each hex based on its grid position.
 	*/
 	static const GLint defTileVerts[];
+	std::vector<GLint> tileVerts;
 
 	/*
 		The colour values for each tile. RGB.
@@ -22,7 +22,12 @@ class HexMap {
 
 	GLint uniforms[2];
 
+	GLuint vaoMap, vboMap, progMap;
 	unsigned int numIndices;
+
+	std::vector<tile_t> allTiles;
+
+	void updateVAO();
 
 public:
 
@@ -59,6 +64,8 @@ public:
 	Converts mouse point to x and y of tile in the map.
 	Return true if in the grid.
 	*/
-	static bool pointToTile(double, double, int &, int &);
+	tile_t pointToTile(double, double);
+
+	void updateVBO(Territory);
 };
 #endif

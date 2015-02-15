@@ -15,12 +15,18 @@ class Game {
 
 	HexMap map;
 	int score, gold;
+	std::vector<Territory> territories;
 
 public:
 	/*
 		Initialises the map
 	*/
-	bool initGame(std::vector<Territory> &);
+	bool initGame();
+
+	/*
+		Highlight territory
+	*/
+	void highlightTerritory(double, double);
 
 	/*
 		Batch draw function

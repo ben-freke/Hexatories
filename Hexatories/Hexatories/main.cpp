@@ -22,24 +22,36 @@ Actions defaultActions;
 static Territory testTerritory1;
 static Territory testTerritory2;
 
+Game game;
+
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 
-	double xValue = NULL;
-	double yValue = NULL;
+}
 
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		
-		glfwGetCursorPos(window, &xValue, &yValue);
+void curser_pos_callback(GLFWwindow *window, double x, double y) {
+	
+	game.highlightTerritory(x, y);
+}
 
-		log("MouseX: %f, MouseY: %f\n", xValue, yValue);
-		
-		int gridX, gridY;
-		HexMap::pointToTile(xValue, yValue, gridX, gridY);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
-		if (gridX == 17 && gridY == 16) {
-			swordClang.playAudio("swords.wav");
-		}
+
+	if (key == GLFW_KEY_E && action == GLFW_PRESS) {
+		defaultActions.attack(testTerritory1, testTerritory2);
+
+
 	}
+	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+		defaultActions.attack(testTerritory2, testTerritory1);
+
+
+	}
+
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+		defaultActions.increaseTurn();
+
+	}
+
 }
 
 void _update_fps_counter(GLFWwindow* window) {
@@ -90,31 +102,9 @@ GLFWwindow* initWindow(void) {
 	return window;
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-
-
-	if (key == GLFW_KEY_E && action == GLFW_PRESS){
-		defaultActions.attack(testTerritory1, testTerritory2);
-
-
-	}
-	if (key == GLFW_KEY_W && action == GLFW_PRESS){
-		defaultActions.attack(testTerritory2, testTerritory1);
-
-
-	}
-
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
-		defaultActions.increaseTurn();
-
-	}
-		
-}
-
 int main(void) {
 
-	gameMusic.playAudio("sound.wav");
+	/*gameMusic.playAudio("sound.wav");
 	gameMusic.fadeInAudio(0);
 	
 	testTerritory1.setDefenseScore(100);
@@ -122,7 +112,7 @@ int main(void) {
 	testTerritory2.setAttackScore(100);
 	testTerritory2.setOwner(2);
 
-	srand(time(NULL));
+	srand(time(NULL));*/
 
 
 	restart_log();
@@ -152,11 +142,10 @@ int main(void) {
 	}
 
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetCursorPosCallback(window, curser_pos_callback);
 	glfwSetKeyCallback(window, key_callback);
 
-	vector<Territory> territories;
-	Game game;
-	if (!game.initGame(territories)) {
+	if (!game.initGame()) {
 		log("Game init failed\n");
 		return -1;
 	}
