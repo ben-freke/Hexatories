@@ -46,9 +46,7 @@
     <Library Include="lib\SOIL.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="blueBorder.png" />
-    <Image Include="redBorder.png" />
-    <Image Include="whiteBorder.png" />
+    <Image Include="tileBorders.png" />
     <Image Include="wireframe.png" />
   </ItemGroup>
   <ItemGroup>

@@ -47,7 +47,7 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 	for (int i = 0; i < terrCount; i++) {
 
 		ter.push_back(territory);
-
+		int owner = mapCode[mapPos++];
 		tilesInTerr = mapCode[mapPos++];
 
 		for (int j = 0; j < tilesInTerr; j++) {
@@ -56,7 +56,8 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 			tiles.push_back({ tileNum / 33, tileNum % 33 });
 		}
 		
-		ter[i].initTerritory(tiles, tilesInTerr, 0);
+		ter[i].initTerritory(tiles, tilesInTerr, owner);
+		tiles.clear();
 	}
 
 	delete[] mapCode;
@@ -94,23 +95,17 @@ void HexMap::setupVAO(vector<GLint> verts, vector<GLushort> indices) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboMap);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
 
-	GLuint tboWhite, tboBlue, tboRed, tboMap;
+	numIndices = indices.size();
 
-	loadBMP("whiteBorder.png", tboWhite);
-	loadBMP("blueBorder.png", tboBlue);
-	loadBMP("redBorder.png", tboRed);
+	GLuint tboBorder, tboMap;
+
+	loadBMP("tileBorders.png", tboBorder);
 	loadBMP("wireframe.png", tboMap);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tboWhite);
+	glBindTexture(GL_TEXTURE_2D, tboBorder);
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, tboBlue);
-
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, tboRed);
-
-	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, tboMap);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -119,10 +114,8 @@ void HexMap::setupVAO(vector<GLint> verts, vector<GLushort> indices) {
 	fs = compileFShader("map_fs");
 	progMap = createProgram(vs, fs);
 	
-	uniforms[0] = glGetUniformLocation(progMap, "white_tex");
-	uniforms[1] = glGetUniformLocation(progMap, "blue_tex");
-	uniforms[2] = glGetUniformLocation(progMap, "red_tex");
-	uniforms[3] = glGetUniformLocation(progMap, "map_tex");
+	uniforms[0] = glGetUniformLocation(progMap, "border_tex");
+	uniforms[1] = glGetUniformLocation(progMap, "map_tex");
 
 	GLint posAttrib = glGetAttribLocation(progMap, "position");
 	glEnableVertexAttribArray(posAttrib);
@@ -221,10 +214,10 @@ void HexMap::drawMap() {
 
 	glUseProgram(progMap);
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 2; i++)
 		glUniform1i(uniforms[i], i);
 
-	glDrawElements(GL_TRIANGLES, 15906, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(0);
 }

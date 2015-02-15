@@ -131,13 +131,7 @@
     <Image Include="wireframe.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="blueBorder.png">
-      <Filter>Resource Files\Textures</Filter>
-    </Image>
-    <Image Include="redBorder.png">
-      <Filter>Resource Files\Textures</Filter>
-    </Image>
-    <Image Include="whiteBorder.png">
+    <Image Include="tileBorders.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
   </ItemGroup>

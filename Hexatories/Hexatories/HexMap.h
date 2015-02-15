@@ -20,7 +20,9 @@ class HexMap {
 	*/
 	static const GLint cols[];
 
-	GLint uniforms[4];
+	GLint uniforms[2];
+
+	unsigned int numIndices;
 
 public:
 
