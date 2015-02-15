@@ -86,12 +86,24 @@ void Territory::getBorderVBO(vector<GLint> &vertices, vector<GLushort> &indices)
 
 }
 
+int Territory::getOwner(){
+	return owner;
+}
+
+void Territory::setOwner(int newOwner){
+	owner = newOwner;
+}
+
 int Territory::getAttackScore(){
 	return troopsAttack;
 }
 
 void Territory::setAttackScore(int value){
-	troopsAttack = value;
+	troopsAttack = troopsAttack + value;
+}
+
+void Territory::resetAttack(){
+	troopsAttack = 0;
 }
 
 int Territory::getDefenseScore(){
@@ -99,5 +111,9 @@ int Territory::getDefenseScore(){
 }
 
 void Territory::setDefenseScore(int value){
-	troopsDefense =  value;
+	troopsDefense = troopsDefense + value;
+}
+
+void Territory::resetDefense(){
+	troopsDefense = 1;
 }

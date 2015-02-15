@@ -24,22 +24,35 @@ class Territory {
 
 	std::vector<tile_t> tiles, border;
 	int size;
-	int populationNo, troopsAttack, troopsDefense, territoryID, owner;
+	int populationNo, troopsAttack, troopsDefense, territoryID;
 	bool farmBuilt, bankBuilt = false;
-
 	void setupTiles(std::vector<tile_t>);
+
+private:
+
+
 
 public:
 
+	int owner;
+
 	void initTerritory(std::vector<tile_t>, int, int);
+	
+	int getOwner();
+
+	void setOwner(int newOwner);
 
 	int getAttackScore();
 
 	void setAttackScore(int value);
 
+	void resetAttack();
+
 	int getDefenseScore();
 
 	void setDefenseScore(int value);
+
+	void resetDefense();
 
 	void setupBorderTiles();
 

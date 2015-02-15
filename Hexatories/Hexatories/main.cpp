@@ -19,6 +19,8 @@ using namespace std;
 Audio gameMusic;
 Audio swordClang;
 Actions defaultActions;
+static Territory testTerritory1;
+static Territory testTerritory2;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 
@@ -88,17 +90,39 @@ GLFWwindow* initWindow(void) {
 	return window;
 }
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+
+
+	if (key == GLFW_KEY_E && action == GLFW_PRESS){
+		defaultActions.attack(testTerritory1, testTerritory2);
+
+
+	}
+	if (key == GLFW_KEY_W && action == GLFW_PRESS){
+		defaultActions.attack(testTerritory2, testTerritory1);
+
+
+	}
+
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
+		defaultActions.increaseTurn();
+
+	}
+		
+}
+
 int main(void) {
-	/*gameMusic.playAudio("sound.wav");
+
+	gameMusic.playAudio("sound.wav");
 	gameMusic.fadeInAudio(0);
 	
-	Territory testTerritory1;
 	testTerritory1.setDefenseScore(100);
-	Territory testTerritory2;
+	testTerritory1.setOwner(1);
 	testTerritory2.setAttackScore(100);
+	testTerritory2.setOwner(2);
 
-	defaultActions.attack(testTerritory1, testTerritory2, 0);
-		*/
+
 
 
 	restart_log();
@@ -128,6 +152,7 @@ int main(void) {
 	}
 
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetKeyCallback(window, key_callback);
 
 	vector<Territory> territories;
 	Game game;
