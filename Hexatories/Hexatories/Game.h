@@ -11,6 +11,9 @@
 	Currently contains functionality to generate the entire vbo of the hexmap and draw it.
 	Also allows user designed maps to be read from file.
 */
+
+
+
 class Game {
 
 	int score, gold;
@@ -38,6 +41,12 @@ public:
 		Batch draw function
 	*/
 	void draw();
+
+	/*
+		Moves trops from one territory to another
+	*/
+
+	void sendTroops(Territory &receivingTerr, Territory &sendingTerr, int troopType, int noTroops);
 
 };
 

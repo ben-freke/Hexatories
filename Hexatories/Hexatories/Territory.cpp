@@ -6,7 +6,6 @@
 using namespace std;
 
 void Territory::initTerritory(vector<tile_t> innerTiles, int tileCount, int own) {
-
 	size = tileCount;
 	owner = own;
 	colour = own;
@@ -111,29 +110,63 @@ void Territory::setOwner(int newOwner){
 	owner = newOwner;
 }
 
-int Territory::getAttackScore(){
-	return troopsAttack;
+/*
+	Attack and Defence Functions
+*/
+
+int Territory::getNoAttackers(){
+	return attackers.size();
 }
 
-void Territory::setAttackScore(int value){
-	troopsAttack = troopsAttack + value;
+int Territory::getNoDefenders(){
+	return defenders.size();
 }
 
-void Territory::resetAttack(){
-	troopsAttack = 0;
+void Territory::addAttacker(){
+	Attacker attacker;
+	attackers.push_back(attacker);
 }
 
-int Territory::getDefenseScore(){
-	return troopsDefense;
+/*
+	TODO: Implement addDefender()
+*/
+
+void Territory::destroyAttacker(int i){
+	attackers.erase(attackers.begin()+i);
 }
 
-void Territory::setDefenseScore(int value){
-	troopsDefense = troopsDefense + value;
+void Territory::destroyDefender(int i){
+	defenders.erase(defenders.begin() + i);
 }
 
-void Territory::resetDefense(){
-	troopsDefense = 1;
+void Territory::changeAttacker(int id, bool state){
+	attackers[id].moveFlag = state;
 }
+
+/*
+	TODO: Implement changeDefender()
+*/
+
+void Territory::sendAttacker(Territory &targetTerr, int noTroops){
+	for (int i = 0; i < noTroops; i++){
+		attackers[0].moveFlag = true;
+		targetTerr.receiveAttacker(attackers[0]);
+		destroyAttacker(0);
+	}
+}
+
+/*
+	TODO: Implement sendDefender()
+*/
+
+void Territory::receiveAttacker(Attacker troop){
+	attackers.push_back(troop);
+}
+
+/*
+	TODO: Implement receiveDefender()
+*/
+
 
 bool operator==(const tile_t &tile1, const tile_t &tile2) {
 	return ((tile1.x == tile2.x) && (tile1.y == tile2.y));
