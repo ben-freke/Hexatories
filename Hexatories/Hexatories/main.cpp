@@ -32,11 +32,11 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 		if (firstClick){
 			glfwGetCursorPos(window, &xValue, &yValue);
-			if (game.territories[game.getTerritory(xValue, yValue)].getOwner() == 0){
+			if (game.getTerritory(xValue, yValue).getOwner() == 0){
 				cout << "You must use a territory that is already owned... Stupid.\n";
 			}
 			else{
-				firstTerr = &game.territories[game.getTerritory(xValue, yValue)];
+				firstTerr = &game.getTerritory(xValue, yValue);
 
 				firstClick = false;
 			}
@@ -45,7 +45,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 		else {
 			glfwGetCursorPos(window, &xValue, &yValue);
-			defaultActions.attack(game.territories[game.getTerritory(xValue, yValue)], *firstTerr, game);
+			defaultActions.attack(game.getTerritory(xValue, yValue), *firstTerr, game);
 			firstClick = true;
 			firstTerr = NULL;
 		}
