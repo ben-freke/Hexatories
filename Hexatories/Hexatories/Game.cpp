@@ -20,16 +20,21 @@ void Game::highlightTerritory(double x, double y) {
 	if (currTile.x != -1) {
 		if (!(currTile == prevTile)) {
 
-			if (prevTile.x != -1) {
-				territories[prevTile.terrNo].setColour(-1);
-				map.updateVBO(territories[prevTile.terrNo]);
-			}
+			if (prevTile.x != -1) 
+				changeTerritoryColour(territories[prevTile.terrNo], -1);
 
 			prevTile = currTile;
-			territories[prevTile.terrNo].setColour(3);
-			map.updateVBO(territories[prevTile.terrNo]);
+			changeTerritoryColour(territories[prevTile.terrNo], 3);
 		}
+	} else if (prevTile.x != -1) {
+		changeTerritoryColour(territories[prevTile.terrNo], -1);
+		prevTile.x = -1;
 	}
+}
+
+void Game::changeTerritoryColour(Territory ter, int col) {
+	ter.setColour(col);
+	map.updateVBO(ter);
 }
 
 void Game::draw() {

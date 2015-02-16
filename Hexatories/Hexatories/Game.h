@@ -28,6 +28,8 @@ public:
 	*/
 	void highlightTerritory(double, double);
 
+	void changeTerritoryColour(Territory ter, int col);
+
 	/*
 		Batch draw function
 	*/
