@@ -42,8 +42,8 @@ bool Actions::attack(Territory &territoryX, Territory &territoryY, Game &game){
 					int remainingAttack = difference + randomValue;
 					territoryX.setOwner(territoryY.getOwner());
 					//territoryY.resetAttack();
-					territoryX.resetDefense();
-					territoryX.setAttackScore(remainingAttack);
+					//territoryX.resetDefense();
+					//territoryX.setAttackScore(remainingAttack);
 					game.changeTerritoryColour(territoryX, territoryY.getOwner());
 					std::cout << "Remaining Troops: ";
 					std::cout << remainingAttack;
@@ -62,7 +62,7 @@ bool Actions::attack(Territory &territoryX, Territory &territoryY, Game &game){
 
 					int randomValue = std::rand() % 20 - difference;
 					int remainingDefense = difference + randomValue;
-					territoryX.resetAttack();
+					//territoryX.resetAttack();
 
 
 
