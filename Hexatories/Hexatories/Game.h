@@ -18,17 +18,17 @@ class Game {
 
 	int score, gold;
 
-
-public:
 	HexMap map;
 	std::vector<Territory> territories;
+
+public:
 
 	/*
 		Initialises the map
 	*/
 	bool initGame();
 
-	int getTerritory(double x, double y);
+	Territory getTerritory(double x, double y);
 
 	/*
 		Highlight territory
