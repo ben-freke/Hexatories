@@ -13,11 +13,13 @@
 */
 class Game {
 
-	HexMap map;
 	int score, gold;
-	std::vector<Territory> territories;
+
 
 public:
+	HexMap map;
+	std::vector<Territory> territories;
+
 	/*
 		Initialises the map
 	*/
