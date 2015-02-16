@@ -20,6 +20,8 @@ Audio gameMusic;
 Audio swordClang;
 Actions defaultActions;
 bool firstClick = true;
+int sender = NULL;
+
 Territory *firstTerr = NULL;
 
 Game game;
@@ -29,26 +31,16 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
 		double xValue = NULL;
 		double yValue = NULL;
+		glfwGetCursorPos(window, &xValue, &yValue);
 
 		if (firstClick){
-			glfwGetCursorPos(window, &xValue, &yValue);
-			if (game.getTerritory(xValue, yValue).getOwner() == 0){
-				cout << "You must use a territory that is already owned... Stupid.\n";
-			}
-			else{
-				firstTerr = &game.getTerritory(xValue, yValue);
-
-				firstClick = false;
-			}
-			
+			sender = game.getTerritory(xValue, yValue);
+			firstClick = false;
 		}
-
-		else {
-			glfwGetCursorPos(window, &xValue, &yValue);
-			defaultActions.attack(game.getTerritory(xValue, yValue), *firstTerr, game);
+		else{
+			game.sendTroops(game.territories[game.getTerritory(xValue, yValue)], game.territories[sender], 1, 5);
 			firstClick = true;
-			firstTerr = NULL;
-		}
+		}		
 		
 
 	}

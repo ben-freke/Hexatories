@@ -17,7 +17,7 @@ bool Actions::testClearPath(Territory territoryX, Territory territoryY){
 	return true;
 }
 
-
+/*
 bool Actions::attack(Territory &territoryX, Territory &territoryY, Game &game){
 	if (!attackFlag){ 
 		//Check that an attack hasn't already been made this turn.
@@ -85,7 +85,7 @@ bool Actions::attack(Territory &territoryX, Territory &territoryY, Game &game){
 	return false;
 	
 }
-
+*/
 void Actions::increaseTurn(){
 	turnNo++;
 	attackFlag = false;

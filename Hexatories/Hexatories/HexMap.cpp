@@ -24,8 +24,7 @@ bool HexMap::initMap(vector<Territory> &ter) {
 	
 	for (int i = 0; i < terrCount; i++) {
 		ter[i].getBorderVBO(tileVerts, indices);
-		ter[i].setAttackScore(100);
-		ter[i].setDefenseScore(100);
+	
 
 	}
 
@@ -56,12 +55,22 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 	int tileNum;
 	int tilesInTerr;
 	Territory territory;
+
+	/*
+	FOR TESTING:
+	Added so that this loop gives each territory an attack value, but no defense.
+	*/
+	for (int i = 0; i < 10; i++){
+		territory.addAttacker();
+	}
+
 	tile_t currTile;
 
 	/*
 	Loops through each territory, finds how many tiles in each and loops through each of those. Adds all tiles to an array and then passes that to the territory init.
 	*/
 	for (int i = 0; i < terrCount; i++) {
+		
 
 		ter.push_back(territory);
 		int owner = mapCode[mapPos++];
