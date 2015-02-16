@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <ctime>
 #include "Audio.h"
+#include "Game.h"
+
 
 bool returningValue;
 Audio actionMusic;
@@ -16,7 +18,7 @@ bool Actions::testClearPath(Territory territoryX, Territory territoryY){
 }
 
 
-bool Actions::attack(Territory &territoryX, Territory &territoryY){
+bool Actions::attack(Territory &territoryX, Territory &territoryY, Game &game){
 	if (!attackFlag){ 
 		//Check that an attack hasn't already been made this turn.
 		if (!(territoryX.getOwner() == territoryY.getOwner())){
@@ -38,11 +40,12 @@ bool Actions::attack(Territory &territoryX, Territory &territoryY){
 					std::cout << "Battle Won! - You've claimed a territory\n";
 					int randomValue = std::rand() % 20 - difference;
 					int remainingAttack = difference + randomValue;
-					territoryX.setOwner(2);
+					territoryX.setOwner(territoryY.getOwner());
 					territoryY.resetAttack();
 					territoryX.resetDefense();
 					territoryX.setAttackScore(remainingAttack);
-
+					territoryX.setColour(territoryY.getOwner());
+					game.map.updateVBO(territoryX);
 					std::cout << "Remaining Troops: ";
 					std::cout << remainingAttack;
 					std::cout << "\n";
