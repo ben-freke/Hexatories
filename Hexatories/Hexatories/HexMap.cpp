@@ -17,8 +17,8 @@ bool HexMap::initMap(vector<Territory> &ter) {
 
 	vector<GLushort> indices;
 
-	int mapPos = getAllTiles(mapCode, tileVerts, indices);
-	addOverlay(tileVerts, indices);
+	int mapPos = getAllTiles(mapCode, indices);
+	addOverlay(indices);
 
 	int terrCount = setupTerritories(mapCode, mapPos, ter);
 	
@@ -29,7 +29,7 @@ bool HexMap::initMap(vector<Territory> &ter) {
 
 	}
 
-	setupVAO(tileVerts, indices);
+	setupVAO(indices);
 
 	return true;
 }
@@ -83,7 +83,7 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 	return terrCount;
 }
 
-void HexMap::setupVAO(vector<GLint> verts, vector<GLushort> indices) {
+void HexMap::setupVAO(vector<GLushort> indices) {
 
 	/*
 	Vertex shader, fragment shader
@@ -108,7 +108,7 @@ void HexMap::setupVAO(vector<GLint> verts, vector<GLushort> indices) {
 
 	glGenBuffers(1, &vboMap);
 	glBindBuffer(GL_ARRAY_BUFFER, vboMap);
-	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLint), verts.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, tileVerts.size() * sizeof(GLint), tileVerts.data(), GL_STATIC_DRAW);
 
 	glGenBuffers(1, &eboMap);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboMap);
@@ -151,13 +151,13 @@ void HexMap::setupVAO(vector<GLint> verts, vector<GLushort> indices) {
 	glBindVertexArray(0);
 }
 
-void HexMap::addOverlay(vector<GLint> &verts, vector<GLushort> &indices) {
+void HexMap::addOverlay(vector<GLushort> &indices) {
 
 	/*
 	The vertices of the corners of the map (for the wireframe overlay).
 	Beneath is the indices for the draw order of the triangles that make up this rectangle.
 	*/
-	GLint vertsTex[] = {
+	GLint tileVertsTex[] = {
 		152, 740, 0, 0, 0, 0, 0, 4, 
 		878, 740, 0, 0, 0, 1, 0, 4,
 		878, 0, 0, 0, 0, 1, 1, 4,
@@ -173,16 +173,16 @@ void HexMap::addOverlay(vector<GLint> &verts, vector<GLushort> &indices) {
 	Adds these vertices to the end of the vbo and the indices to the ebo.
 	*/
 	for (int i = 0; i < 6; i++) {
-		int vertCount = verts.size() / 8;
+		int vertCount = tileVerts.size() / 8;
 		indices.push_back(vertCount + rectIndices[i]);
 	}
 
 	for (int i = 0; i < 32; i++) {
-		verts.push_back(vertsTex[i]);
+		tileVerts.push_back(tileVertsTex[i]);
 	}
 }
 
-int HexMap::getAllTiles(int *mapCode, vector<GLint> &verts, vector<GLushort> &indices) {
+int HexMap::getAllTiles(int *mapCode, vector<GLushort> &indices) {
 #pragma region vars
 	/*
 	currTile - the current tile not in columns/rows. For instance the 3rd tile in the 2nd column would be (1 * 33 + 3). 41 being the column height.
@@ -215,7 +215,7 @@ int HexMap::getAllTiles(int *mapCode, vector<GLint> &verts, vector<GLushort> &in
 				colType = mapCode[mapPos++];
 			}
 
-			HexMap::calcTileVerts(x, y, colType, verts);
+			calcTileVerts(x, y, colType);
 
 			for (int i = 0; i < 12; i++) {	// Set up the vertex draw order for the current tile.
 				indices.push_back(baseIndices[i] + 6 * currTile);
@@ -241,7 +241,7 @@ void HexMap::drawMap() {
 	glBindVertexArray(0);
 }
 
-#pragma region defaultVertsCols
+#pragma region defaultTileVertsCols
 
 const GLint HexMap::defTileVerts[] = {
 	152, 729,	//left
@@ -259,7 +259,7 @@ const GLint HexMap::cols[] = {
 };
 #pragma endregion
 
-void HexMap::calcTileVerts(int x, int y, int col, vector<GLint> &vboArray) {
+void HexMap::calcTileVerts(int x, int y, int col) {
 
 	/*
 	xoff - either 1 or 0 depending on your x value. Needed as every other column is lower down (look at the map if confused).
@@ -274,23 +274,23 @@ void HexMap::calcTileVerts(int x, int y, int col, vector<GLint> &vboArray) {
 
 	i will always be a multiple of 7, for the 7 floats per vertex.
 
-	note: i / 3.5 will increase by 2 each loop, and is used for the x/y positions from the verts array.
+	note: i / 3.5 will increase by 2 each loop, and is used for the x/y positions from the tileVerts array.
 	Cast is needed just for the compiler to not throw a fit.
 	*/
 	for (int i = 0; i < 42; i += 7) {
 
-		vboArray.push_back(defTileVerts[(int)(i / 3.5)] + (18 * x));	// Calculate the x pos of the current tile and store it.
-		vboArray.push_back(defTileVerts[(int)(i / 3.5) + 1] - (22 * y + 11 * xoff));	// Calculate the y pos and store it.
+		tileVerts.push_back(defTileVerts[(int)(i / 3.5)] + (18 * x));	// Calculate the x pos of the current tile and store it.
+		tileVerts.push_back(defTileVerts[(int)(i / 3.5) + 1] - (22 * y + 11 * xoff));	// Calculate the y pos and store it.
 
 		for (int j = colPos; j < colPos + 3; j++) {		// Loops through the colour array, appending your selected colour to the end of each vertex.
-			vboArray.push_back(cols[j]);
+			tileVerts.push_back(cols[j]);
 		}
 
 		/*
 		Invalid texture coords so the shader knows what's up
 		*/
 		for (int j = 0; j < 3; j++) {
-			vboArray.push_back(-1);
+			tileVerts.push_back(-1);
 		}
 	}
 }

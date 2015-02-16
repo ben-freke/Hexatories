@@ -29,22 +29,13 @@ class HexMap {
 
 	void updateVAO();
 
-public:
-
-	bool initMap(std::vector<Territory> &);
-
 	int setupTerritories(int *, int, std::vector<Territory> &);
 
-	void setupVAO(std::vector<GLint>, std::vector<GLushort>);
+	void setupVAO(std::vector<GLushort>);
 
-	void addOverlay(std::vector<GLint> &, std::vector<GLushort> &);
+	void addOverlay(std::vector<GLushort> &);
 
-	int getAllTiles(int *, std::vector<GLint> &, std::vector<GLushort> &);
-
-	/*
-	Just draws the map & grid currently.
-	*/
-	void drawMap();
+	int getAllTiles(int *, std::vector<GLushort> &);
 
 	/*
 	Calculate vertex position. Also includes the colour of each vertex.
@@ -52,13 +43,22 @@ public:
 	HexTile.initTile(xPos, yPos, col, vertsArray);
 	It appends the tiles vertices to the end of the passed array.
 	*/
-	static void calcTileVerts(int, int, int, std::vector<GLint> &);
+	void calcTileVerts(int, int, int);
 
 	/*
 	Returns the string containing map data to interpret. Really needs reworking.
 	Usage: string map = mapFromFile("BeachMap");
 	*/
 	static int *mapFromFile(const char *);
+
+public:
+
+	bool initMap(std::vector<Territory> &);
+
+	/*
+	Just draws the map & grid currently.
+	*/
+	void drawMap();
 
 	/*
 	Converts mouse point to x and y of tile in the map.
