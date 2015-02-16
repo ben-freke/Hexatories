@@ -25,6 +25,8 @@ public:
 	*/
 	bool initGame();
 
+	int getTerritory(double x, double y);
+
 	/*
 		Highlight territory
 	*/

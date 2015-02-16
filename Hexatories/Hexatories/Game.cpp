@@ -32,6 +32,11 @@ void Game::highlightTerritory(double x, double y) {
 	}
 }
 
+int Game::getTerritory(double x, double y){
+	tile_t currTile = map.pointToTile(x, y);
+	return currTile.terrNo;
+}
+
 void Game::changeTerritoryColour(Territory ter, int col) {
 	ter.setColour(col);
 	map.updateVBO(ter);

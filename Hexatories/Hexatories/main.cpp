@@ -19,13 +19,31 @@ using namespace std;
 Audio gameMusic;
 Audio swordClang;
 Actions defaultActions;
+bool firstClick = true;
+Territory *firstTerr = NULL;
 
 Game game;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+		double xValue = NULL;
+		double yValue = NULL;
+
+		if (firstClick){
+			glfwGetCursorPos(window, &xValue, &yValue);
+			firstTerr = &game.territories[game.getTerritory(xValue, yValue)];
+			firstClick = false;
+		}
+
+		else {
+			glfwGetCursorPos(window, &xValue, &yValue);
+			defaultActions.attack(game.territories[game.getTerritory(xValue, yValue)], *firstTerr, game);
+			firstClick = true;
+			firstTerr = NULL;
+		}
 		
+
 	}
 
 }
@@ -39,7 +57,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
 	if (key == GLFW_KEY_E && action == GLFW_PRESS) {
-		defaultActions.attack(game.territories[0], game.territories[1], game);
 
 
 	}
@@ -149,7 +166,6 @@ int main(void) {
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	game.territories[1].setAttackScore(100);
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window))

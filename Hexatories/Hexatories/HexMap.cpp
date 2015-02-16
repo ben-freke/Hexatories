@@ -24,6 +24,8 @@ bool HexMap::initMap(vector<Territory> &ter) {
 	
 	for (int i = 0; i < terrCount; i++) {
 		ter[i].getBorderVBO(tileVerts, indices);
+		ter[i].setAttackScore(100);
+
 	}
 
 	setupVAO(tileVerts, indices);
