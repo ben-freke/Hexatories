@@ -121,9 +121,9 @@ void gameUI::initText(vector<GLushort> &indices) {
 
 	GLushort baseIndex = 4;
 
-	for (int i = 0; i < 27; i+=3) {	// 9 different locations * 3 = 27
-		for (int j = 0; j < textVerts[i]; j++) { // number of letters at location
-			for (int k = 0; k < 2; k++) { // 2x2 square
+	for (int i = 0; i < 27; i+=3) {		// 9 different locations * 3 = 27
+		for (int j = 0; j < textVerts[i]; j++) {	// number of letters at location
+			for (int k = 0; k < 2; k++) {	// 2x2 square
 				for (int l = 0; l < 2; l++) {
 
 					int kxorl = (k || l) &! (k && l);
