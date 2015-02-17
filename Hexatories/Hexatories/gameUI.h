@@ -1,6 +1,7 @@
 #include <vector>
 #include <GL\glew.h>
 #include <GLFW/glfw3.h>
+#include "Territory.h"
 
 #ifndef __GAMEUI_H
 #define __GAMEUI_H
@@ -12,10 +13,6 @@ class gameUI {
 		DEF, TOTAL_DEF, SEND_ATK, SEND_DEF,
 	};
 
-	enum class UpdateType {
-		RELATIVE, SET,
-	};
-
 	GLint uniforms[2];
 	GLuint vao, vbo, prog;
 	std::vector<GLint> verts;
@@ -24,12 +21,12 @@ class gameUI {
 	void setupVAO(std::vector<GLushort>);
 
 	void mainOverlay(std::vector<GLushort> &);
-	void initText();
+	void initText(std::vector<GLushort> &);
 
 public:
 
 	void initUI();
 	void drawUI();
-	void changeText(Text, UpdateType, int);
+	void changeText(Text, int);
 };
 #endif

@@ -11,7 +11,7 @@ void main() {
 		if (Tex_coord.z == 4) {
 			outColour = texture(map_tex, vec2(Tex_coord.x, Tex_coord.y));
 		} else {
-			outColour = texture(border_tex, vec2((Tex_coord.x + Tex_coord.z) * 1/4, Tex_coord.y));
+			outColour = texture(border_tex, vec2((Tex_coord.x + Tex_coord.z) * 0.25, Tex_coord.y));
 		}
 	}
 }

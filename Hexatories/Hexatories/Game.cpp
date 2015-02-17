@@ -133,7 +133,7 @@ void Game::sendTroops(Territory &receivingTerr, Territory &sendingTerr, int troo
 			}
 		}
 		else{
-				cout << "You do not have enough troops to send\n";
+			cout << "You do not have enough troops to send\n";
 		}
 	}
 }

@@ -130,8 +130,6 @@ void HexMap::setupVAO(vector<GLushort> indices) {
 	loadBMP("tileBorders.png", tboBorder);
 	loadBMP("wireframe.png", tboMap);
 
-	printf("%d, %d\n", tboBorder, tboMap);
-
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, tboBorder);
 
@@ -369,16 +367,14 @@ tile_t HexMap::pointToTile(double mouseX, double mouseY) {
 	/*
 	Offsets
 	*/
-	mouseX = mouseX - 147;
-	mouseY = mouseY - 32;
+	mouseX -= 147;
+	mouseY -= 32;
 
 	int gridX, gridY;
 
 	tile_t nullTile = { -1, -1, -1 };
-	/*
-	Bounds check
-	*/
-	if (mouseX < 0 || mouseX > 740 || mouseY > 740) return nullTile;
+
+	if (mouseX > 740 || mouseY > 736 || mouseX < 0 || mouseY < 0) return nullTile;
 
 	/*
 	Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
@@ -396,7 +392,8 @@ tile_t HexMap::pointToTile(double mouseX, double mouseY) {
 	Inequality, test if we are in the main tile of this rectangle or the two smaller sections.
 	If we are, grid co ords are rect co ords, otherwise x is -1 and y is rect +1/0/-1
 	*/
-	if (mouseX > 12 * abs(0.5 - mouseY / 22)) {
+	if (mouseX > 12 * abs(0.5 - ((mouseY < 0) ? mouseY * -1 : mouseY) / 22)) {
+		if (mouseY < 0) return nullTile;
 		gridX = rectX;
 		gridY = rectY;
 	} else {

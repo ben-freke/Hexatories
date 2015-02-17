@@ -8,6 +8,7 @@ using namespace std;
 void gameUI::initUI() {
 	vector<GLushort> indices;
 	mainOverlay(indices);
+	initText(indices);
 
 	setupVAO(indices);
 }
@@ -17,10 +18,10 @@ void gameUI::drawUI() {
 
 	glUseProgram(prog);
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 2; i++)
 		glUniform1i(uniforms[i], i + 3);
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, 222, GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(0);
 }
@@ -73,7 +74,7 @@ void gameUI::setupVAO(vector<GLushort> indices) {
 
 void gameUI::mainOverlay(vector<GLushort> &indices) {
 
-	GLint tileVertsTex[] = {
+	GLint rectVerts[] = {
 		0, 768, 0, 0, 10,
 		1024, 768, 1, 0, 10,
 		1024, 0, 1, 1, 10,
@@ -85,6 +86,7 @@ void gameUI::mainOverlay(vector<GLushort> &indices) {
 		2, 3, 0,
 
 	};
+
 	/*
 	Adds these vertices to the end of the vbo and the indices to the ebo.
 	*/
@@ -92,8 +94,52 @@ void gameUI::mainOverlay(vector<GLushort> &indices) {
 		indices.push_back(rectIndices[i]);
 	}
 
-	for (int i = 0; i < 32; i++) {
-		verts.push_back(tileVertsTex[i]);
+	for (int i = 0; i < 20; i++) {
+		verts.push_back(rectVerts[i]);
+	}
+
+}
+
+void gameUI::initText(vector<GLushort> &indices) {
+
+	GLint textVerts[] {
+		5, 62, 598,			//coins
+		4, 68, 525,			//pop
+		5, 68, 456,			//total pop
+		4, 5, 283,			//atk
+		4, 5, 173,			//total atk
+		4, 77, 283,			//def
+		4, 77, 173,			//total def
+		3, 907, 565,		//send atk
+		3, 963, 565,
+	};
+
+	GLushort textIndices[] = {
+			0, 1, 2,
+			2, 3, 0,
+	};
+
+	GLushort baseIndex = 4;
+
+	for (int i = 0; i < 27; i+=3) {	// 9 different locations * 3 = 27
+		for (int j = 0; j < textVerts[i]; j++) { // number of letters at location
+			for (int k = 0; k < 2; k++) { // 2x2 square
+				for (int l = 0; l < 2; l++) {
+
+					int kxorl = (k || l) &! (k && l);
+					verts.push_back(textVerts[i + 1] + ((j + kxorl) * 14));
+					verts.push_back(textVerts[i + 2] - 16 * k);
+					verts.push_back(kxorl);
+					verts.push_back(k);
+					verts.push_back(0);
+				}
+			}
+
+			for (int k = 0; k < 6; k++)
+				indices.push_back(baseIndex + textIndices[k]);
+
+			baseIndex += 4;
+		}
 	}
 
 }
