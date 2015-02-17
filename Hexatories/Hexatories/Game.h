@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include "Territory.h"
 #include "HexMap.h"
+#include "gameUI.h"
 
 #ifndef __GAME_H
 #define __GAME_H
@@ -19,6 +20,7 @@ class Game {
 	int score, gold;
 
 	HexMap map;
+	gameUI ui;
 	std::vector<Territory> territories;
 
 public:
@@ -28,14 +30,16 @@ public:
 	*/
 	bool initGame();
 
-	Territory getTerritory(double x, double y);
+	Territory *getTerritory(double x, double y);
 
 	/*
 		Highlight territory
 	*/
 	void highlightTerritory(double, double);
 
-	void changeTerritoryColour(Territory ter, int col);
+	void changeTerritoryColour(Territory &ter, int col);
+	
+	void resetTerrs();
 
 	/*
 		Batch draw function

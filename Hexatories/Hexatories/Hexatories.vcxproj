@@ -20,7 +20,7 @@
     <ClCompile Include="Shaders.cpp" />
     <ClCompile Include="Territory.cpp" />
     <ClCompile Include="Textures.cpp" />
-    <ClCompile Include="UI.cpp" />
+    <ClCompile Include="gameUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="audio\libraries\libsndfile-1.dll" />
@@ -42,7 +42,7 @@
     <ClInclude Include="SOIL.h" />
     <ClInclude Include="Territory.h" />
     <ClInclude Include="Textures.h" />
-    <ClInclude Include="UI.h" />
+    <ClInclude Include="gameUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\SOIL.lib" />

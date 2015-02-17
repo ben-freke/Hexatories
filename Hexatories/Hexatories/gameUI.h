@@ -2,7 +2,10 @@
 #include <GL\glew.h>
 #include <GLFW/glfw3.h>
 
-class UI {
+#ifndef __GAMEUI_H
+#define __GAMEUI_H
+
+class gameUI {
 
 	enum class Text { 
 		COINS = 0, POP, TOTAL_POP, ATK, TOTAL_ATK,
@@ -20,7 +23,7 @@ class UI {
 	void updateVAO();
 	void setupVAO(std::vector<GLushort>);
 
-	void mainOverlay();
+	void mainOverlay(std::vector<GLushort> &);
 	void initText();
 
 public:
@@ -29,3 +32,4 @@ public:
 	void drawUI();
 	void changeText(Text, UpdateType, int);
 };
+#endif

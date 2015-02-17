@@ -86,9 +86,10 @@ bool Actions::attack(Territory &territoryX, Territory &territoryY, Game &game){
 	
 }
 */
-void Actions::increaseTurn(){
+void Actions::increaseTurn(Game &game){
 	turnNo++;
 	attackFlag = false;
+	game.resetTerrs();
 	std::cout << "Turn Number: " << turnNo << "\n";
 
 }

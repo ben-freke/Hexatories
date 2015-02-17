@@ -50,10 +50,10 @@ void Territory::setColour(int newCol) {
 void Territory::getBorderVBO(vector<GLint> &vertices, vector<GLushort> &indices) {
 
 	array<GLint, 32> defVerts = {
-		152, 740, 0, 0, 0, 0, 0, colour,
-		878, 740, 0, 0, 0, 1, 0, colour,
-		878, 0, 0, 0, 0, 1, 1, colour,
-		152, 0, 0, 0, 0, 0, 1, colour,
+		147, 736, 0, 0, 0, 0, 0, colour,
+		873, 736, 0, 0, 0, 1, 0, colour,
+		873, 0, 0, 0, 0, 1, 1, colour,
+		147, 0, 0, 0, 0, 0, 1, colour,
 	};
 
 	GLushort rectIndices[] = {
@@ -114,53 +114,69 @@ void Territory::setOwner(int newOwner){
 	Attack and Defence Functions
 */
 
-int Territory::getNoAttackers(){
-	return attackers.size();
+int Territory::getAttackers(){
+	return attackers[0];
 }
 
-int Territory::getNoDefenders(){
-	return defenders.size();
+int Territory::getDefense(){
+	return defenders[0] * 15 + population;
 }
 
 void Territory::addAttacker(){
-	Attacker attacker;
-	attackers.push_back(attacker);
+	attackers[0]++;
 }
 
 /*
 	TODO: Implement addDefender()
 */
 
-void Territory::destroyAttacker(int i){
-	attackers.erase(attackers.begin()+i);
+bool Territory::destroyAttackers(int i){
+	if (i == -1) {
+		attackers[0] = 0; 
+		return true;
+	}
+	if (i > attackers[0]) return false;
+	attackers[0] -= i;
+	return true;
 }
 
-void Territory::destroyDefender(int i){
-	defenders.erase(defenders.begin() + i);
-}
-
-void Territory::changeAttacker(int id, bool state){
-	attackers[id].moveFlag = state;
+bool Territory::destroyDefenders(int i){
+	if (i == -1) {
+		defenders[0] = 0;
+		return true;
+	}
+	if (i > defenders[0]) return false;
+	defenders[0] -= i;
+	return true;
 }
 
 /*
 	TODO: Implement changeDefender()
 */
 
-void Territory::sendAttacker(Territory &targetTerr, int noTroops){
-	for (int i = 0; i < noTroops; i++){
-		attackers[0].moveFlag = true;
-		targetTerr.receiveAttacker(attackers[0]);
-		destroyAttacker(0);
-	}
+bool Territory::sendTroops(Territory &targetTerr, int noAtk, int noDef){
+	if (attackers[0] < noAtk || defenders[0] < noDef) return false;
+	attackers[0] -= noAtk;
+	defenders[0] -= noDef;
+	targetTerr.receiveTroops(noAtk, noDef);
+	return true;
+}
+
+void Territory::reset() {
+	attackers[0] += attackers[1];
+	attackers[1] = 0;
+
+	defenders[0] += defenders[1];
+	defenders[1] = 0;
 }
 
 /*
 	TODO: Implement sendDefender()
 */
 
-void Territory::receiveAttacker(Attacker troop){
-	attackers.push_back(troop);
+void Territory::receiveTroops(int numAtk, int numDef){
+	attackers[1] += numAtk;
+	defenders[1] += numDef;
 }
 
 /*

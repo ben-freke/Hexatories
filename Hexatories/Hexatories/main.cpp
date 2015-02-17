@@ -19,14 +19,13 @@ using namespace std;
 Audio gameMusic;
 Audio swordClang;
 Actions defaultActions;
-bool firstClick = true;
-int sender = NULL;
-
-Territory *firstTerr = NULL;
 
 Game game;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+
+	static bool firstClick = true;
+	static Territory *firstTerr;
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
 		double xValue = NULL;
@@ -34,12 +33,16 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		glfwGetCursorPos(window, &xValue, &yValue);
 
 		if (firstClick){
-			sender = game.getTerritory(xValue, yValue);
-			firstClick = false;
+			firstTerr = game.getTerritory(xValue, yValue);
+			if (firstTerr != NULL) 
+				firstClick = false;
 		}
 		else{
-			game.sendTroops(game.territories[game.getTerritory(xValue, yValue)], game.territories[sender], 1, 5);
-			firstClick = true;
+			Territory *terr = game.getTerritory(xValue, yValue);
+			if (terr != NULL) {
+				game.sendTroops(*terr, *firstTerr, 1, 3);
+				firstClick = true;
+			}
 		}		
 		
 
@@ -65,7 +68,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-		defaultActions.increaseTurn();
+		defaultActions.increaseTurn(game);
 
 	}
 
@@ -123,9 +126,9 @@ int main(void) {
 
 	/*gameMusic.playAudio("sound.wav");
 	gameMusic.fadeInAudio(0);
+	*/
 	
-	
-	srand(time(NULL));*/
+	srand((unsigned int)time(NULL));
 
 
 	restart_log();

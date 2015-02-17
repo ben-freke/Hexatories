@@ -13,7 +13,7 @@ class Actions {
 public:
 	
 	bool testClearPath(Territory territoryX, Territory territoryY);
-	void increaseTurn();
+	void increaseTurn(Game &game);
 	bool attack(Territory &territoryX, Territory &territoryY, Game &game);
 };
 

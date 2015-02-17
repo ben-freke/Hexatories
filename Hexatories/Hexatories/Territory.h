@@ -5,16 +5,6 @@
 #ifndef __TERRITORY_H
 #define __TERRITORY_H
 
-struct Attacker
-{
-	bool moveFlag = false;
-};
-
-struct Defender
-{
-	bool moveFlag = false;
-};
-
 struct tile_t {
 	int x, y, terrNo;
 };
@@ -35,11 +25,11 @@ bool operator==(const tile_t &tile1, const tile_t &tile2);
 class Territory {
 
 	std::vector<tile_t> tiles, border;
-	std::vector<Attacker> attackers;
-	std::vector<Defender> defenders;
+	
+	int attackers[2];
+	int defenders[2];
 
-
-	int populationNo, troopsAttack, troopsDefense, size, owner, vboPos, colour;
+	int population, troopsAttack, troopsDefense, size, owner, vboPos, colour;
 	bool farmBuilt, bankBuilt = false;
 
 	void setupTiles(std::vector<tile_t>);
@@ -54,13 +44,15 @@ public:
 
 	void setOwner(int newOwner);
 
+	void reset();
+
 	/*
 		Gets the number of attackers and defenders.
 	*/
 
-	int getNoAttackers();
+	int getAttackers();
 
-	int getNoDefenders();
+	int getDefense();
 
 	/*
 		Adds attackers and defenders
@@ -73,30 +65,23 @@ public:
 		Destroys attackers or defenders
 	*/
 
-	void destroyAttacker(int i);
+	bool destroyAttackers(int i);
 
-	void destroyDefender(int i);
-
-	/*
-		Changes the state of attackers or defedners (e.g. moved in turn = true)
-		TODO: Implement changeDefender()
-	*/
-
-	void changeAttacker(int id, bool state);
+	bool destroyDefenders(int i);
 
 	/*
 		Sends attackers and defenders
 		TODO: Implement sendDefender()
 	*/
 
-	void sendAttacker(Territory &targetTerr, int noTroops);
+	bool sendTroops(Territory &targetTerr, int numAtk, int numDef);
 
 	/*
 		Receives attackers and defenders
 		TODO: Implement receiveDefender()
 	*/
 	
-	void receiveAttacker(Attacker troop);
+	void receiveTroops(int numAtk, int numDef);
 
 	
 	void setupBorderTiles();

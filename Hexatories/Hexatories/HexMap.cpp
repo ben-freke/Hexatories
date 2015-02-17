@@ -130,10 +130,12 @@ void HexMap::setupVAO(vector<GLushort> indices) {
 	loadBMP("tileBorders.png", tboBorder);
 	loadBMP("wireframe.png", tboMap);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tboBorder);
+	printf("%d, %d\n", tboBorder, tboMap);
 
 	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, tboBorder);
+
+	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, tboMap);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -167,10 +169,10 @@ void HexMap::addOverlay(vector<GLushort> &indices) {
 	Beneath is the indices for the draw order of the triangles that make up this rectangle.
 	*/
 	GLint tileVertsTex[] = {
-		152, 740, 0, 0, 0, 0, 0, 4, 
-		878, 740, 0, 0, 0, 1, 0, 4,
-		878, 0, 0, 0, 0, 1, 1, 4,
-		152, 0, 0, 0, 0, 0, 1, 4,
+		147, 736, 0, 0, 0, 0, 0, 4, 
+		873, 736, 0, 0, 0, 1, 0, 4,
+		873, 0, 0, 0, 0, 1, 1, 4,
+		147, 0, 0, 0, 0, 0, 1, 4,
 	};
 
 	GLushort rectIndices[] = {
@@ -243,7 +245,7 @@ void HexMap::drawMap() {
 	glUseProgram(progMap);
 
 	for (int i = 0; i < 2; i++)
-		glUniform1i(uniforms[i], i);
+		glUniform1i(uniforms[i], i + 1);
 
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
 
@@ -253,12 +255,12 @@ void HexMap::drawMap() {
 #pragma region defaultTileVertsCols
 
 const GLint HexMap::defTileVerts[] = {
-	152, 729,	//left
-	158, 718,	//bottom left
-	170, 718,	//bottom right
-	176, 729,	//right
-	170, 740,	//top right
-	158, 740,	//top left
+	147, 725,	//left
+	153, 714,	//bottom left
+	165, 714,	//bottom right
+	171, 725,	//right
+	165, 736,	//top right
+	153, 736,	//top left
 };
 
 const GLint HexMap::cols[] = {
@@ -367,8 +369,8 @@ tile_t HexMap::pointToTile(double mouseX, double mouseY) {
 	/*
 	Offsets
 	*/
-	mouseX = mouseX - 152;
-	mouseY = mouseY - 28;
+	mouseX = mouseX - 147;
+	mouseY = mouseY - 32;
 
 	int gridX, gridY;
 
