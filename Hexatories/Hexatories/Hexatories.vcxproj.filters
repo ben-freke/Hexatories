@@ -140,6 +140,15 @@
     <Image Include="tileBorders.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
+    <Image Include="Textures\attack.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="Textures\nums.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="Textures\gui.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Debug\notes.txt">

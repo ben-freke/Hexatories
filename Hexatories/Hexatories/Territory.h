@@ -30,7 +30,7 @@ class Territory {
 	int defenders[2];
 
 	int population, troopsAttack, troopsDefense, size, owner, vboPos, colour;
-	bool farmBuilt, bankBuilt = false;
+	bool farmBuilt = false, bankBuilt = false, selected = false;
 
 	void setupTiles(std::vector<tile_t>);
 
@@ -90,5 +90,10 @@ public:
 
 	void updateBorderVBO(std::vector<GLint> &);
 
+	bool isSelected();
+
+	void invSelect();
+
+	void getInfo(int *);
 };
 #endif

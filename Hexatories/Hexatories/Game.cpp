@@ -16,26 +16,132 @@ bool Game::initGame() {
 	return true;
 }
 
-void Game::highlightTerritory(double x, double y) {
-	static tile_t prevTile = { -1, -1, -1 };
-	tile_t currTile = map.pointToTile(x, y);
+void Game::handleMouseInput(double x, double y, bool click) {
+	static Territory *firstTerr, *secondTerr, *currTerr;	//firstTerr & secondTerr for send troops, currTerr for the selected one
+	static int numAtkSend, numDefSend;
+	static bool sendTroopsPressed = false, attack = false;
 
-	if (currTile.x != -1) {
-		if (!(currTile == prevTile)) {
+	gameUI::Section sect;
 
-			if (prevTile.x != -1) 
-				changeTerritoryColour(territories[prevTile.terrNo], -1);
+	int ix = (int)x;
+	int iy = (int)y;
 
-			prevTile = currTile;
-			changeTerritoryColour(territories[prevTile.terrNo], 3);
+	if (((sect = ui.pointInBox(ix, iy)) == gameUI::Section::MAP) &! click) {
+		Territory *hTerr;
+		hTerr = getTerritory(ix, iy);
+		highlightTerritory(hTerr);
+		return;
+	}
+
+	highlightTerritory(NULL);
+	if (!click) return;
+
+	switch (sect) {
+
+	case gameUI::Section::MAP:{
+		if (firstTerr == NULL) {
+			Territory *nextTerr = getTerritory(ix, iy);
+			selectTerr(nextTerr, currTerr);
+			currTerr = nextTerr;
+		} else {
+			secondTerr = getTerritory(ix, iy);
+			if (secondTerr->getOwner() != firstTerr->getOwner()) {
+				ui.attackButton(true);
+				attack = true;
+			}
 		}
-	} else if (prevTile.x != -1) {
-		changeTerritoryColour(territories[prevTile.terrNo], -1);
-		prevTile.x = -1;
+		break;
+	}
+
+	case gameUI::Section::SEND_TROOPS: {
+		if (!sendTroopsPressed) {
+			firstTerr = currTerr;
+
+		} else {
+			if (attack) ui.attackButton(false);
+			sendTroops(*secondTerr, *firstTerr, 1, 5);
+			selectTerr(NULL, firstTerr);
+			firstTerr = NULL;
+			secondTerr = NULL;
+
+			numAtkSend = 0;
+			numDefSend = 0;
+			ui.changeText(gameUI::Text::SEND_ATK, 0);
+			ui.changeText(gameUI::Text::SEND_DEF, 0);
+		}
+		sendTroopsPressed = !sendTroopsPressed;
+		break;
+	}
+
+	case gameUI::Section::ATK_UP: {
+		ui.changeText(gameUI::Text::SEND_ATK, ++numAtkSend);
+		break;
+	}
+
+	case gameUI::Section::ATK_DOWN: {
+		if (numAtkSend > 0)
+			ui.changeText(gameUI::Text::SEND_ATK, --numAtkSend);
+		break;
+	}
+
+	case gameUI::Section::DEF_UP: {
+		ui.changeText(gameUI::Text::SEND_DEF, ++numDefSend);
+		break;
+	}
+
+	case gameUI::Section::DEF_DOWN: {
+		if (numDefSend > 0)
+			ui.changeText(gameUI::Text::SEND_DEF, --numDefSend);
+		break;
+	}
+
 	}
 }
 
-Territory *Game::getTerritory(double x, double y){
+void Game::selectTerr(Territory *terr, Territory *prevTerr) {
+
+	int vals[3];
+
+	if (prevTerr != NULL) {
+		changeTerritoryColour(*prevTerr, -1);
+		prevTerr->invSelect();
+	}
+
+	if (terr == NULL) {
+		for (int i = 0; i < 3; i++) vals[i] = 0;
+	} else {
+		changeTerritoryColour(*terr, 3);
+		terr->invSelect();
+		terr->getInfo(vals);
+	}
+
+	ui.changeText(gameUI::Text::POP, vals[0]);
+	ui.changeText(gameUI::Text::ATK, vals[1]);
+	ui.changeText(gameUI::Text::DEF, vals[2]);
+}
+
+void Game::highlightTerritory(Territory *currTerr) {
+	static Territory *prevTerr;
+
+	if (currTerr != NULL) {
+		if (!(currTerr == prevTerr)) {
+
+			if (prevTerr != NULL)
+				if (!prevTerr->isSelected()) 
+					changeTerritoryColour(*prevTerr, -1);
+
+			prevTerr = currTerr;
+			changeTerritoryColour(*prevTerr, 3);
+		}
+	} else if (prevTerr != NULL) {
+		if (!prevTerr->isSelected()) {
+			changeTerritoryColour(*prevTerr, -1);
+			prevTerr = NULL;
+		}
+	}
+}
+
+Territory *Game::getTerritory(int x, int y){
 	tile_t currTile = map.pointToTile(x, y);
 	
 	if (currTile.terrNo == -1) return NULL;

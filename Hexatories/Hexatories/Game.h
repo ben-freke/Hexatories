@@ -30,12 +30,12 @@ public:
 	*/
 	bool initGame();
 
-	Territory *getTerritory(double x, double y);
+	Territory *getTerritory(int, int);
 
 	/*
 		Highlight territory
 	*/
-	void highlightTerritory(double, double);
+	void highlightTerritory(Territory *);
 
 	void changeTerritoryColour(Territory &ter, int col);
 	
@@ -52,6 +52,8 @@ public:
 
 	void sendTroops(Territory &receivingTerr, Territory &sendingTerr, int troopType, int noTroops);
 
+	void handleMouseInput(double, double, bool);
+	void selectTerr(Territory *, Territory *);
 };
 
 #endif

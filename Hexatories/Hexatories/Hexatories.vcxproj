@@ -48,6 +48,9 @@
     <Library Include="lib\SOIL.lib" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Textures\attack.png" />
+    <Image Include="Textures\gui.png" />
+    <Image Include="Textures\nums.png" />
     <Image Include="tileBorders.png" />
     <Image Include="wireframe.png" />
   </ItemGroup>

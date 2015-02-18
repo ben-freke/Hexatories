@@ -39,6 +39,14 @@ void Territory::setupTiles(vector<tile_t> innerTiles) {
 	}
 }
 
+bool Territory::isSelected() {
+	return selected;
+}
+
+void Territory::invSelect() {
+	selected = !selected;
+}
+
 void Territory::setColour(int newCol) {
 	if (newCol != -1) {
 		colour = newCol;
@@ -168,6 +176,12 @@ void Territory::reset() {
 
 	defenders[0] += defenders[1];
 	defenders[1] = 0;
+}
+
+void Territory::getInfo(int *vals) {
+	vals[0] = population;
+	vals[1] = attackers[0] + attackers[1];
+	vals[2] = defenders[0] + defenders[1];
 }
 
 /*

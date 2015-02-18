@@ -8,25 +8,37 @@
 
 class gameUI {
 
-	enum class Text { 
-		COINS = 0, POP, TOTAL_POP, ATK, TOTAL_ATK,
-		DEF, TOTAL_DEF, SEND_ATK, SEND_DEF,
-	};
+	static const int sectionCoords[];
 
-	GLint uniforms[2];
-	GLuint vao, vbo, prog;
+	GLint uniforms[3];
+	GLuint vao, vbo, ebo, prog;
 	std::vector<GLint> verts;
+	std::vector<GLushort> indices;
 
 	void updateVAO();
-	void setupVAO(std::vector<GLushort>);
+	void setupVAO();
 
-	void mainOverlay(std::vector<GLushort> &);
-	void initText(std::vector<GLushort> &);
+	void mainOverlay();
+	void initText();
 
 public:
 
+	enum class Text {
+		COINS = 0, TOTAL_POP, TOTAL_ATK, TOTAL_DEF,
+		POP, ATK, DEF, SEND_ATK, SEND_DEF,
+	};
+
+	enum class Section {
+		MAP = 0, SEND_TROOPS, ATK_UP, ATK_DOWN,
+		DEF_UP, DEF_DOWN, SETTINGS, CLOSE, NULL_SEC,
+	};
+
 	void initUI();
 	void drawUI();
-	void changeText(Text, int);
+
+	void attackButton(bool);
+
+	bool changeText(Text, int);
+	Section pointInBox(int, int);
 };
 #endif

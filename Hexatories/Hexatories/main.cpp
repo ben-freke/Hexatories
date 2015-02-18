@@ -31,28 +31,15 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		double xValue = NULL;
 		double yValue = NULL;
 		glfwGetCursorPos(window, &xValue, &yValue);
-
-		if (firstClick){
-			firstTerr = game.getTerritory(xValue, yValue);
-			if (firstTerr != NULL) 
-				firstClick = false;
-		}
-		else{
-			Territory *terr = game.getTerritory(xValue, yValue);
-			if (terr != NULL) {
-				game.sendTroops(*terr, *firstTerr, 1, 3);
-				firstClick = true;
-			}
-		}		
-		
-
+		printf("x: %d, y: %d\n", (int)xValue, (int)yValue);
+		game.handleMouseInput(xValue, yValue, true);
 	}
 
 }
 
 void curser_pos_callback(GLFWwindow *window, double x, double y) {
 	
-	game.highlightTerritory(x, y);
+	game.handleMouseInput(x, y, false);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {

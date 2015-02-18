@@ -374,7 +374,7 @@ tile_t HexMap::pointToTile(double mouseX, double mouseY) {
 
 	tile_t nullTile = { -1, -1, -1 };
 
-	if (mouseX > 740 || mouseY > 736 || mouseX < 0 || mouseY < 0) return nullTile;
+	if (mouseX > 720 || mouseY > 736 || mouseX < 0 || mouseY < 0) return nullTile;
 
 	/*
 	Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
