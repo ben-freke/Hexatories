@@ -152,7 +152,7 @@ void gameUI::initText() {
 		5, 68, 456,			//total pop
 		4, 5, 173,			//total atk
 		4, 77, 173,			//total def
-		4, 68, 525,			//pop
+		4, 75, 525,			//pop
 		4, 5, 283,			//atk
 		4, 77, 283,			//def
 		3, 907, 565,		//send atk

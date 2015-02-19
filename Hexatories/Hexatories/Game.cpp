@@ -45,6 +45,11 @@ void Game::handleMouseInput(double x, double y, bool click) {
 			currTerr = nextTerr;
 		} else {
 			secondTerr = getTerritory(ix, iy);
+			if (secondTerr == firstTerr) {
+				firstTerr = NULL;
+				sendTroopsPressed = !sendTroopsPressed;
+				break;
+			}
 			if (secondTerr->getOwner() != firstTerr->getOwner()) {
 				ui.attackButton(true);
 				attack = true;
@@ -168,8 +173,8 @@ void Game::resetTerrs() {
 	Takes in a sending and receiving territory, the type of troop (e.g. attackers or defenders) and the 
 	number of troops to send.
 */
-
 void Game::sendTroops(Territory &receivingTerr, Territory &sendingTerr, int troopType, int noTroops){
+
 	/*
 		Troop type can be either 1 or 0, where 1 is attackers and 0 is defenders.
 	*/
