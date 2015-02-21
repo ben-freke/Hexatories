@@ -140,6 +140,17 @@ void Game::handleMouseInput(double x, double y, bool click) {
 	}
 }
 
+void Game::handleKeyInput(int key) {
+	switch (key) {
+	case GLFW_KEY_SPACE : {
+		nextTurn();
+		break;
+	}
+
+	}
+
+}
+
 void Game::selectTerr(Territory *terr, Territory *prevTerr) {
 
 	int vals[3];
@@ -202,6 +213,11 @@ void Game::draw() {
 }
 
 void Game::resetTerrs() {
+	for (unsigned int i = 0; i < territories.size(); i++) territories[i].reset();
+}
+
+void Game::nextTurn() {
+	ui.changeText(gameUI::Text::ROUND, ++turnNo);
 	for (unsigned int i = 0; i < territories.size(); i++) territories[i].reset();
 }
 

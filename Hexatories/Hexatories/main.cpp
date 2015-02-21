@@ -11,14 +11,12 @@
 #include "Game.h"
 #include "HexMap.h"
 #include "Audio.h"
-#include "Actions.h"
 
 // (C) Group 16
 using namespace std;
 
 Audio gameMusic;
 Audio swordClang;
-Actions defaultActions;
 
 Game game;
 
@@ -44,20 +42,8 @@ void curser_pos_callback(GLFWwindow *window, double x, double y) {
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
-
-	if (key == GLFW_KEY_E && action == GLFW_PRESS) {
-
-
-	}
-	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-
-
-	}
-
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-		defaultActions.increaseTurn(game);
-
-	}
+	if (action == GLFW_PRESS)
+		game.handleKeyInput(key);
 
 }
 

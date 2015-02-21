@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Actions.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="HexMap.cpp" />
@@ -33,7 +32,6 @@
     <None Include="Shaders\map_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actions.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="HexMap.h" />

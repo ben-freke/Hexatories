@@ -15,11 +15,13 @@
 
 class Game {
 
-	int score, gold;
+	int score, gold, turnNo = 1;
 
 	HexMap map;
 	gameUI ui;
 	std::vector<Territory> territories;
+
+	void nextTurn();
 
 public:
 
@@ -51,6 +53,8 @@ public:
 	void sendTroops(Territory &receivingTerr, Territory &sendingTerr, int troopType, int noTroops);
 
 	void handleMouseInput(double, double, bool);
+	void handleKeyInput(int);
+
 	void selectTerr(Territory *, Territory *);
 };
 

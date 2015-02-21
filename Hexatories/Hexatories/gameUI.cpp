@@ -208,7 +208,7 @@ void gameUI::updateVAO() {
 
 bool gameUI::changeText(Text type, int num) {
 
-	static int vals[9];
+	static int vals[11];
 	static int countDigits[11] = {	//to make sure the int isn't too many digits
 		5, 5, 4, 4, 4, 4, 4, 3, 3, 5, 3
 	};
