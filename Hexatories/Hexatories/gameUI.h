@@ -25,7 +25,7 @@ public:
 
 	enum class Text {
 		COINS = 0, TOTAL_POP, TOTAL_ATK, TOTAL_DEF,
-		POP, ATK, DEF, SEND_ATK, SEND_DEF,
+		POP, ATK, DEF, SEND_ATK, SEND_DEF, SCORE, ROUND,
 	};
 
 	enum class Section {
@@ -37,7 +37,7 @@ public:
 	void initUI();
 	void drawUI();
 
-	void attackButton(bool);
+	void changeButton(int);
 
 	bool changeText(Text, int);
 	Section pointInBox(int, int);

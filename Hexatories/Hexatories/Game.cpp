@@ -60,7 +60,7 @@ void Game::handleMouseInput(double x, double y, bool click) {
 				sendTroopsPressed = false;
 
 				if (attack) {
-					ui.attackButton(false);
+					ui.changeButton(-1);
 					attack = false;
 				}
 
@@ -71,10 +71,10 @@ void Game::handleMouseInput(double x, double y, bool click) {
 			selectTerr(secondTerr, NULL);
 
 			if (secondTerr->getOwner() != firstTerr->getOwner() && !attack) {
-				ui.attackButton(true);
+				ui.changeButton(1);
 				attack = true;
 			} else if (secondTerr->getOwner() == firstTerr->getOwner() && attack) {
-				ui.attackButton(false);
+				ui.changeButton(0);
 				attack = false;
 			}
 		}
@@ -85,12 +85,10 @@ void Game::handleMouseInput(double x, double y, bool click) {
 		if (!sendTroopsPressed && currTerr != NULL) {
 			firstTerr = currTerr;
 			sendTroopsPressed = true;
+			ui.changeButton(0);
 		} else {
 
-			if (attack) {
-				ui.attackButton(false);
-				attack = false;
-			}
+			ui.changeButton(-1);
 
 			sendTroops(*secondTerr, *firstTerr, 1, 5);
 			selectTerr(NULL, firstTerr);

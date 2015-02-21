@@ -26,14 +26,14 @@ void gameUI::drawUI() {
 	glBindVertexArray(0);
 }
 
-void gameUI::attackButton(bool add) {
+void gameUI::changeButton(int button) {
 	static int pos[2];
 
 	GLint rectVerts[] = {
-		917, 476, 0, 0, 11,
-		998, 476, 1, 0, 11,
-		998, 430, 1, 1, 11,
-		917, 430, 0, 1, 11,
+		917, 476, 0, 0, button + 11,
+		998, 476, 1, 0, button + 11,
+		998, 430, 1, 1, button + 11,
+		917, 430, 0, 1, button + 11,
 	};
 
 	GLushort rectIndices[] = {
@@ -41,27 +41,31 @@ void gameUI::attackButton(bool add) {
 		2, 3, 0,
 	};
 
-	if (add) {
+	if (button > -1) {
+		if (pos[0] == 0) {
+			pos[0] = indices.size();
+			pos[1] = verts.size();
 
-		pos[0] = indices.size();
-		pos[1] = verts.size();
+			for (int i = 0; i < 6; i++) indices.push_back((pos[1] / 5) + rectIndices[i]);
+			for (int i = 0; i < 20; i++) verts.push_back(rectVerts[i]);
+		} else {
+			for (int i = 0; i < 4; i++) {
+				verts[pos[1] + 4 + 5 * i] = button + 11;
+			}
+		}
 
-		for (int i = 0; i < 6; i++) indices.push_back((pos[1] / 5) + rectIndices[i]);
-		for (int i = 0; i < 20; i++) verts.push_back(rectVerts[i]);
-
-	} else {
-		if (pos[0] == verts.size() - 20) {
+	} else if (pos[0] != 0) {
+		if (pos[1] == verts.size() - 20) {
 			for (int i = 0; i < 20; i++) verts.pop_back();
 		} else {
 			verts.erase(verts.begin() + pos[1], verts.begin() + pos[1] + 20);
 		}
-		if (pos[1] == indices.size() - 6) {
+		if (pos[0] == indices.size() - 6) {
 			for (int i = 0; i < 6; i++) indices.pop_back();
 		} else {
 			indices.erase(indices.begin() + pos[0], indices.begin() + pos[0] + 6);
 		}
 		pos[0] = 0;
-		pos[1] = 1;
 	}
 	updateVAO();
 }
@@ -81,11 +85,11 @@ void gameUI::setupVAO() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
 
-	GLuint tboMain, tboNums, tboATK;
+	GLuint tboMain, tboNums, tboBut;
 	
 	loadBMP("gui.png", tboMain);
 	loadBMP("nums.png", tboNums);
-	loadBMP("attack.png", tboATK);
+	loadBMP("buttons.png", tboBut);
 
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, tboMain);
@@ -94,7 +98,7 @@ void gameUI::setupVAO() {
 	glBindTexture(GL_TEXTURE_2D, tboNums);
 
 	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, tboATK);
+	glBindTexture(GL_TEXTURE_2D, tboBut);
 
 	glActiveTexture(GL_TEXTURE0);
 
@@ -104,7 +108,7 @@ void gameUI::setupVAO() {
 
 	uniforms[0] = glGetUniformLocation(prog, "main_tex");
 	uniforms[1] = glGetUniformLocation(prog, "num_tex");
-	uniforms[2] = glGetUniformLocation(prog, "attack_tex");
+	uniforms[2] = glGetUniformLocation(prog, "button_tex");
 
 	GLint posAttrib = glGetAttribLocation(prog, "position");
 	glEnableVertexAttribArray(posAttrib);
@@ -157,6 +161,8 @@ void gameUI::initText() {
 		4, 77, 283,			//def
 		3, 907, 565,		//send atk
 		3, 963, 565,		//send def
+		5, 248, 762,		//score
+		3, 833, 762,		//turn
 	};
 
 	GLushort textIndices[] = {
@@ -166,7 +172,7 @@ void gameUI::initText() {
 
 	GLushort baseIndex = 4;
 
-	for (int i = 0; i < 27; i+=3) {		// 9 different locations * 3 = 27
+	for (int i = 0; i < 33; i+=3) {		// 11 different locations * 3 = 33
 		for (int j = 0; j < textVerts[i]; j++) {	// number of letters at location
 			for (int k = 0; k < 2; k++) {	// 2x2 square
 				for (int l = 0; l < 2; l++) {
@@ -203,8 +209,8 @@ void gameUI::updateVAO() {
 bool gameUI::changeText(Text type, int num) {
 
 	static int vals[9];
-	static int countDigits[9] = {	//to make sure the int isn't too many digits
-		5, 5, 4, 4, 4, 4, 4, 3, 3,
+	static int countDigits[11] = {	//to make sure the int isn't too many digits
+		5, 5, 4, 4, 4, 4, 4, 3, 3, 5, 3
 	};
 
 	int typeNum = (int)type;
