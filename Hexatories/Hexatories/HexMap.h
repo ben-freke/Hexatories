@@ -14,16 +14,16 @@ class HexMap {
 	*/
 	static const GLint defTileVerts[];
 	std::vector<GLint> tileVerts;
+	std::vector<GLushort> indices;
 
 	/*
 		The colour values for each tile. RGB.
 	*/
 	static const GLint cols[];
 
-	GLint uniforms[2];
+	GLint uniforms[3];
 
 	GLuint vaoMap, vboMap, progMap;
-	unsigned int numIndices;
 
 	std::vector<tile_t> allTiles;
 
@@ -31,11 +31,11 @@ class HexMap {
 
 	int setupTerritories(int *, int, std::vector<Territory> &);
 
-	void setupVAO(std::vector<GLushort>);
+	void setupVAO();
 
-	void addOverlay(std::vector<GLushort> &);
+	void addOverlay();
 
-	int getAllTiles(int *, std::vector<GLushort> &);
+	int getAllTiles(int *);
 
 	/*
 	Calculate vertex position. Also includes the colour of each vertex.
@@ -66,6 +66,8 @@ public:
 	*/
 	tile_t pointToTile(double, double);
 
-	void updateVBO(Territory);
+	void updateBorder(Territory);
+
+	void updateBuilding(Territory *, bool);
 };
 #endif

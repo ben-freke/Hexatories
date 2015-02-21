@@ -19,7 +19,7 @@ void gameUI::drawUI() {
 	glUseProgram(prog);
 
 	for (int i = 0; i < 3; i++)
-		glUniform1i(uniforms[i], i + 3);
+		glUniform1i(uniforms[i], i + 4);
 
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
 
@@ -87,13 +87,13 @@ void gameUI::setupVAO() {
 	loadBMP("nums.png", tboNums);
 	loadBMP("attack.png", tboATK);
 
-	glActiveTexture(GL_TEXTURE3);
+	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, tboMain);
 
-	glActiveTexture(GL_TEXTURE4);
+	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, tboNums);
 
-	glActiveTexture(GL_TEXTURE5);
+	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, tboATK);
 
 	glActiveTexture(GL_TEXTURE0);

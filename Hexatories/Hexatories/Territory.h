@@ -30,8 +30,8 @@ class Territory {
 	int attackers[2];
 	int defenders[2];
 
-	int population, troopsAttack, troopsDefense, size, owner, vboPos, colour;
-	bool farmBuilt = false, bankBuilt = false, selected = false;
+	int population, troopsAttack, troopsDefense, size, owner, vboPos, colour, farmBuilt = -1, bankBuilt = -1;
+	bool selected = false;
 
 	void setupTiles(std::vector<tile_t>);
 

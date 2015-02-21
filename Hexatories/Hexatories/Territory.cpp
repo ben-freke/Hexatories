@@ -86,19 +86,29 @@ void Territory::addBuilding(bool type, vector<GLint> &vertices, vector<GLushort>
 		2, 3, 0,
 	};
 
-	int building = 0;
+	int building = -1, tile;
 	array<GLint, 32> verts;
 
-	if (type == true && !(farmBuilt)) {
-		farmBuilt = true;
-		building = 5;
+	if (type == true && farmBuilt == -1) {
+		do {
+			farmBuilt = rand() % tiles.size();
+		} while (farmBuilt == bankBuilt);
+
+		tile = farmBuilt;
+		building = 0;
 	}
-	if (type == false && !(bankBuilt)) {
-		bankBuilt = true;
-		building = 6;
+	if (type == false && bankBuilt == -1) {
+
+		do {
+			bankBuilt = rand() % tiles.size();
+		} while (farmBuilt == bankBuilt);
+
+		tile = bankBuilt;
+		building = 1;
 	}
-	if (building != 0) {
-		verts = getTileRect(tiles[0].x, tiles[1].y, building);
+
+	if (building != -1) {
+		verts = getTileRect(tiles[tile].x, tiles[tile].y, building + 5);
 
 		for (int j = 0; j < 32; j++) {
 			vertices.push_back(verts[j]);

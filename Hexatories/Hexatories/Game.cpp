@@ -129,6 +129,16 @@ void Game::handleMouseInput(double x, double y, bool click) {
 		break;
 	}
 
+	case gameUI::Section::BUY_FARM: {
+		map.updateBuilding(currTerr, true);
+		break;
+	}
+
+	case gameUI::Section::BUY_BANK: {
+		map.updateBuilding(currTerr, false);
+		break;
+	}
+
 	}
 }
 
@@ -185,7 +195,7 @@ Territory *Game::getTerritory(int x, int y){
 
 void Game::changeTerritoryColour(Territory &ter, int col) {
 	ter.setColour(col);
-	map.updateVBO(ter);
+	map.updateBorder(ter);
 }
 
 void Game::draw() {

@@ -15,33 +15,39 @@ bool HexMap::initMap(vector<Territory> &ter) {
 		return false;
 	}
 
-	vector<GLushort> indices;
-
-	int mapPos = getAllTiles(mapCode, indices);
-	addOverlay(indices);
+	int mapPos = getAllTiles(mapCode);
+	addOverlay();
 
 	int terrCount = setupTerritories(mapCode, mapPos, ter);
 	
 	for (int i = 0; i < terrCount; i++) {
 		ter[i].getBorderVBO(tileVerts, indices);
-	
-
 	}
 
-	setupVAO(indices);
+	setupVAO();
 
 	return true;
 }
 
 void HexMap::updateVAO() {
 	glBindVertexArray(vaoMap);
+
 	glBindBuffer(GL_ARRAY_BUFFER, vboMap);
 	glBufferData(GL_ARRAY_BUFFER, tileVerts.size() * sizeof(GLint), tileVerts.data(), GL_STATIC_DRAW);
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
+
 	glBindVertexArray(0);
 }
 
-void HexMap::updateVBO(Territory ter) {
+void HexMap::updateBorder(Territory ter) {
 	ter.updateBorderVBO(tileVerts);
+	updateVAO();
+}
+
+void HexMap::updateBuilding(Territory *ter, bool building) {
+	if (ter == NULL) return;
+	ter->addBuilding(building, tileVerts, indices);
 	updateVAO();
 }
 
@@ -92,7 +98,7 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 	return terrCount;
 }
 
-void HexMap::setupVAO(vector<GLushort> indices) {
+void HexMap::setupVAO() {
 
 	/*
 	Vertex shader, fragment shader
@@ -123,18 +129,20 @@ void HexMap::setupVAO(vector<GLushort> indices) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboMap);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
 
-	numIndices = indices.size();
-
-	GLuint tboBorder, tboMap;
+	GLuint tboBorder, tboMap, tboBuild;
 
 	loadBMP("tileBorders.png", tboBorder);
 	loadBMP("wireframe.png", tboMap);
+	loadBMP("bankFarm.png", tboBuild);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, tboBorder);
 
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, tboMap);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, tboBuild);
 
 	glActiveTexture(GL_TEXTURE0);
 
@@ -144,6 +152,7 @@ void HexMap::setupVAO(vector<GLushort> indices) {
 	
 	uniforms[0] = glGetUniformLocation(progMap, "border_tex");
 	uniforms[1] = glGetUniformLocation(progMap, "map_tex");
+	uniforms[2] = glGetUniformLocation(progMap, "farm_bank_tex");
 
 	GLint posAttrib = glGetAttribLocation(progMap, "position");
 	glEnableVertexAttribArray(posAttrib);
@@ -160,7 +169,7 @@ void HexMap::setupVAO(vector<GLushort> indices) {
 	glBindVertexArray(0);
 }
 
-void HexMap::addOverlay(vector<GLushort> &indices) {
+void HexMap::addOverlay() {
 
 	/*
 	The vertices of the corners of the map (for the wireframe overlay).
@@ -191,7 +200,7 @@ void HexMap::addOverlay(vector<GLushort> &indices) {
 	}
 }
 
-int HexMap::getAllTiles(int *mapCode, vector<GLushort> &indices) {
+int HexMap::getAllTiles(int *mapCode) {
 #pragma region vars
 	/*
 	currTile - the current tile not in columns/rows. For instance the 3rd tile in the 2nd column would be (1 * 33 + 3). 41 being the column height.
@@ -242,10 +251,10 @@ void HexMap::drawMap() {
 
 	glUseProgram(progMap);
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 3; i++)
 		glUniform1i(uniforms[i], i + 1);
 
-	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, indices.size() , GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(0);
 }
