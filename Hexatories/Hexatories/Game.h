@@ -17,7 +17,7 @@
 
 class Game {
 
-	int score, gold;
+	int score[2], gold[2];
 
 	HexMap map;
 	gameUI ui;
@@ -49,6 +49,8 @@ public:
 	/*
 		Moves trops from one territory to another
 	*/
+
+	void build(int buildType, Territory &targetTerr);
 
 	void sendTroops(Territory &receivingTerr, Territory &sendingTerr, int troopType, int noTroops);
 
