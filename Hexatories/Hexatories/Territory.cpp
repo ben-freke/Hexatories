@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <array>
 #include "Territory.h"
 #include "log.h"
 
@@ -55,14 +54,64 @@ void Territory::setColour(int newCol) {
 	}
 }
 
-void Territory::getBorderVBO(vector<GLint> &vertices, vector<GLushort> &indices) {
+array<GLint, 32> Territory::getTileRect(int x, int y, int z) {
 
-	array<GLint, 32> defVerts = {
-		147, 736, 0, 0, 0, 0, 0, colour,
-		873, 736, 0, 0, 0, 1, 0, colour,
-		873, 0, 0, 0, 0, 1, 1, colour,
-		147, 0, 0, 0, 0, 0, 1, colour,
+	array<GLint, 32> verts = {
+		147, 736, 0, 0, 0, 0, 0, z,
+		873, 736, 0, 0, 0, 1, 0, z,
+		873, 0, 0, 0, 0, 1, 1, z,
+		147, 0, 0, 0, 0, 0, 1, z,
 	};
+
+	int xoff = x % 2;
+
+	verts[0] += 18 * x;
+	verts[24] = verts[0];
+	verts[8] = verts[0] + 24;
+	verts[16] = verts[8];
+
+	verts[1] -= (22 * y) + (11 * xoff);
+	verts[9] = verts[1];
+	verts[17] = verts[1] - 23;
+	verts[25] = verts[17];
+
+	return verts;
+}
+
+void Territory::addBuilding(bool type, vector<GLint> &vertices, vector<GLushort> &indices) {
+
+	GLushort baseIndex = vertices.size() / 8;
+	GLushort rectIndices[] = {
+		0, 1, 2,
+		2, 3, 0,
+	};
+
+	int building = 0;
+	array<GLint, 32> verts;
+
+	if (type == true && !(farmBuilt)) {
+		farmBuilt = true;
+		building = 5;
+	}
+	if (type == false && !(bankBuilt)) {
+		bankBuilt = true;
+		building = 6;
+	}
+	if (building != 0) {
+		verts = getTileRect(tiles[0].x, tiles[1].y, building);
+
+		for (int j = 0; j < 32; j++) {
+			vertices.push_back(verts[j]);
+		}
+
+		for (int j = 0; j < 6; j++) {
+			indices.push_back(baseIndex + rectIndices[j]);
+		}
+
+	}
+}
+
+void Territory::getBorderVBO(vector<GLint> &vertices, vector<GLushort> &indices) {
 
 	GLushort rectIndices[] = {
 		0, 1, 2,
@@ -72,25 +121,9 @@ void Territory::getBorderVBO(vector<GLint> &vertices, vector<GLushort> &indices)
 	vboPos = vertices.size() + 7;
 	int baseIndex = (vertices.size() / 8);
 
-	int x, y, xoff;
-
 	for (unsigned int i = 0; i < border.size(); i++) {
 
-		array<GLint, 32> verts = defVerts;
-
-		x = border[i].x;
-		y = border[i].y;
-		xoff = x % 2;
-
-		verts[0] += 18 * x;
-		verts[24] = verts[0];
-		verts[8] = verts[0] + 24;
-		verts[16] = verts[8];
-
-		verts[1] -= (22 * y) + (11 * xoff);
-		verts[9] = verts[1];
-		verts[17] = verts[1] - 23;
-		verts[25] = verts[17];
+		array<GLint, 32> verts = getTileRect(border[i].x, border[i].y, colour);
 
 		for (int j = 0; j < 32; j++) {
 			vertices.push_back(verts[j]);

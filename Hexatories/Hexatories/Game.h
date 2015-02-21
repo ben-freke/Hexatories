@@ -13,8 +13,6 @@
 	Also allows user designed maps to be read from file.
 */
 
-
-
 class Game {
 
 	int score, gold;

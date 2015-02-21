@@ -39,17 +39,28 @@ void Game::handleMouseInput(double x, double y, bool click) {
 	switch (sect) {
 
 	case gameUI::Section::MAP:{
+
 		if (firstTerr == NULL) {
+
 			Territory *nextTerr = getTerritory(ix, iy);
 			selectTerr(nextTerr, currTerr);
 			currTerr = nextTerr;
+
 		} else {
+
 			secondTerr = getTerritory(ix, iy);
 			if (secondTerr == firstTerr) {
+
+				selectTerr(NULL, firstTerr);
 				firstTerr = NULL;
-				sendTroopsPressed = !sendTroopsPressed;
+				secondTerr = NULL;
+				sendTroopsPressed = false;
 				break;
+
 			}
+
+			selectTerr(secondTerr, NULL);
+
 			if (secondTerr->getOwner() != firstTerr->getOwner()) {
 				ui.attackButton(true);
 				attack = true;
@@ -59,13 +70,15 @@ void Game::handleMouseInput(double x, double y, bool click) {
 	}
 
 	case gameUI::Section::SEND_TROOPS: {
-		if (!sendTroopsPressed) {
+		if (!sendTroopsPressed && currTerr != NULL) {
 			firstTerr = currTerr;
-
+			sendTroopsPressed = true;
 		} else {
+
 			if (attack) ui.attackButton(false);
 			sendTroops(*secondTerr, *firstTerr, 1, 5);
 			selectTerr(NULL, firstTerr);
+			selectTerr(NULL, secondTerr);
 			firstTerr = NULL;
 			secondTerr = NULL;
 
@@ -73,8 +86,8 @@ void Game::handleMouseInput(double x, double y, bool click) {
 			numDefSend = 0;
 			ui.changeText(gameUI::Text::SEND_ATK, 0);
 			ui.changeText(gameUI::Text::SEND_DEF, 0);
+			sendTroopsPressed = false;
 		}
-		sendTroopsPressed = !sendTroopsPressed;
 		break;
 	}
 

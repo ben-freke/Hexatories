@@ -1,4 +1,5 @@
 #include <vector>
+#include <array>
 #include <GL\glew.h>
 #include <GLFW/glfw3.h>
 
@@ -37,6 +38,10 @@ class Territory {
 public:
 
 	void initTerritory(std::vector<tile_t>, int, int);
+
+	std::array<GLint, 32> getTileRect(int, int, int);
+
+	void addBuilding(bool, std::vector<GLint> &, std::vector<GLushort> &);
 	
 	void setColour(int);
 

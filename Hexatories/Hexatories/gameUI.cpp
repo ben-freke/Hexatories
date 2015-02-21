@@ -250,6 +250,10 @@ const int gameUI::sectionCoords[] = {
 	902, 252, 950, 281,		// atk down
 	959, 158, 1008, 186,	// def up
 	959, 252, 1008, 281,	// def down
+	900, 602, 1007, 653,	// buy attack
+	900, 665, 1007, 720,	// buy defence
+	900, 525, 1007, 590,	// buy farm
+	900, 440, 1007, 515,	// buy bank
 	0, 34, 137, 130,		// settings
 	3, 2, 31, 22,			// close
 };
@@ -257,12 +261,12 @@ const int gameUI::sectionCoords[] = {
 gameUI::Section gameUI::pointInBox(int x, int y) {
 
 	int tx, bx, ty, by;
-	for (int i = 0; i < 32; i += 4) {
+	for (int i = 0; i < 48; i += 4) {
 		tx = sectionCoords[i];
 		ty = sectionCoords[i + 1];
 		bx = sectionCoords[i + 2];
 		by = sectionCoords[i + 3];
 		if (x >= tx && x <= bx && y >= ty && y <= by) return (gameUI::Section)(i / 4);
 	}
-	return (gameUI::Section)(8);
+	return (gameUI::Section)(12);
 }
