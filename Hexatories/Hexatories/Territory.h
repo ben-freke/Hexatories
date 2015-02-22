@@ -1,11 +1,13 @@
 #include <vector>
 #include <array>
+#include <string>
 #include <GL\glew.h>
 #include <GLFW/glfw3.h>
 
 #ifndef __TERRITORY_H
 #define __TERRITORY_H
 
+#pragma region tileFuncs
 struct tile_t {
 	int x, y, terrNo;
 };
@@ -22,6 +24,7 @@ struct findTile {
 };
 
 bool operator==(const tile_t &tile1, const tile_t &tile2);
+#pragma endregion
 
 class Territory {
 
@@ -30,75 +33,67 @@ class Territory {
 	int attackers[2];
 	int defenders[2];
 
-	int population, troopsAttack, troopsDefense, size, owner, vboPos, colour, farmBuilt = -1, bankBuilt = -1;
+	int population, size, owner, farmBuilt = -1, bankBuilt = -1;
+	int colour, vboPos;
+
 	bool selected = false;
+
+	
+#pragma region troops
+	int getAttackers();
+
+	int getDefense();
+
+	void destroyAttackers();
+
+	void destroyDefenders(int i);
+
+	void receiveTroops(int numAtk, int numDef);
+#pragma endregion
 
 	void setupTiles(std::vector<tile_t>);
 
-public:
-
-	void initTerritory(std::vector<tile_t>, int, int);
-
 	std::array<GLint, 32> getTileRect(int, int, int);
 
-	void addBuilding(bool, std::vector<GLint> &, std::vector<GLushort> &);
-	
-	void setColour(int);
+public:
+
+#pragma region otherFuncs
+	void initTerritory(std::vector<tile_t>, int, int);
+	void initTerritory(int, std::vector<tile_t>, std::vector<tile_t>, int[], int[], int);
 
 	int getOwner();
 
 	void setOwner(int newOwner);
 
-	void reset();
+	void getInfo(int *);
 
-	/*
-		Gets the number of attackers and defenders.
-	*/
+	void fillSaveData(std::string &);
+#pragma endregion
 
-	int getAttackers();
-
-	int getDefense();
-
-	/*
-		Adds attackers and defenders
-		TODO: Implement addDefender()
-	*/
-
+#pragma region troops
 	void addAttacker();
 
-	/*
-		Destroys attackers or defenders
-	*/
-
-	bool destroyAttackers(int i);
-
-	bool destroyDefenders(int i);
-
-	/*
-		Sends attackers and defenders
-		TODO: Implement sendDefender()
-	*/
+	void addDefender();
 
 	bool sendTroops(Territory &targetTerr, int numAtk, int numDef);
 
-	/*
-		Receives attackers and defenders
-		TODO: Implement receiveDefender()
-	*/
-	
-	void receiveTroops(int numAtk, int numDef);
+	void sendTroopsMoved(Territory &, int, int);
 
-	
-	void setupBorderTiles();
+	void resetTroops();
+#pragma endregion
 
+#pragma region territoryDrawMethods
 	void getBorderVBO(std::vector<GLint> &, std::vector<GLushort> &);
 
 	void updateBorderVBO(std::vector<GLint> &);
 
+	void addBuilding(bool, std::vector<GLint> &, std::vector<GLushort> &);
+
+	void setColour(int);
+
 	bool isSelected();
 
 	void invSelect();
-
-	void getInfo(int *);
+#pragma endregion
 };
 #endif

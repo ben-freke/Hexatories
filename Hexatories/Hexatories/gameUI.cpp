@@ -7,10 +7,20 @@
 using namespace std;
 
 void gameUI::initUI() {
+
+	verts.clear();
+	indices.clear();
+
 	mainOverlay();
 	initText();
+	changeText(gameUI::Text::ROUND, 1);
 
-	setupVAO();
+	if (firstTime) {
+		setupVAO();
+		firstTime = false;
+	} else {
+		updateVAO();
+	}
 }
 
 void gameUI::drawUI() {
@@ -70,6 +80,7 @@ void gameUI::changeButton(int button) {
 	updateVAO();
 }
 
+#pragma region openglStuff
 void gameUI::setupVAO() {
 
 	GLuint vs, fs, ebo;
@@ -117,6 +128,17 @@ void gameUI::setupVAO() {
 	GLint texAttrib = glGetAttribLocation(prog, "tex_coord");
 	glEnableVertexAttribArray(texAttrib);
 	glVertexAttribPointer(texAttrib, 3, GL_INT, GL_FALSE, 5 * sizeof(GLint), (void*)(2 * sizeof(GLint)));
+
+	glBindVertexArray(0);
+}
+
+void gameUI::updateVAO() {
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLint), verts.data(), GL_STATIC_DRAW);
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 }
@@ -194,17 +216,7 @@ void gameUI::initText() {
 	}
 
 }
-
-void gameUI::updateVAO() {
-	glBindVertexArray(vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLint), verts.data(), GL_STATIC_DRAW);
-
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
-
-	glBindVertexArray(0);
-}
+#pragma endregion
 
 bool gameUI::changeText(Text type, int num) {
 
@@ -215,11 +227,7 @@ bool gameUI::changeText(Text type, int num) {
 
 	int typeNum = (int)type;
 
-	if (typeNum < 4) {	//coins, totalPop, totalAtk, totalDef are not set explicitly
-		vals[typeNum] += num;
-	} else {
-		vals[typeNum] = num;
-	}
+	vals[typeNum] = num;
 
 	int maxLength = countDigits[typeNum];
 	if (num >= pow(10, maxLength)) return false;
@@ -249,6 +257,7 @@ bool gameUI::changeText(Text type, int num) {
 	return true;
 }
 
+#pragma region sections
 const int gameUI::sectionCoords[] = {
 	147, 32, 867, 768,		// map
 	915, 292, 1000, 338,	// send troops
@@ -276,3 +285,4 @@ gameUI::Section gameUI::pointInBox(int x, int y) {
 	}
 	return (gameUI::Section)(12);
 }
+#pragma endregion

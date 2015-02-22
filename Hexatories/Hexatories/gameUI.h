@@ -7,7 +7,7 @@
 #define __GAMEUI_H
 
 class gameUI {
-
+#pragma region vars
 	static const int sectionCoords[];
 
 	GLint uniforms[3];
@@ -15,10 +15,15 @@ class gameUI {
 	std::vector<GLint> verts;
 	std::vector<GLushort> indices;
 
-	void updateVAO();
-	void setupVAO();
+	bool firstTime = true;
+#pragma endregion
 
+#pragma region openglStuff
+	void setupVAO();
+	void updateVAO();
 	void mainOverlay();
+#pragma endregion
+
 	void initText();
 
 public:

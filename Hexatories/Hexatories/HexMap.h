@@ -8,11 +8,13 @@
 #define __HEXMAP_H
 
 class HexMap {
-
+#pragma region vars
 	/*
 		Default vertex array. These are adjusted for each hex based on its grid position.
 	*/
 	static const GLint defTileVerts[];
+
+
 	std::vector<GLint> tileVerts;
 	std::vector<GLushort> indices;
 
@@ -25,13 +27,14 @@ class HexMap {
 
 	GLuint vaoMap, vboMap, progMap;
 
+	bool firstTime = true;
+
 	std::vector<tile_t> allTiles;
+#pragma endregion
 
-	void updateVAO();
-
-	int setupTerritories(int *, int, std::vector<Territory> &);
-
+#pragma region openglStuff
 	void setupVAO();
+	void updateVAO();
 
 	void addOverlay();
 
@@ -44,16 +47,19 @@ class HexMap {
 	It appends the tiles vertices to the end of the passed array.
 	*/
 	void calcTileVerts(int, int, int);
+#pragma endregion
+
+	int setupTerritories(int *, int, std::vector<Territory> &);
 
 	/*
-	Returns the string containing map data to interpret. Really needs reworking.
-	Usage: string map = mapFromFile("BeachMap");
+		Returns the string containing map data to interpret.
+		Usage: string map = mapFromFile("BeachMap");
 	*/
-	static int *mapFromFile(const char *);
+	static int *mapFromFile(std::string);
 
 public:
 
-	bool initMap(std::vector<Territory> &);
+	void initMap(std::vector<Territory> &, bool);
 
 	/*
 	Just draws the map & grid currently.
@@ -65,9 +71,9 @@ public:
 	Return true if in the grid.
 	*/
 	tile_t pointToTile(double, double);
+	void addToTiles(tile_t);
 
-	void updateBorder(Territory);
-
+	void updateBorder(Territory &, bool);
 	void updateBuilding(Territory *, bool);
 };
 #endif
