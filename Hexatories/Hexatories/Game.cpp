@@ -264,7 +264,7 @@ void Game::handleMouseInput(double x, double y, bool click) {
 			sendTroopsPressed = true;
 			ui.changeButton(0);	//Indent button
 
-		} else {
+		} else if (secondTerr != NULL) {
 
 			ui.changeButton(-1);	//Resets the button
 
