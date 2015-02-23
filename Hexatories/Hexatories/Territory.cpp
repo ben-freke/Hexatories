@@ -197,9 +197,6 @@ void Territory::receiveTroops(int numAtk, int numDef){
 	TODO: Implement receiveDefender()
 */
 
-bool Territory::checkBank(){
-	return bankBuilt;
-}
 
 bool operator==(const tile_t &tile1, const tile_t &tile2) {
 	return ((tile1.x == tile2.x) && (tile1.y == tile2.y));

@@ -94,9 +94,6 @@ public:
 
 	void invSelect();
 
-	bool checkBank();
-
-
 	void getInfo(int *);
 };
 #endif

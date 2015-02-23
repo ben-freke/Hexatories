@@ -168,33 +168,27 @@ void Game::resetTerrs() {
 	for (unsigned int i = 0; i < territories.size(); i++) territories[i].reset();
 }
 
-void Game::build(int buildType, Territory &targetTerr){
-	if (gold[0] > 1000){
-		if (targetTerr.getInfo)
-	}
-}
-
 /*
 	Sends the troops from one tile to another. METHOD IS NOT YET FOOLPROOF.
 	Takes in a sending and receiving territory, the type of troop (e.g. attackers or defenders) and the 
 	number of troops to send.
 */
-void Game::sendTroops(Territory &receivingTerr, Territory &sendingTerr, int noAttack, int noDefense){
+void Game::sendTroops(Territory &receivingTerr, Territory &sendingTerr, int troopType, int noTroops){
 
 	/*
 		Troop type can be either 1 or 0, where 1 is attackers and 0 is defenders.
 	*/
+	if (troopType == 0){
 
-	if (receivingTerr.getOwner() == sendingTerr.getOwner()) {
+		//Send Defender
 
-		sendingTerr.sendTroops(receivingTerr, noAttack, noDefense);
 
 	}
+	else if (troopType == 1) {
+		if (sendingTerr.getAttackers() >= noTroops) {
+			if (receivingTerr.getOwner() != sendingTerr.getOwner()) {
 
-
-	else {
-
-				int attack = noAttack * 15;
+				int attack = noTroops * 15;
 				int defense = receivingTerr.getDefense();
 
 				int randomBoundaries = (int)(attack * 0.10);
@@ -214,12 +208,12 @@ void Game::sendTroops(Territory &receivingTerr, Territory &sendingTerr, int noAt
 					/*
 						Destroy all attackers sent from the opposing territory
 						*/
-					sendingTerr.destroyAttackers(noAttack);
+					sendingTerr.destroyAttackers(noTroops);
 
 					/*
 						Destroys any lost defenders in the territory
 					*/
-					receivingTerr.destroyDefenders(noAttack);
+					receivingTerr.destroyDefenders(noTroops);
 				}
 				/*
 					Attack has won. All defenders should be destroyed and remaining attackers recorded.
@@ -236,7 +230,7 @@ void Game::sendTroops(Territory &receivingTerr, Territory &sendingTerr, int noAt
 					/*
 					Destroy all attackers sent from the opposing territory
 					*/
-					sendingTerr.destroyAttackers(noAttack - remainingTroops);
+					sendingTerr.destroyAttackers(noTroops - remainingTroops);
 
 					sendingTerr.sendTroops(receivingTerr, remainingTroops, 0);
 
@@ -245,6 +239,12 @@ void Game::sendTroops(Territory &receivingTerr, Territory &sendingTerr, int noAt
 
 					cout << "Success in attacking\n";
 				}
-			
+			} else {
+				cout << "You have the same owner\n";
+			}
+		}
+		else{
+			cout << "You do not have enough troops to send\n";
+		}
 	}
 }
