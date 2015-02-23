@@ -11,62 +11,56 @@
 #include "Game.h"
 #include "HexMap.h"
 #include "Audio.h"
-#include "Actions.h"
 
 // (C) Group 16
 using namespace std;
 
 Audio gameMusic;
 Audio swordClang;
-Actions defaultActions;
 
 Game game;
 
+/*
+	Passes mouse click input to Game to be processed
+*/
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 
-	static bool firstClick = true;
-	static Territory *firstTerr;
-
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+
 		double xValue = NULL;
 		double yValue = NULL;
+
 		glfwGetCursorPos(window, &xValue, &yValue);
-		printf("x: %d, y: %d\n", (int)xValue, (int)yValue);
-		game.handleMouseInput(xValue, yValue, true);
+		//printf("x: %d, y: %d\n", (int)xValue, (int)yValue);
+		game.handleMouseInput(xValue, yValue, true, false);	// true == clicked (not hover) false = don't reset selected ters
+
 	}
 
 }
 
+/*
+	Passes mouse over input to Game to be processed
+*/
 void curser_pos_callback(GLFWwindow *window, double x, double y) {
 	
-	game.handleMouseInput(x, y, false);
+	game.handleMouseInput(x, y, false, false);	// false == mouseover not click, false = don't reset selected ters
 }
 
+/*
+	Passes key input to Game to be processed
+*/
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
-
-	if (key == GLFW_KEY_E && action == GLFW_PRESS) {
-
-
-	}
-	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-
-
-	}
-
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-		defaultActions.increaseTurn(game);
-
-	}
+	if (action == GLFW_PRESS)
+		game.handleKeyInput(key);
 
 }
 
+/*
+	Adds FPS to window title
+*/
 void _update_fps_counter(GLFWwindow* window) {
 
-	double xValue = NULL;
-	double yValue = NULL;
-	glfwGetCursorPos(window, &xValue, &yValue);
-	
 	static double previous_seconds = glfwGetTime();
 	static int frame_count;
 	double current_seconds = glfwGetTime();
@@ -87,6 +81,9 @@ void _update_fps_counter(GLFWwindow* window) {
 
 }
 
+/*
+	Sets up the game window
+*/
 GLFWwindow* initWindow(void) {
 
 	//glfwWindowHint(GLFW_SAMPLES, 4);
@@ -117,10 +114,9 @@ int main(void) {
 	
 	srand((unsigned int)time(NULL));
 
+	restart_log();	// Clear the debug log
 
-	restart_log();
-
-	// Initialize the library 
+	// Initialize glfw
 	if (!glfwInit())
 		return -1;
 
@@ -133,7 +129,6 @@ int main(void) {
 
 	glDepthFunc(GL_NEVER);	//Renders in order drawn (last drawn on top)
 
-	// Make the window's context current
 	glfwMakeContextCurrent(window);
 
 	glewExperimental = true;
@@ -144,14 +139,12 @@ int main(void) {
 		return -1;
 	}
 
+	// set input callbacks (basically event handlers)
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetCursorPosCallback(window, curser_pos_callback);
 	glfwSetKeyCallback(window, key_callback);
 
-	if (!game.initGame()) {
-		log("Game init failed\n");
-		return -1;
-	}
+	game.initGame();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -164,10 +157,9 @@ int main(void) {
 
 		game.draw();
 		
-		// Swap front and back buffers 
 		glfwSwapBuffers(window);
 
-		// Poll for and process events 
+		// Poll for events (i.e. input)
 		glfwPollEvents();
 	}
 

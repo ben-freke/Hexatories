@@ -9,37 +9,86 @@
 #define __GAME_H
 
 /*
-	Currently contains functionality to generate the entire vbo of the hexmap and draw it.
-	Also allows user designed maps to be read from file.
+	Contains necessary information to remember about a player
 */
+struct player {
+	int coins, score, population;
+};
 
-
-
+/*
+	Runs everything about the game in one way or another
+*/
 class Game {
 
-	int score, gold;
+	int turnNo = 1;
+
+	player players[2]; // 0 = AI 1 = you
 
 	HexMap map;
 	gameUI ui;
-	std::vector<Territory> territories;
+
+	std::vector<Territory> territories;	//All the territories on the current map
+
+	/*
+		Increment turn, resetting territories attackers/defenders and incrementing Population/coins
+	*/
+	void nextTurn();
+
+	/*
+		Loops through and updates the score for the player selected (passed int)
+	*/
+	void updateScore(int);
+
+#pragma region territoryHandling
+	/*
+		Returns the territory under the mouse co ordinates
+	*/
+	Territory *getTerritory(int, int);
+
+	/*
+		Selects a territory, updating the information on the sidebar and highlighting it until it is deselected
+	*/
+	void selectTerr(Territory *, Territory *);
+
+	/*
+		Makes a territories border gold (used on mouseover)
+	*/
+	void highlightTerritory(Territory *);
+
+	/*
+		Changes a territories border colour.
+	*/
+	void changeTerritoryColour(Territory &ter, int col);
+#pragma endregion
+
+#pragma region saving
+	/*
+		Loads save from file
+	*/
+	std::vector<int> Game::getSave();
+
+	/*
+		Starts a new game, allowing the map to initialise the territories from the map it loads
+	*/
+	void newGame();
+
+	/*
+		Loads map from file, sets up territories and players
+	*/
+	void loadGame();
+
+	/*
+		Saves the game to file
+	*/
+	void saveGame();
+#pragma endregion
 
 public:
 
 	/*
-		Initialises the map
+		Initialises the game
 	*/
-	bool initGame();
-
-	Territory *getTerritory(int, int);
-
-	/*
-		Highlight territory
-	*/
-	void highlightTerritory(Territory *);
-
-	void changeTerritoryColour(Territory &ter, int col);
-	
-	void resetTerrs();
+	void initGame();
 
 	/*
 		Batch draw function
@@ -47,13 +96,14 @@ public:
 	void draw();
 
 	/*
-		Moves trops from one territory to another
+		Handle all mouse click/mouse over events
 	*/
+	void handleMouseInput(double, double, bool, bool);
 
-	void sendTroops(Territory &receivingTerr, Territory &sendingTerr, int troopType, int noTroops);
-
-	void handleMouseInput(double, double, bool);
-	void selectTerr(Territory *, Territory *);
+	/*
+		Handles all keyboard input
+	*/
+	void handleKeyInput(int);
 };
 
 #endif

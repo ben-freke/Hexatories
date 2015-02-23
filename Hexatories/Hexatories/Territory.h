@@ -1,14 +1,20 @@
 #include <vector>
+#include <array>
+#include <string>
 #include <GL\glew.h>
 #include <GLFW/glfw3.h>
 
 #ifndef __TERRITORY_H
 #define __TERRITORY_H
 
+#pragma region tileFuncs
 struct tile_t {
 	int x, y, terrNo;
-};
+};	//Used in arrays to store tiles in a territory
 
+/*
+	Compares two tiles, used for find_if
+*/
 struct findTile {
 
 	int m_x, m_y;
@@ -20,80 +26,149 @@ struct findTile {
 	}
 };
 
+/*
+	Allows use of the == operator on tiles
+*/
 bool operator==(const tile_t &tile1, const tile_t &tile2);
+#pragma endregion
 
 class Territory {
 
 	std::vector<tile_t> tiles, border;
 	
-	int attackers[2];
+	int attackers[2];	//[0] unused [1] used
 	int defenders[2];
 
-	int population, troopsAttack, troopsDefense, size, owner, vboPos, colour;
-	bool farmBuilt = false, bankBuilt = false, selected = false;
+	int population, size, owner, farmBuilt = -1, bankBuilt = -1;
+	int colour, vboPos;
 
-	void setupTiles(std::vector<tile_t>);
+	bool selected = false;	//Used to determine if we should stay highlighted when mouse is off us
 
-public:
-
-	void initTerritory(std::vector<tile_t>, int, int);
 	
-	void setColour(int);
-
-	int getOwner();
-
-	void setOwner(int newOwner);
-
-	void reset();
+#pragma region troops
 
 	/*
-		Gets the number of attackers and defenders.
+		Gets the defense of a territory (15 * defenders[1] + pop)
 	*/
-
-	int getAttackers();
-
 	int getDefense();
 
 	/*
-		Adds attackers and defenders
-		TODO: Implement addDefender()
+		Destroys all attackers on a tile (will never need to be x amount)
 	*/
+	void destroyAttackers();
 
+	/*
+		Destroys i defenders (plus however many population necessary)
+	*/
+	void destroyDefenders(int i);
+
+	/*
+		Adds troops from another territory
+	*/
+	void receiveTroops(int numAtk, int numDef);
+#pragma endregion
+
+	/*
+		Works out which tiles are borders and inner tiles
+	*/
+	void setupTiles(std::vector<tile_t>);
+
+	/*
+		Gets the vertices of the rectangle surrounding a tile
+	*/
+	std::array<GLint, 32> getTileRect(int, int, int);
+
+public:
+
+#pragma region otherFuncs
+	/*
+		Normal constructor
+	*/
+	void initTerritory(std::vector<tile_t>, int, int);
+
+	/*
+		Overloaded constructor for when we load a game
+	*/
+	void initTerritory(int, std::vector<tile_t>, std::vector<tile_t>, int[], int[], int);
+
+	/*
+		Return who owns this territory
+	*/
+	int getOwner();
+
+	/*
+		Changes the owner
+	*/
+	void setOwner(int newOwner);
+
+	/*
+		Returns information to be displayed when territory is selected
+	*/
+	void getInfo(int *);
+
+	/*
+		Adds necessary data to the passed string for saving
+	*/
+	void fillSaveData(std::string &);
+#pragma endregion
+
+#pragma region troops
+	/*
+		Adds a used attacker
+	*/
 	void addAttacker();
 
 	/*
-		Destroys attackers or defenders
+		Adds a used defender
 	*/
-
-	bool destroyAttackers(int i);
-
-	bool destroyDefenders(int i);
+	void addDefender();
 
 	/*
-		Sends attackers and defenders
-		TODO: Implement sendDefender()
+		Transfers troops from one territory to another (assuming you have them)
 	*/
-
 	bool sendTroops(Territory &targetTerr, int numAtk, int numDef);
 
 	/*
-		Receives attackers and defenders
-		TODO: Implement receiveDefender()
+		For attacking territories - needs reworking
 	*/
-	
-	void receiveTroops(int numAtk, int numDef);
+	void sendTroopsMoved(Territory &, int, int);
 
-	
-	void setupBorderTiles();
+	/*
+		Sets used troops to unused
+	*/
+	void resetTroops();
+#pragma endregion
 
+#pragma region territoryDrawMethods
+	/*
+		Adds the borders to the passed vectors
+	*/
 	void getBorderVBO(std::vector<GLint> &, std::vector<GLushort> &);
 
+	/*
+		Updates colour of the border
+	*/
 	void updateBorderVBO(std::vector<GLint> &);
 
+	/*
+		Adds building to random tile on map
+	*/
+	void addBuilding(bool, std::vector<GLint> &, std::vector<GLushort> &);
+
+	/*
+		Changes the colour var
+	*/
+	void setColour(int);
+
+	/*
+		Returns selected
+	*/
 	bool isSelected();
 
+	/*
+		Inverts selected
+	*/
 	void invSelect();
-
-	void getInfo(int *);
+#pragma endregion
 };
 #endif
