@@ -8,18 +8,18 @@ using namespace std;
 
 void gameUI::initUI() {
 
-	verts.clear();
+	verts.clear();	//Reset openGL arrays in case of restarted game
 	indices.clear();
 
-	mainOverlay();
-	initText();
-	changeText(gameUI::Text::ROUND, 1);
+	mainOverlay();	//set up main overlay
+	initText();	//add text
+	changeText(gameUI::Text::ROUND, 1);	//round is 1 until increased (or changed due to load)
 
-	if (firstTime) {
-		setupVAO();
+	if (firstTime) {	//If UI has not been loaded before
+		setupVAO();	//Set up vao, textures etc
 		firstTime = false;
 	} else {
-		updateVAO();
+		updateVAO();	//Else just update the VBO/EBO
 	}
 }
 
@@ -29,7 +29,7 @@ void gameUI::drawUI() {
 	glUseProgram(prog);
 
 	for (int i = 0; i < 3; i++)
-		glUniform1i(uniforms[i], i + 4);
+		glUniform1i(uniforms[i], i + 4);	//Tell gpu which textures to use
 
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
 
@@ -37,9 +37,9 @@ void gameUI::drawUI() {
 }
 
 void gameUI::changeButton(int button) {
-	static int pos[2];
+	static int pos[2];	//[0] position in indices [1] position in verts
 
-	GLint rectVerts[] = {
+	GLint rectVerts[] = {	//button + 11 due to shader texture numbers
 		917, 476, 0, 0, button + 11,
 		998, 476, 1, 0, button + 11,
 		998, 430, 1, 1, button + 11,
@@ -51,31 +51,32 @@ void gameUI::changeButton(int button) {
 		2, 3, 0,
 	};
 
-	if (button > -1) {
-		if (pos[0] == 0) {
-			pos[0] = indices.size();
+	if (button > -1) {	//if -1 it is to clear, not add or change
+		if (pos[0] == 0) {	//if no extra button addd
+
+			pos[0] = indices.size();	//record positions
 			pos[1] = verts.size();
 
-			for (int i = 0; i < 6; i++) indices.push_back((pos[1] / 5) + rectIndices[i]);
+			for (int i = 0; i < 6; i++) indices.push_back((pos[1] / 5) + rectIndices[i]);	//add verts/indices
 			for (int i = 0; i < 20; i++) verts.push_back(rectVerts[i]);
-		} else {
+		} else {	//if there already is an extra button
 			for (int i = 0; i < 4; i++) {
-				verts[pos[1] + 4 + 5 * i] = button + 11;
+				verts[pos[1] + 4 + 5 * i] = button + 11;	//change which button it is
 			}
 		}
 
-	} else if (pos[0] != 0) {
-		if (pos[1] == verts.size() - 20) {
-			for (int i = 0; i < 20; i++) verts.pop_back();
+	} else if (pos[0] != 0) {	//if delete and button exists
+		if (pos[1] == verts.size() - 20) {	//if verts has nothing else after us
+			for (int i = 0; i < 20; i++) verts.pop_back();	//pop all of our verts
 		} else {
-			verts.erase(verts.begin() + pos[1], verts.begin() + pos[1] + 20);
+			verts.erase(verts.begin() + pos[1], verts.begin() + pos[1] + 20);	//else delete our verts
 		}
-		if (pos[0] == indices.size() - 6) {
-			for (int i = 0; i < 6; i++) indices.pop_back();
+		if (pos[0] == indices.size() - 6) {	//if indices has nothing after us
+			for (int i = 0; i < 6; i++) indices.pop_back();	//pop out indices
 		} else {
-			indices.erase(indices.begin() + pos[0], indices.begin() + pos[0] + 6);
+			indices.erase(indices.begin() + pos[0], indices.begin() + pos[0] + 6);	//else delete indices
 		}
-		pos[0] = 0;
+		pos[0] = 0;	//used to check if we exist (see above)
 	}
 	updateVAO();
 }
@@ -85,24 +86,24 @@ void gameUI::setupVAO() {
 
 	GLuint vs, fs, ebo;
 
-	glGenVertexArrays(1, &vao);
+	glGenVertexArrays(1, &vao);	//VAO contains all information for drawing the UI, including VBO & EBO
 	glBindVertexArray(vao);
 
-	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &vbo);	//Contains all verts information
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLint), verts.data(), GL_STATIC_DRAW);
 
-	glGenBuffers(1, &ebo);
+	glGenBuffers(1, &ebo);	//Contains draw order of verts
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
 
-	GLuint tboMain, tboNums, tboBut;
+	GLuint tboMain, tboNums, tboBut;	//for our textures
 	
 	loadBMP("gui.png", tboMain);
 	loadBMP("nums.png", tboNums);
 	loadBMP("buttons.png", tboBut);
 
-	glActiveTexture(GL_TEXTURE4);
+	glActiveTexture(GL_TEXTURE4);	//bind our textures to various slots
 	glBindTexture(GL_TEXTURE_2D, tboMain);
 
 	glActiveTexture(GL_TEXTURE5);
@@ -111,17 +112,17 @@ void gameUI::setupVAO() {
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, tboBut);
 
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);	//reset bound slot
 
-	vs = compileVShader("main_vs");
+	vs = compileVShader("main_vs");	//compile shader program
 	fs = compileFShader("UI_fs");
 	prog = createProgram(vs, fs);
 
-	uniforms[0] = glGetUniformLocation(prog, "main_tex");
+	uniforms[0] = glGetUniformLocation(prog, "main_tex");	//get position of these variables in our program and save them
 	uniforms[1] = glGetUniformLocation(prog, "num_tex");
 	uniforms[2] = glGetUniformLocation(prog, "button_tex");
 
-	GLint posAttrib = glGetAttribLocation(prog, "position");
+	GLint posAttrib = glGetAttribLocation(prog, "position");	//set up our vertex attributes. (px, py, tx, ty, tz)
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 2, GL_INT, GL_FALSE, 5 * sizeof(GLint), 0);
 
@@ -135,17 +136,17 @@ void gameUI::setupVAO() {
 void gameUI::updateVAO() {
 	glBindVertexArray(vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);	//update VBO on GPU
 	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLint), verts.data(), GL_STATIC_DRAW);
 
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);	//update EBO
 
 	glBindVertexArray(0);
 }
 
 void gameUI::mainOverlay() {
 
-	GLint rectVerts[] = {
+	GLint rectVerts[] = {	//Just the coords of the window with the texture coords and texture number
 		0, 768, 0, 0, 10,
 		1024, 768, 1, 0, 10,
 		1024, 0, 1, 1, 10,
@@ -159,7 +160,7 @@ void gameUI::mainOverlay() {
 	};
 
 	/*
-	Adds these vertices to the end of the vbo and the indices to the ebo.
+		Adds these vertices to the end of the vbo and the indices to the ebo.
 	*/
 	for (int i = 0; i < 6; i++) {
 		indices.push_back(rectIndices[i]);
@@ -196,12 +197,12 @@ void gameUI::initText() {
 
 	for (int i = 0; i < 33; i+=3) {		// 11 different locations * 3 = 33
 		for (int j = 0; j < textVerts[i]; j++) {	// number of letters at location
-			for (int k = 0; k < 2; k++) {	// 2x2 square
+			for (int k = 0; k < 2; k++) {	// 2x2 square for each letter
 				for (int l = 0; l < 2; l++) {
 
-					int kxorl = (k || l) &! (k && l);
-					verts.push_back(textVerts[i + 1] + ((j + kxorl) * 14));
-					verts.push_back(textVerts[i + 2] - 16 * k);
+					int kxorl = (k || l) &! (k && l);	//k xor l, look at an xor truth table to see what it does
+					verts.push_back(textVerts[i + 1] + ((j + kxorl) * 14));	//increments x position based on letter number
+					verts.push_back(textVerts[i + 2] - 16 * k);	//increments y position for last 2 verts in each letter
 					verts.push_back(kxorl);
 					verts.push_back(k);
 					verts.push_back(0);
@@ -209,7 +210,7 @@ void gameUI::initText() {
 			}
 
 			for (int k = 0; k < 6; k++)
-				indices.push_back(baseIndex + textIndices[k]);
+				indices.push_back(baseIndex + textIndices[k]);	//adds indices for each letter
 
 			baseIndex += 4;
 		}
@@ -220,39 +221,33 @@ void gameUI::initText() {
 
 bool gameUI::changeText(Text type, int num) {
 
-	static int vals[11];
-	static int countDigits[11] = {	//to make sure the int isn't too many digits
+	static int vals[11];	//the current value of each digit (see Text enum for list, they're in that order)
+	static int countDigits[11] = {	//The number of digits in each set of digits (see Text enum for list, they're in that order)
 		5, 5, 4, 4, 4, 4, 4, 3, 3, 5, 3
 	};
 
-	int typeNum = (int)type;
+	int typeNum = (int)type;	//Converts enum to int for ease of use
 
-	vals[typeNum] = num;
+	vals[typeNum] = num;	//sets text to passed value
 
-	int maxLength = countDigits[typeNum];
-	if (num >= pow(10, maxLength)) return false;
+	int maxLength = countDigits[typeNum];	//gets the max amount of digits
+	if (num >= pow(10, maxLength)) return false;	//checks it's not too many digits
 
-	int *newNum = new int[maxLength];
-	for (int i = maxLength - 1; i > -1; i--) {
-		newNum[maxLength - (i + 1)] = (int)(vals[typeNum] / pow(10, i)) % 10;
+	vector<int> newNum;	//separates into digits by dividing by decreasing powers of i and doing mod 10
+	for (int i = maxLength - 1; i > -1; i--) // i.e. maxLength = 5, 1st loop, i = 4, 10^i = 10000, 2nd loop 10^i = 1000 etx
+		newNum.push_back((int)(vals[typeNum] / pow(10, i)) % 10);
+
+	int baseIndex = 24;	//always the same as the only thing before us is the main overlay
+
+	for (int i = 0; i < typeNum; i++) {	//adds however many digits come before us to the base index (loops through max digits to check)
+		baseIndex += countDigits[i] * 20;
 	}
-
-	int baseIndex = 24;
-
-	int myBaseIndex = 0;
-
-	for (int i = 0; i < typeNum; i++) {
-		myBaseIndex += countDigits[i] * 20;
-	}
-
-	baseIndex += myBaseIndex;
 
 	for (int i = 0; i < maxLength; i++) {
 		for (int j = 0; j < 4; j++)
-			verts[baseIndex + i * 20 + j * 5] = newNum[i];
+			verts[baseIndex + i * 20 + j * 5] = newNum[i];	//changes the number, looping through each vertex
 	}
 
-	delete[] newNum;
 	updateVAO();
 	return true;
 }
@@ -270,19 +265,18 @@ const int gameUI::sectionCoords[] = {
 	900, 525, 1007, 590,	// buy farm
 	900, 440, 1007, 515,	// buy bank
 	0, 34, 137, 130,		// settings
-	3, 2, 31, 22,			// close
 };
 
 gameUI::Section gameUI::pointInBox(int x, int y) {
 
-	int tx, bx, ty, by;
-	for (int i = 0; i < 48; i += 4) {
+	int tx, bx, ty, by;	// top x, bottom x, top y, bottom y
+	for (int i = 0; i < 44; i += 4) {
 		tx = sectionCoords[i];
 		ty = sectionCoords[i + 1];
 		bx = sectionCoords[i + 2];
 		by = sectionCoords[i + 3];
-		if (x >= tx && x <= bx && y >= ty && y <= by) return (gameUI::Section)(i / 4);
+		if (x >= tx && x <= bx && y >= ty && y <= by) return (gameUI::Section)(i / 4); // just a point in box check
 	}
-	return (gameUI::Section)(12);
+	return (gameUI::Section)(11);
 }
 #pragma endregion

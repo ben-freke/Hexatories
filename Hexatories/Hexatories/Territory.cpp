@@ -39,36 +39,36 @@ void Territory::setOwner(int newOwner) {
 }
 
 void Territory::getInfo(int *vals) {
-	vals[0] = population;
-	vals[1] = attackers[0];
-	vals[2] = defenders[0];
-	vals[3] = attackers[0] + attackers[1];
-	vals[4] = defenders[0] + defenders[1];
+	vals[0] = population;	//pop
+	vals[1] = attackers[0];	//attack
+	vals[2] = defenders[0];	//def
+	vals[3] = attackers[0] + attackers[1];	//total atk
+	vals[4] = defenders[0] + defenders[1];	//total def
 }
 
 void Territory::setupTiles(vector<tile_t> innerTiles) {
 
 	int x, y, xoff, adjacentTiles;
-	int xChange[6] = { 0, 0, 1, 1, -1, -1 };
+	int xChange[6] = { 0, 0, 1, 1, -1, -1 };	//relative coords for surrounding tiles
 	int yChange[6] = { -1, 1, -1, 0, -1, 0 };
 
 	for (int i = 0; i < size; i++) {
 
-		x = innerTiles[i].x;
+		x = innerTiles[i].x;	//gets the x/y position of the tile we are checking is border or not
 		y = innerTiles[i].y;
-		xoff = x % 2;
-		adjacentTiles = 0;
+		xoff = x % 2;	//x offset (every other column is lower by 1/2 and therefore has different surrounding tiles
+		adjacentTiles = 0;	//to count how many adjacent tiles are in the same territory
 
-		for (int j = 0; j < 6; j++) {
-			if (find_if(innerTiles.begin(), innerTiles.end(), 
+		for (int j = 0; j < 6; j++) {	//Loops through surrounding tiles
+			if (find_if(innerTiles.begin(), innerTiles.end(),	//if finds the tile it is checking in the vector that contains our tiles
 				findTile(x + xChange[j], y + yChange[j] + xoff * abs(xChange[j]))) != innerTiles.end()) {
-				adjacentTiles++;
+				adjacentTiles++;	//add one to the number of tiles we are adjacent to (in our territory)
 			}
 		}
 
-		if (adjacentTiles == 6) {
+		if (adjacentTiles == 6) {	//if we have 6 adjacent tiles in the same territory (all of them) we are an inner tile
 			tiles.push_back(innerTiles[i]); 
-		} else {
+		} else {	//else we have a border with a different territory
 			border.push_back(innerTiles[i]);
 		}
 	}
@@ -126,30 +126,27 @@ void Territory::addDefender() {
 	defenders[1]++;
 }
 
-int Territory::getAttackers() {
-	return attackers[0];
-}
-
 int Territory::getDefense() {
 	return defenders[0] * 15 + (population - 10);
 }
 
 void Territory::destroyAttackers() {
+	//If we are calling this it is from another territory, we must have taken over this territory thus destroy all
 	attackers[0] = 0;
 	attackers[1] = 0;
 }
 
 void Territory::destroyDefenders(int i) {
-	if (i == -1) {
+	if (i == -1) {	//If destroy all (in case this terr was attacked and lost)
 		defenders[0] = 0;
 		defenders[1] = 0;
 		population = 10;
 		return;
-	}
+	}	//if we need to get rid of more defenders than we have (due to population defense)
 	if (i > defenders[0]) {
 		i -= defenders[0];
 		defenders[0] = 0;
-		population -= i * 15;
+		population -= i * 15;	//Remove needed population
 		return;
 	}
 	defenders[0] -= i;
@@ -157,7 +154,7 @@ void Territory::destroyDefenders(int i) {
 }
 
 bool Territory::sendTroops(Territory &targetTerr, int noAtk, int noDef) {
-	if (attackers[0] < noAtk || defenders[0] < noDef) return false;
+	if (attackers[0] < noAtk || defenders[0] < noDef) return false;	//If we don't have enough troops
 	attackers[0] -= noAtk;
 	defenders[0] -= noDef;
 	targetTerr.receiveTroops(noAtk, noDef);
@@ -232,8 +229,8 @@ void Territory::sendTroopsMoved(Territory &receivingTerr, int troopType, int noT
 }
 
 void Territory::resetTroops() {
-	attackers[0] += attackers[1];
-	attackers[1] = 0;
+	attackers[0] += attackers[1];	//add used attackers to unused
+	attackers[1] = 0;	//clear unused
 
 	defenders[0] += defenders[1];
 	defenders[1] = 0;
@@ -248,7 +245,7 @@ void Territory::receiveTroops(int numAtk, int numDef) {
 #pragma region openglStuffs
 array<GLint, 32> Territory::getTileRect(int x, int y, int z) {
 
-	array<GLint, 32> verts = {
+	array<GLint, 32> verts = {	//Default verts, z is a texture number for the shader
 		147, 736, 0, 0, 0, 0, 0, z,
 		873, 736, 0, 0, 0, 1, 0, z,
 		873, 0, 0, 0, 0, 1, 1, z,
@@ -257,7 +254,7 @@ array<GLint, 32> Territory::getTileRect(int x, int y, int z) {
 
 	int xoff = x % 2;
 
-	verts[0] += 18 * x;
+	verts[0] += 18 * x;	//calculates the vertices based on the x/y of the tile
 	verts[24] = verts[0];
 	verts[8] = verts[0] + 24;
 	verts[16] = verts[8];
@@ -277,7 +274,7 @@ void Territory::getBorderVBO(vector<GLint> &vertices, vector<GLushort> &indices)
 		2, 3, 0,
 	};
 
-	vboPos = vertices.size() + 7;
+	vboPos = vertices.size() + 7;	//+7 as we will only want to change the colour which will start 7 in from the current end
 	int baseIndex = (vertices.size() / 8);
 
 	for (unsigned int i = 0; i < border.size(); i++) {
@@ -296,7 +293,7 @@ void Territory::getBorderVBO(vector<GLint> &vertices, vector<GLushort> &indices)
 }
 
 void Territory::updateBorderVBO(vector<GLint> &verts) {
-	for (unsigned int i = 0; i < border.size(); i++) {
+	for (unsigned int i = 0; i < border.size(); i++) {	//loops through all borders changing the colour in the vector
 		for (int j = 0; j < 4; j++)
 			verts[vboPos + (32 * i) + (8 * j)] = colour;
 	}
@@ -310,18 +307,18 @@ void Territory::addBuilding(bool type, vector<GLint> &vertices, vector<GLushort>
 		2, 3, 0,
 	};
 
-	int building = -1, tile;
+	int building = -1, tile;	//building = building type, -1 null 0 farm, 1 bank
 	array<GLint, 32> verts;
 
-	if (type == true && farmBuilt == -1) {
+	if (type == true && farmBuilt == -1) {	//if we want to build a bank and don't have a bank
 		do {
-			farmBuilt = rand() % tiles.size();
+			farmBuilt = rand() % tiles.size();	//choose random tile making sure bank isn't already on it
 		} while (farmBuilt == bankBuilt);
 
 		tile = farmBuilt;
 		building = 0;
 	}
-	if (type == false && bankBuilt == -1) {
+	if (type == false && bankBuilt == -1) {	//same as farm, but for banks
 
 		do {
 			bankBuilt = rand() % tiles.size();

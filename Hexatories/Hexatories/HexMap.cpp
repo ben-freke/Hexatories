@@ -26,17 +26,18 @@ void HexMap::initMap(vector<Territory> &ter, bool setupTer) {
 	tileVerts.clear();
 	indices.clear();
 
-	int mapPos = getAllTiles(mapCode);
-	addOverlay();
+	int mapPos = getAllTiles(mapCode);	//loads all tile vertices
 
-	if (setupTer) {
+	addOverlay();	// adds the tile wireframe
+
+	if (setupTer) {	//if we are setting up territories, initialise them and get their borders
 		int terrCount = setupTerritories(mapCode, mapPos, ter);
 		for (unsigned int i = 0; i < ter.size(); i++) {
 			ter[i].getBorderVBO(tileVerts, indices);
 		}
 	}
 
-	if (firstTime) {
+	if (firstTime) {	//if we've never been initialised before, setup textures etc.
 		setupVAO();
 		firstTime = false;
 	} else {
@@ -52,7 +53,7 @@ void HexMap::drawMap() {
 	glUseProgram(progMap);
 
 	for (int i = 0; i < 3; i++)
-		glUniform1i(uniforms[i], i + 1);
+		glUniform1i(uniforms[i], i + 1);	//tell gpu which textures to use
 
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
 
@@ -74,20 +75,20 @@ tile_t HexMap::pointToTile(double mouseX, double mouseY) {
 	if (mouseX > 720 || mouseY > 736 || mouseX < 0 || mouseY < 0) return nullTile;
 
 	/*
-	Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
+		Find rectangle within which point lies. Each rect has sections of 3 different tiles in.
 	*/
 	int rectX = (int)mouseX / 18;
 	int rectY = (int)(mouseY - ((rectX % 2) * 11)) / 22;
 
 	/*
-	Mouse position relative to the current box
+		Mouse position relative to the current box
 	*/
 	mouseX -= 18 * rectX;
 	mouseY -= 22 * rectY + ((rectX % 2) * 11);
 
 	/*
-	Inequality, test if we are in the main tile of this rectangle or the two smaller sections.
-	If we are, grid co ords are rect co ords, otherwise x is -1 and y is rect +1/0/-1
+		Inequality, test if we are in the main tile of this rectangle or the two smaller sections.
+		If we are, grid co ords are rect co ords, otherwise x is -1 and y is rect +1/0/-1
 	*/
 	if (mouseX > 12 * abs(0.5 - ((mouseY < 0) ? mouseY * -1 : mouseY) / 22)) {
 		if (mouseY < 0) return nullTile;
@@ -99,7 +100,7 @@ tile_t HexMap::pointToTile(double mouseX, double mouseY) {
 	}
 
 	/*
-	Final bounds test
+		Final bounds test
 	*/
 	if (gridX < 0 || gridX > 39 || gridY < 0 || gridY > 32) return nullTile;
 
@@ -124,8 +125,10 @@ void HexMap::setupVAO() {
 	Define and bind vao.
 	Define and bind vbo. (Vertex information)
 	Define and bind ebo. (Draw order)
-	Load texture.
+	Load textures.
+	Bind textures to slots.
 	Load program.
+	Get uniform variable positions in program
 	Define position variable for shader.
 	Define colour variable for shader.
 	Define texture variable for shader.
@@ -186,9 +189,9 @@ void HexMap::updateVAO() {
 	glBindVertexArray(vaoMap);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboMap);
-	glBufferData(GL_ARRAY_BUFFER, tileVerts.size() * sizeof(GLint), tileVerts.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, tileVerts.size() * sizeof(GLint), tileVerts.data(), GL_STATIC_DRAW);	//update vbo
 
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);	//update ebo
 
 	glBindVertexArray(0);
 }
@@ -298,18 +301,18 @@ void HexMap::calcTileVerts(int x, int y, int col) {
 	int colPos = col * 3;
 
 	/*
-	Each vertex has 7 floats which define it. x, y, r, g, b, texX, texY.
-	Goes through each of the vertices (of which there are 6, 6 * 7 = 42) defining their floats.
+	Each vertex has 8 floats which define it. x, y, r, g, b, texX, texY, texZ.
+	Goes through each of the vertices (of which there are 6) defining their floats.
 
-	i will always be a multiple of 7, for the 7 floats per vertex.
+	i will always be a multiple of 2, for the x, y floats per vertex. 
 
-	note: i / 3.5 will increase by 2 each loop, and is used for the x/y positions from the tileVerts array.
+	note: i will increase by 2 each loop, and is used for the x/y positions from the tileVerts array.
 	Cast is needed just for the compiler to not throw a fit.
 	*/
-	for (int i = 0; i < 42; i += 7) {
+	for (int i = 0; i < 12; i += 2) {
 
-		tileVerts.push_back(defTileVerts[(int)(i / 3.5)] + (18 * x));	// Calculate the x pos of the current tile and store it.
-		tileVerts.push_back(defTileVerts[(int)(i / 3.5) + 1] - (22 * y + 11 * xoff));	// Calculate the y pos and store it.
+		tileVerts.push_back(defTileVerts[(int)i] + (18 * x));	// Calculate the x pos of the current tile and store it.
+		tileVerts.push_back(defTileVerts[(int)i + 1] - (22 * y + 11 * xoff));	// Calculate the y pos and store it.
 
 		for (int j = colPos; j < colPos + 3; j++) {		// Loops through the colour array, appending your selected colour to the end of each vertex.
 			tileVerts.push_back(cols[j]);
@@ -326,17 +329,17 @@ void HexMap::calcTileVerts(int x, int y, int col) {
 #pragma endregion
 
 void HexMap::updateBorder(Territory &ter, bool load) {
-	if (load) {
-		ter.getBorderVBO(tileVerts, indices);
-	} else {
-		ter.updateBorderVBO(tileVerts);
+	if (load) {	//if we are being called from a load game
+		ter.getBorderVBO(tileVerts, indices);	//add border details to the vbo
+	} else {	//otherwise
+		ter.updateBorderVBO(tileVerts);	//update the border details (which will have already been added)
 	}
 	updateVAO();
 }
 
 void HexMap::updateBuilding(Territory *ter, bool building) {
 	if (ter == NULL) return;
-	ter->addBuilding(building, tileVerts, indices);
+	ter->addBuilding(building, tileVerts, indices);	// adds building to the terr, true = farm, false = bank
 	updateVAO();
 }
 
