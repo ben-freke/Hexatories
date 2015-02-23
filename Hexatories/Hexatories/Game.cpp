@@ -10,6 +10,11 @@
 using namespace std;
 
 void Game::initGame() {
+
+	gameMusic.playAudio("sound.wav");
+	gameMusic.setVolume(100);
+	swordClang.setVolume(100);
+
 	newGame();
 	players[0].coins = 1500;
 	players[1].coins = 1500;
@@ -178,11 +183,12 @@ void Game::saveGame() {
 #pragma endregion
 
 #pragma region inputHandle
-void Game::handleMouseInput(double x, double y, bool click, bool reset) {
+bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 	static Territory *firstTerr, *secondTerr, *currTerr;	//firstTerr & secondTerr for send troops, currTerr for the selected one
 	static int numAtkSend, numDefSend;	//The number of troops selected with the arrows for send trops
 	static bool sendTroopsPressed = false;	//So we know what to do when the button is pressed next
+	static bool settingsOpen = false;
 
 	if (reset) {
 		
@@ -197,6 +203,11 @@ void Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			ui.changeButton(-1);
 			sendTroopsPressed = false;
 		}
+		if (settingsOpen) {
+			settingsOpen = false;
+			ui.drawSettings(0);
+		}
+		return false;
 	}
 
 	gameUI::Section sect;
@@ -211,133 +222,191 @@ void Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		Territory *hTerr;
 		hTerr = getTerritory(ix, iy);
 		highlightTerritory(hTerr);
-		return;
+		return false;
 	}
 
 	highlightTerritory(NULL);	//Will only reach here if not on map or is a click, therefore get rid of the previously highlighter terr
 
-	if (!click) return;	//Everything beyond this point requires a click
+#pragma region Settings
+	if (settingsOpen) {
 
-	switch (sect) {	//Based on button pressed
+		if (!click && sect != gameUI::Section::NULL_SEC) return false;
 
-	case gameUI::Section::MAP:{
+		switch (sect) {
 
-		if (!sendTroopsPressed) {	//If we haven't pressed send troops (we are just selecting a territory)
+		case gameUI::Section::SETTINGS:
+		case gameUI::Section::NULL_SEC: {
+			settingsOpen = false;
+			ui.drawSettings(0);
+			break;
+		}
+		case gameUI::Section::MUTE_BACK: {
+			ui.drawSettings(1);
+			if (gameMusic.getVolume() == 100) {
+				gameMusic.setVolume(0);
+			} else {
+				gameMusic.setVolume(100);
+			}
+			break;
+		}
 
-			Territory *nextTerr = getTerritory(ix, iy);	//Get the clicked on territory
-			if (nextTerr == currTerr) nextTerr = NULL;	//If this and previous are the same we want to deselect it
-			selectTerr(nextTerr, currTerr);	//Passing NULL as the first parameter just deselects the second, if not swaps which is selected
-			currTerr = nextTerr;
+		case gameUI::Section::MUTE_EFFECTS: {
+			ui.drawSettings(2);
+			if (swordClang.getVolume() == 100) {
+				swordClang.setVolume(0);
+			} else {
+				swordClang.setVolume(100);
+			}
+			break;
+		}
 
-		} else {	//Send troops pressed, we have one territory (to send from) selected, firstTerr
+		case gameUI::Section::SAVE: {
+			saveGame();
+			break;
+		}
 
-			if (secondTerr != NULL) selectTerr(NULL, secondTerr);	//If we have already selected a secondTerr, we are changing it, so NULL
+		case gameUI::Section::EXIT_WINDOWS: {
+			return true;
+			break;
+		}
 
-			secondTerr = getTerritory(ix, iy);	//Get the territory we clicked on
-			if (secondTerr == firstTerr) {	//If it is the one we wanted to send from
+		case gameUI::Section::EXIT_MAIN: {
+			break;
+		}
 
-				selectTerr(NULL, firstTerr);	//Deselect it
-				firstTerr = NULL;	//Reset all territories
+		}
+	} else {
+#pragma endregion
+		if (!click) return false;	//Everything beyond this point requires a click
+
+		switch (sect) {	//Based on button pressed
+
+		case gameUI::Section::MAP: {
+
+			if (!sendTroopsPressed) {	//If we haven't pressed send troops (we are just selecting a territory)
+
+				Territory *nextTerr = getTerritory(ix, iy);	//Get the clicked on territory
+				if (nextTerr == currTerr) nextTerr = NULL;	//If this and previous are the same we want to deselect it
+				selectTerr(nextTerr, currTerr);	//Passing NULL as the first parameter just deselects the second, if not swaps which is selected
+				currTerr = nextTerr;
+
+			} else {	//Send troops pressed, we have one territory (to send from) selected, firstTerr
+
+				if (secondTerr != NULL) selectTerr(NULL, secondTerr);	//If we have already selected a secondTerr, we are changing it, so NULL
+
+				secondTerr = getTerritory(ix, iy);	//Get the territory we clicked on
+				if (secondTerr == firstTerr) {	//If it is the one we wanted to send from
+
+					selectTerr(NULL, firstTerr);	//Deselect it
+					firstTerr = NULL;	//Reset all territories
+					secondTerr = NULL;
+					currTerr = NULL;
+
+					/*
+						Resets the send troops button to default and resets state
+						*/
+					ui.changeButton(-1);
+					sendTroopsPressed = false;
+
+					break;
+				}
+
+				selectTerr(secondTerr, NULL);	//If valid select the territory
+
+				/*
+					If they have different owners, change button to attack, if not change to send troops (indented)
+					*/
+				if (secondTerr->getOwner() != firstTerr->getOwner()) {
+					ui.changeButton(1);
+				} else if (secondTerr->getOwner() == firstTerr->getOwner()) {
+					ui.changeButton(0);
+				}
+			}
+			break;
+		}
+
+		case gameUI::Section::SEND_TROOPS: {
+
+			if (currTerr == NULL) break;	//If no terr selected
+
+			if (!sendTroopsPressed) {	//If the button hasn't been pressed yet
+
+				firstTerr = currTerr;	//Remember first terr selected
+				sendTroopsPressed = true;
+				ui.changeButton(0);	//Indent button
+
+			} else if (secondTerr != NULL) {
+
+				ui.changeButton(-1);	//Resets the button
+
+				firstTerr->sendTroops(*secondTerr, 5, 0);	//Send troops
+
+				selectTerr(NULL, firstTerr);	//deselect territories
+				selectTerr(NULL, secondTerr);
+
+				firstTerr = NULL;	//reset all territories
 				secondTerr = NULL;
 				currTerr = NULL;
 
-				/*
-					Resets the send troops button to default and resets state
-				*/
-				ui.changeButton(-1);
+				numAtkSend = 0;	//reset troops to send
+				numDefSend = 0;
+
+				ui.changeText(gameUI::Text::SEND_ATK, 0);	//update troops to send text
+				ui.changeText(gameUI::Text::SEND_DEF, 0);
 				sendTroopsPressed = false;
-
-				break;
 			}
+			break;
+		}
 
-			selectTerr(secondTerr, NULL);	//If valid select the territory
+		case gameUI::Section::ATK_UP: {
+			ui.changeText(gameUI::Text::SEND_ATK, ++numAtkSend);	//Add one to the attack to send text & var
+			saveGame();
+			break;
+		}
 
-			/*
-				If they have different owners, change button to attack, if not change to send troops (indented)
-			*/
-			if (secondTerr->getOwner() != firstTerr->getOwner()) {
-				ui.changeButton(1);
-			} else if (secondTerr->getOwner() == firstTerr->getOwner()) {
-				ui.changeButton(0);
+		case gameUI::Section::ATK_DOWN: {
+			if (numAtkSend > 0)
+				ui.changeText(gameUI::Text::SEND_ATK, --numAtkSend);	//Take one from the attack to send text & var
+			loadGame();
+			break;
+		}
+
+		case gameUI::Section::DEF_UP: {
+			ui.changeText(gameUI::Text::SEND_DEF, ++numDefSend);	//Add one to the defence to send text & var
+			break;
+		}
+
+		case gameUI::Section::DEF_DOWN: {
+			if (numDefSend > 0)
+				ui.changeText(gameUI::Text::SEND_DEF, --numDefSend);	//Take one from the attack to send text & var
+			break;
+		}
+
+		case gameUI::Section::BUY_FARM: {
+			if (players[1].coins > 1500) {
+				map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
+				players[1].coins = players[1].coins - 1500;
 			}
+			break;
 		}
-		break;
-	}
 
-	case gameUI::Section::SEND_TROOPS: {
-
-		if (currTerr == NULL) break;	//If no terr selected
-
-		if (!sendTroopsPressed) {	//If the button hasn't been pressed yet
-			
-			firstTerr = currTerr;	//Remember first terr selected
-			sendTroopsPressed = true;
-			ui.changeButton(0);	//Indent button
-
-		} else if (secondTerr != NULL) {
-
-			ui.changeButton(-1);	//Resets the button
-
-			firstTerr->sendTroops(*secondTerr, 5, 0);	//Send troops
-
-			selectTerr(NULL, firstTerr);	//deselect territories
-			selectTerr(NULL, secondTerr);
-
-			firstTerr = NULL;	//reset all territories
-			secondTerr = NULL;
-			currTerr = NULL;
-
-			numAtkSend = 0;	//reset troops to send
-			numDefSend = 0;
-
-			ui.changeText(gameUI::Text::SEND_ATK, 0);	//update troops to send text
-			ui.changeText(gameUI::Text::SEND_DEF, 0);
-			sendTroopsPressed = false;
+		case gameUI::Section::BUY_BANK: {
+			if (players[1].coins > 1500) {
+				map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
+				players[1].coins = players[1].coins - 1500;
+			}
+			break;
 		}
-		break;
-	}
 
-	case gameUI::Section::ATK_UP: {
-		ui.changeText(gameUI::Text::SEND_ATK, ++numAtkSend);	//Add one to the attack to send text & var
-		saveGame();
-		break;
-	}
-
-	case gameUI::Section::ATK_DOWN: {
-		if (numAtkSend > 0)
-			ui.changeText(gameUI::Text::SEND_ATK, --numAtkSend);	//Take one from the attack to send text & var
-		loadGame();
-		break;
-	}
-
-	case gameUI::Section::DEF_UP: {
-		ui.changeText(gameUI::Text::SEND_DEF, ++numDefSend);	//Add one to the defence to send text & var
-		break;
-	}
-
-	case gameUI::Section::DEF_DOWN: {
-		if (numDefSend > 0)
-			ui.changeText(gameUI::Text::SEND_DEF, --numDefSend);	//Take one from the attack to send text & var
-		break;
-	}
-
-	case gameUI::Section::BUY_FARM: {
-		if (players[1].coins > 1500){
-			map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
-			players[1].coins = players[1].coins - 1500;
+		case gameUI::Section::SETTINGS: {
+			settingsOpen = true;
+			ui.drawSettings(0);
+			break;
 		}
-		break;
-	}
 
-	case gameUI::Section::BUY_BANK: {
-		if (players[1].coins > 1500){
-			map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
-			players[1].coins = players[1].coins - 1500;
 		}
-		break;
 	}
-
-	}
+	return true;
 }
 
 void Game::handleKeyInput(int key) {

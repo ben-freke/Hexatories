@@ -15,6 +15,8 @@ public:
 	void fadeInAudio(int time);
 	void fadeOutAudio(int time);
 	void audioFadeThread(int time, int type);
+	int getVolume();
+	void setVolume(int newVol);
 };
 
 #endif

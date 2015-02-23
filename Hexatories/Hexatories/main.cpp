@@ -15,9 +15,6 @@
 // (C) Group 16
 using namespace std;
 
-Audio gameMusic;
-Audio swordClang;
-
 Game game;
 
 /*
@@ -107,10 +104,6 @@ GLFWwindow* initWindow(void) {
 }
 
 int main(void) {
-
-	/*gameMusic.playAudio("sound.wav");
-	gameMusic.fadeInAudio(0);
-	*/
 	
 	srand((unsigned int)time(NULL));
 

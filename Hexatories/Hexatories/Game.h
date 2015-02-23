@@ -4,6 +4,7 @@
 #include "Territory.h"
 #include "HexMap.h"
 #include "gameUI.h"
+#include "Audio.h"
 
 #ifndef __GAME_H
 #define __GAME_H
@@ -26,6 +27,9 @@ class Game {
 
 	HexMap map;
 	gameUI ui;
+
+	Audio gameMusic;
+	Audio swordClang;
 
 	std::vector<Territory> territories;	//All the territories on the current map
 
@@ -98,7 +102,7 @@ public:
 	/*
 		Handle all mouse click/mouse over events
 	*/
-	void handleMouseInput(double, double, bool, bool);
+	bool handleMouseInput(double, double, bool, bool);
 
 	/*
 		Handles all keyboard input

@@ -15,6 +15,8 @@ void Territory::initTerritory(vector<tile_t> innerTiles, int tileCount, int own)
 
 void Territory::initTerritory(int own, std::vector<tile_t> borders, std::vector<tile_t> inner, int attack[2], 
 	int defence[2], int pop) {
+	
+	size = borders.size() + inner.size();
 
 	owner = own;
 	colour = own;

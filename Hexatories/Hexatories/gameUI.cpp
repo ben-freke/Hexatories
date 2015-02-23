@@ -28,7 +28,7 @@ void gameUI::drawUI() {
 
 	glUseProgram(prog);
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 5; i++)
 		glUniform1i(uniforms[i], i + 4);	//Tell gpu which textures to use
 
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
@@ -97,11 +97,13 @@ void gameUI::setupVAO() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
 
-	GLuint tboMain, tboNums, tboBut;	//for our textures
+	GLuint tboMain, tboNums, tboBut, tboSet, tboMute;	//for our textures
 	
 	loadBMP("gui.png", tboMain);
 	loadBMP("nums.png", tboNums);
 	loadBMP("buttons.png", tboBut);
+	loadBMP("settings.png", tboSet);
+	loadBMP("mute.png", tboMute);
 
 	glActiveTexture(GL_TEXTURE4);	//bind our textures to various slots
 	glBindTexture(GL_TEXTURE_2D, tboMain);
@@ -112,6 +114,12 @@ void gameUI::setupVAO() {
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, tboBut);
 
+	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, tboSet);
+
+	glActiveTexture(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, tboMute);
+
 	glActiveTexture(GL_TEXTURE0);	//reset bound slot
 
 	vs = compileVShader("main_vs");	//compile shader program
@@ -121,6 +129,8 @@ void gameUI::setupVAO() {
 	uniforms[0] = glGetUniformLocation(prog, "main_tex");	//get position of these variables in our program and save them
 	uniforms[1] = glGetUniformLocation(prog, "num_tex");
 	uniforms[2] = glGetUniformLocation(prog, "button_tex");
+	uniforms[3] = glGetUniformLocation(prog, "set_tex");
+	uniforms[4] = glGetUniformLocation(prog, "mute_tex");
 
 	GLint posAttrib = glGetAttribLocation(prog, "position");	//set up our vertex attributes. (px, py, tx, ty, tz)
 	glEnableVertexAttribArray(posAttrib);
@@ -156,7 +166,6 @@ void gameUI::mainOverlay() {
 	GLushort rectIndices[] = {
 		0, 1, 2,
 		2, 3, 0,
-
 	};
 
 	/*
@@ -217,6 +226,93 @@ void gameUI::initText() {
 	}
 
 }
+
+void gameUI::drawSettings(int option) {
+	static int muted[2];	//remembers if each button is muted and the mute buttons pos in verts
+
+	GLushort rectIndices[] = {
+		0, 1, 2,
+		2, 3, 0,
+	};
+
+	if (option == 0) {	//draw/undraw settings
+		if (!settingsOpen) {	//means settings isn't drawn yet
+
+			settingsOpen = true;	//remembers whether to destroy next time
+
+			GLint rectVerts[] = {	//settings box coords
+				0, 739, 0, 0, 13,
+				801, 739, 1, 0, 13,
+				801, 382, 1, 1, 13,
+				0, 382, 0, 1, 13,
+			};
+
+			GLushort baseIndex = verts.size() / 5;
+
+			for (int i = 0; i < 6; i++) 
+				indices.push_back(rectIndices[i] + baseIndex);
+			
+
+			for (int i = 0; i < 20; i++) 
+				verts.push_back(rectVerts[i]);
+			
+		} else {
+
+			settingsOpen = false;
+
+			int extra = 0;
+			for (int i = 0; i < 2; i++)
+				extra += (muted[i] > 0) ? 1 : 0;
+
+			for (int i = 0; i < 20 + 20 * extra; i++)
+				verts.pop_back();
+
+			for (int i = 0; i < 6 + 6 * extra; i++)
+				indices.pop_back();
+
+		}
+		updateVAO();
+		return;
+	}
+
+	GLint rectVerts[2][20] = {	//Mute background box coords
+		{ 
+		343, 554, 0, 0, 14,
+		361, 554, 1, 0, 14,
+		361, 510, 1, 1, 14,
+		343, 510, 0, 1, 14, 
+		}, 
+		{
+		343, 471, 0, 0, 14,
+		361, 471, 1, 0, 14,
+		361, 427, 1, 1, 14,
+		343, 427, 0, 1, 14,
+		},
+	};
+
+	if (option == 1 || option == 2) {
+		option--;
+		if (muted[option] == 0) {
+
+			muted[option] = verts.size();
+
+			int baseIndex = muted[option] / 5;
+
+			for (int i = 0; i < 20; i++)
+				verts.push_back(rectVerts[option][i]);
+
+			for (int i = 0; i < 6; i++)
+				indices.push_back(rectIndices[i] + baseIndex);
+		} else {
+			verts.erase(verts.begin() + muted[option], verts.begin() + muted[option] + 20);
+			for (int i = 0; i < 6; i++)
+				indices.pop_back();
+			muted[option] = 0;
+		}
+	}
+	updateVAO();
+}
+
 #pragma endregion
 
 bool gameUI::changeText(Text type, int num) {
@@ -265,18 +361,30 @@ const int gameUI::sectionCoords[] = {
 	900, 525, 1007, 590,	// buy farm
 	900, 440, 1007, 515,	// buy bank
 	0, 34, 137, 130,		// settings
+	323, 207, 381, 266,		// mute back
+	323, 290, 381, 349,		// mute effects
+	352, 62, 512, 184,		// save
+	463, 216, 599, 329,		// exit main
+	653, 199, 783, 324,		// exit windows
+	0, 29, 801, 386,		// settings window
 };
 
 gameUI::Section gameUI::pointInBox(int x, int y) {
 
-	int tx, bx, ty, by;	// top x, bottom x, top y, bottom y
-	for (int i = 0; i < 44; i += 4) {
+	int tx, bx, ty, by, i = 0, max = 44;	// top x, bottom x, top y, bottom y
+	if (settingsOpen) {
+		i = 40;
+		max += 24;
+	}
+	for (i; i < max; i += 4) {
+
 		tx = sectionCoords[i];
 		ty = sectionCoords[i + 1];
 		bx = sectionCoords[i + 2];
 		by = sectionCoords[i + 3];
 		if (x >= tx && x <= bx && y >= ty && y <= by) return (gameUI::Section)(i / 4); // just a point in box check
+
 	}
-	return (gameUI::Section)(11);
+	return (gameUI::Section)(17);
 }
 #pragma endregion

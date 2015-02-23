@@ -8,7 +8,7 @@ int Audio::playAudio(char* filename) {
 
 	buffer.loadFromFile(filename);
 	sound.setBuffer(buffer);
-	sound.setVolume(100);
+	
 	sound.play();
 
 	return 0;
@@ -44,4 +44,12 @@ void Audio::audioFadeThread(int time, int type) {
 		}
 		sound.stop();
 	}
+}
+
+int Audio::getVolume() {
+	return (int) sound.getVolume();
+}
+
+void Audio::setVolume(int newVol) {
+	sound.setVolume((float) newVol);
 }
