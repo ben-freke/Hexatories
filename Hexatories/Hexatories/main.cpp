@@ -32,7 +32,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 		glfwGetCursorPos(window, &xValue, &yValue);
 		//printf("x: %d, y: %d\n", (int)xValue, (int)yValue);
-		game.handleMouseInput(xValue, yValue, true);	// true == clicked (not hover)
+		game.handleMouseInput(xValue, yValue, true, false);	// true == clicked (not hover) false = don't reset selected ters
 
 	}
 
@@ -43,7 +43,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 */
 void curser_pos_callback(GLFWwindow *window, double x, double y) {
 	
-	game.handleMouseInput(x, y, false);	// false == mouseover not click
+	game.handleMouseInput(x, y, false, false);	// false == mouseover not click, false = don't reset selected ters
 }
 
 /*

@@ -183,11 +183,26 @@ void Game::saveGame() {
 #pragma endregion
 
 #pragma region inputHandle
-void Game::handleMouseInput(double x, double y, bool click) {
+void Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 	static Territory *firstTerr, *secondTerr, *currTerr;	//firstTerr & secondTerr for send troops, currTerr for the selected one
 	static int numAtkSend, numDefSend;	//The number of troops selected with the arrows for send trops
 	static bool sendTroopsPressed = false;	//So we know what to do when the button is pressed next
+
+	if (reset) {
+		
+		if (secondTerr != NULL) selectTerr(NULL, secondTerr);
+		if (currTerr != NULL) selectTerr(NULL, currTerr);
+
+		currTerr = NULL;
+		firstTerr = NULL;
+		secondTerr = NULL;
+
+		if (sendTroopsPressed) {
+			ui.changeButton(-1);
+			sendTroopsPressed = false;
+		}
+	}
 
 	gameUI::Section sect;
 
@@ -401,7 +416,9 @@ void Game::draw() {
 
 void Game::nextTurn() {
 	ui.changeText(gameUI::Text::ROUND, ++turnNo);	//increment turn
-	for (unsigned int i = 0; i < territories.size(); i++) territories[i].resetTroops();	//Reset so all troops can be used again
+	for (unsigned int i = 0; i < territories.size(); i++) 
+		territories[i].resetTroops();
+	handleMouseInput(0, 0, false, true);
 }
 
 void Game::updateScore(int player) {

@@ -98,7 +98,7 @@ public:
 	/*
 		Handle all mouse click/mouse over events
 	*/
-	void handleMouseInput(double, double, bool);
+	void handleMouseInput(double, double, bool, bool);
 
 	/*
 		Handles all keyboard input
