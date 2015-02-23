@@ -322,17 +322,21 @@ void Game::handleMouseInput(double x, double y, bool click, bool reset) {
 	}
 
 	case gameUI::Section::BUY_FARM: {
-		if (players[1].coins >= 1500){
-			map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
-			players[1].coins = players[1].coins - 1500;
+		if (currTerr->getOwner() == 1){
+			if (players[1].coins >= 1500){
+				map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
+				players[1].coins = players[1].coins - 1500;
+			}
 		}
 		break;
 	}
 
 	case gameUI::Section::BUY_BANK: {
-		if (players[1].coins >= 1500){
-			map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
-			players[1].coins = players[1].coins - 1500;
+		if (currTerr->getOwner() == 1){
+			if (players[1].coins >= 1500){
+				map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
+				players[1].coins = players[1].coins - 1500;
+			}
 		}
 		break;
 	}
