@@ -17,18 +17,15 @@ void Game::initGame() {
 #pragma region save
 vector<int> Game::getSave() {
 
-	string savePath;
-	cout << "Input full save path & filename\nE.G. C:\\Games\\Hexatories\\save.save\n";
-	cin >> savePath;
+	vector<int> saveCode;
 
 	/*
 		Opens your file for reading. Look up fstream if confused. Basically allows for simpler file handling.
 	*/
-	ifstream file(savePath);
-	while (!file.is_open()) {
-		savePath.clear();
-		cout << "Input full save path & filename\nE.G. C:\\Games\\Hexatories\\save.test\n";
-		cin >> savePath;
+	ifstream file("Saves\\save1.hexatories");
+	if (!file.is_open()) {
+		saveCode.push_back(-1);
+		return saveCode;
 	}
 
 	string saveString;
@@ -53,8 +50,6 @@ vector<int> Game::getSave() {
 
 	}
 
-	vector<int> saveCode;
-
 	/*
 		Converts the sub strings to their integer values
 	*/
@@ -73,14 +68,17 @@ void Game::newGame() {
 
 }
 
-void Game::loadGame() {
+bool Game::loadGame() {
+
+	vector<int> save = getSave();	// save data
+	if (save[0] == -1) {
+		return false;
+	}
 
 	territories.clear();
 
 	map.initMap(territories, false);	//false so map doesn't init territories
 	ui.initUI();
-
-	vector<int> save = getSave();	// save data
 	
 	vector<int> buildings[2];	//keeps the territory numbers that have [0] farms and [1] banks built
 
@@ -143,6 +141,8 @@ void Game::loadGame() {
 	ui.changeText(gameUI::Text::SCORE, players[1].score);
 	ui.changeText(gameUI::Text::TOTAL_POP, players[1].population);
 	ui.changeText(gameUI::Text::ROUND, turnNo);
+
+	return true;
 }
 
 void Game::saveGame() {
@@ -165,17 +165,10 @@ void Game::saveGame() {
 	for (unsigned int i = 0; i < territories.size(); i++)
 		territories[i].fillSaveData(saveCode);
 
-	string savePath;
-	cout << "Input full save path & filename\nE.G. C:\\Games\\Hexatories\\save.save\n";
-	cin >> savePath;
+	ofstream file("Saves\\save1.hexatories");
 
-	ofstream file(savePath);
-
-	while (!file.is_open()) {
-		savePath.clear();
-		cout << "Input full save path & filename\nE.G. C:\\Games\\Hexatories\\save.save\n";
-		cin >> savePath;
-		ofstream file(savePath);
+	if (!file.is_open()) {
+		return;
 	}
 
 	file << saveCode;

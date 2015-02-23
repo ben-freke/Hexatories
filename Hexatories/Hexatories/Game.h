@@ -74,7 +74,7 @@ class Game {
 	/*
 		Loads map from file, sets up territories and players
 	*/
-	void loadGame();
+	bool loadGame();
 
 	/*
 		Saves the game to file
