@@ -361,14 +361,12 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::ATK_UP: {
 			ui.changeText(gameUI::Text::SEND_ATK, ++numAtkSend);	//Add one to the attack to send text & var
-			saveGame();
 			break;
 		}
 
 		case gameUI::Section::ATK_DOWN: {
 			if (numAtkSend > 0)
 				ui.changeText(gameUI::Text::SEND_ATK, --numAtkSend);	//Take one from the attack to send text & var
-			loadGame();
 			break;
 		}
 
