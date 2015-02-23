@@ -11,6 +11,8 @@ using namespace std;
 
 void Game::initGame() {
 	newGame();
+	players[0].coins = 1500;
+	players[1].coins = 1500;
 }
 
 #pragma region save
@@ -276,7 +278,7 @@ void Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 			ui.changeButton(-1);	//Resets the button
 
-			firstTerr->sendTroopsMoved(*secondTerr, 1, 5);	//Send troops
+			firstTerr->sendTroops(*secondTerr, 5, 0);	//Send troops
 
 			selectTerr(NULL, firstTerr);	//deselect territories
 			selectTerr(NULL, secondTerr);
@@ -320,12 +322,18 @@ void Game::handleMouseInput(double x, double y, bool click, bool reset) {
 	}
 
 	case gameUI::Section::BUY_FARM: {
-		map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
+		if (players[1].coins > 1500){
+			map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
+			players[1].coins = players[1].coins - 1500;
+		}
 		break;
 	}
 
 	case gameUI::Section::BUY_BANK: {
-		map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
+		if (players[1].coins > 1500){
+			map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
+			players[1].coins = players[1].coins - 1500;
+		}
 		break;
 	}
 

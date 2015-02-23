@@ -153,29 +153,26 @@ void Territory::destroyDefenders(int i) {
 
 }
 
-bool Territory::sendTroops(Territory &targetTerr, int noAtk, int noDef) {
-	if (attackers[0] < noAtk || defenders[0] < noDef) return false;	//If we don't have enough troops
-	attackers[0] -= noAtk;
-	defenders[0] -= noDef;
-	targetTerr.receiveTroops(noAtk, noDef);
-	return true;
-}
-
-void Territory::sendTroopsMoved(Territory &receivingTerr, int troopType, int noTroops) {
+bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend) {
 
 	/*
 	Troop type can be either 1 or 0, where 1 is attackers and 0 is defenders.
 	*/
-	if (troopType == 0) {
+	if (receivingTerr.getOwner() == owner) {
+		if (attackers[0] < noAttack || defenders[0] < noDefend) return false;	//If we don't have enough troops
+		attackers[0] -= noAttack;
+		defenders[0] -= noDefend;
+		receivingTerr.receiveTroops(noAttack, noDefend);
+	}
+
+
 
 		//Send Defender
 
+	else{
+		if (attackers[0] >= noAttack) {
 
-	} else if (troopType == 1) {
-		if (attackers[0] >= noTroops) {
-			if (receivingTerr.getOwner() != owner) {
-
-				int attack = noTroops * 15;
+				int attack = noAttack * 15;
 				int defense = receivingTerr.getDefense();
 
 				int randomBoundaries = (int)(attack * 0.10);
@@ -196,8 +193,8 @@ void Territory::sendTroopsMoved(Territory &receivingTerr, int troopType, int noT
 					/*
 					Destroys any lost defenders in the territory
 					*/
-					receivingTerr.destroyDefenders(noTroops);
-					attackers[0] -= noTroops;	//all attackers sent are destroyed
+					receivingTerr.destroyDefenders(noAttack);
+					attackers[0] -= noAttack;	//all attackers sent are destroyed
 				}
 				/*
 				Attack has won. All defenders should be destroyed and remaining attackers recorded.
@@ -211,22 +208,21 @@ void Territory::sendTroopsMoved(Territory &receivingTerr, int troopType, int noT
 					receivingTerr.destroyDefenders(-1);
 					receivingTerr.destroyAttackers();
 
-					attackers[0] -= noTroops - remainingTroops;	//Destroy lost troops
+					attackers[0] -= noAttack;	//Destroy lost troops
+					receivingTerr.receiveTroops(remainingTroops, 0);
 
-					sendTroops(receivingTerr, remainingTroops, 0);	//send remaining troops
+						
 
 					receivingTerr.setOwner(owner);
 
 					cout << "Success in attacking\n";
 				}
 			} else {
-				cout << "You have the same owner\n";
-			}
-		} else {
 			cout << "You do not have enough troops to send\n";
 		}
-	}
+	} 
 }
+
 
 void Territory::resetTroops() {
 	attackers[0] += attackers[1];	//add used attackers to unused
