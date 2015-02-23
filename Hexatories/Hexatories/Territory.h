@@ -110,6 +110,11 @@ public:
 		Adds necessary data to the passed string for saving
 	*/
 	void fillSaveData(std::string &);
+
+	/*
+		returns the population
+	*/
+	int getPopulation();
 #pragma endregion
 
 #pragma region troops
@@ -133,7 +138,7 @@ public:
 	/*
 		Sets used troops to unused
 	*/
-	void resetTroops();
+	void incrementTurn(int &);
 #pragma endregion
 
 #pragma region territoryDrawMethods

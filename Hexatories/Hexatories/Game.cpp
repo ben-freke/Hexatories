@@ -16,8 +16,7 @@ void Game::initGame() {
 	swordClang.setVolume(100);
 
 	newGame();
-	players[0].coins = 1500;
-	players[1].coins = 1500;
+
 }
 
 #pragma region save
@@ -71,7 +70,7 @@ void Game::newGame() {
 
 	map.initMap(territories, true);	//true so that map will init the territories
 	ui.initUI();
-
+	updatePlayerInfo();
 }
 
 bool Game::loadGame() {
@@ -143,9 +142,7 @@ bool Game::loadGame() {
 	for (unsigned int i = 0; i < buildings[1].size(); i++)	//updates all territories with banks
 		map.updateBuilding(&territories[buildings[1][i]], false);
 
-	ui.changeText(gameUI::Text::COINS, players[1].coins);
-	ui.changeText(gameUI::Text::SCORE, players[1].score);
-	ui.changeText(gameUI::Text::TOTAL_POP, players[1].population);
+	updatePlayerInfo();
 	ui.changeText(gameUI::Text::ROUND, turnNo);
 
 	return true;
@@ -206,7 +203,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		if (settingsOpen) {
 			settingsOpen = false;
 			ui.drawSettings(0);
-		}
+	}
 		return false;
 	}
 
@@ -240,6 +237,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			ui.drawSettings(0);
 			break;
 		}
+
 		case gameUI::Section::MUTE_BACK: {
 			ui.drawSettings(1);
 			if (gameMusic.getVolume() == 100) {
@@ -330,10 +328,11 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			if (currTerr == NULL) break;	//If no terr selected
 
 			if (!sendTroopsPressed) {	//If the button hasn't been pressed yet
-
-				firstTerr = currTerr;	//Remember first terr selected
-				sendTroopsPressed = true;
-				ui.changeButton(0);	//Indent button
+				if (currTerr->getOwner() == 2) {
+					firstTerr = currTerr;	//Remember first terr selected
+					sendTroopsPressed = true;
+					ui.changeButton(0);	//Indent button
+				}
 
 			} else if (secondTerr != NULL) {
 
@@ -350,6 +349,8 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 				numAtkSend = 0;	//reset troops to send
 				numDefSend = 0;
+
+				updatePlayerInfo();
 
 				ui.changeText(gameUI::Text::SEND_ATK, 0);	//update troops to send text
 				ui.changeText(gameUI::Text::SEND_DEF, 0);
@@ -383,20 +384,23 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::BUY_FARM: {
-			if (players[1].coins > 1500) {
-				map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
-				players[1].coins = players[1].coins - 1500;
+			if (currTerr->getOwner() == 1) {
+				if (players[1].coins >= 1500) {
+					map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
+					players[1].coins = players[1].coins - 1500;
+				}
 			}
 			break;
 		}
 
 		case gameUI::Section::BUY_BANK: {
-			if (players[1].coins > 1500) {
-				map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
-				players[1].coins = players[1].coins - 1500;
+			if (currTerr->getOwner() == 1) {
+				if (players[1].coins >= 1500) {
+					map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
+					players[1].coins = players[1].coins - 1500;
+				}
+				break;
 			}
-			break;
-		}
 
 		case gameUI::Section::SETTINGS: {
 			settingsOpen = true;
@@ -404,6 +408,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			break;
 		}
 
+		}
 		}
 	}
 	return true;
@@ -486,11 +491,42 @@ void Game::draw() {
 
 void Game::nextTurn() {
 	ui.changeText(gameUI::Text::ROUND, ++turnNo);	//increment turn
-	for (unsigned int i = 0; i < territories.size(); i++) 
-		territories[i].resetTroops();
+ 	for (unsigned int i = 0; i < territories.size(); i++) {
+
+		int owner, coins = -1;
+		owner = territories[i].getOwner();
+		owner--;
+
+		if (owner != -1) 
+			coins = players[owner].coins;
+		
+
+		territories[i].incrementTurn(coins);
+
+		if (owner > 0) {
+			players[owner].coins = coins;
+			if (players[owner].coins > 99999) players[owner].coins = 99999;
+		}
+	}
+
+	updatePlayerInfo();
+
 	handleMouseInput(0, 0, false, true);
 }
 
 void Game::updateScore(int player) {
 
+}
+
+void Game::updatePlayerInfo() {
+
+	players[1].population = 0;
+
+	for (unsigned int i = 0; i < territories.size(); i++)
+		if (territories[i].getOwner() == 2)
+			players[1].population += territories[i].getPopulation();
+
+	ui.changeText(gameUI::Text::COINS, players[1].coins);
+	ui.changeText(gameUI::Text::TOTAL_POP, players[1].population);
+	ui.changeText(gameUI::Text::SCORE, players[1].score);
 }

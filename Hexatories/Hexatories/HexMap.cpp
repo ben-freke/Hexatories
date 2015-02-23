@@ -361,7 +361,9 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 	for (int i = 0; i < 10; i++){
 		territory.addAttacker();
 	}
-	territory.resetTroops();
+
+	int foo = -1;
+	territory.incrementTurn(foo);
 
 	tile_t currTile;
 

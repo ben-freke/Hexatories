@@ -13,6 +13,7 @@
 	Contains necessary information to remember about a player
 */
 struct player {
+	player() : coins(250){}
 	int coins, score, population;
 };
 
@@ -24,7 +25,6 @@ class Game {
 	int turnNo = 1;
 
 	player players[2]; // 0 = AI 1 = you
-
 	HexMap map;
 	gameUI ui;
 
@@ -42,6 +42,11 @@ class Game {
 		Loops through and updates the score for the player selected (passed int)
 	*/
 	void updateScore(int);
+
+	/*
+		Displays player info on screen
+	*/
+	void updatePlayerInfo();
 
 #pragma region territoryHandling
 	/*

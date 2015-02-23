@@ -213,8 +213,6 @@ bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend)
 					attackers[0] -= noAttack;	//Destroy lost troops
 					receivingTerr.receiveTroops(remainingTroops, 0);
 
-						
-
 					receivingTerr.setOwner(owner);
 
 					cout << "Success in attacking\n";
@@ -225,13 +223,23 @@ bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend)
 	} 
 }
 
-
-void Territory::resetTroops() {
+void Territory::incrementTurn(int &coins) {
 	attackers[0] += attackers[1];	//add used attackers to unused
 	attackers[1] = 0;	//clear unused
 
 	defenders[0] += defenders[1];
 	defenders[1] = 0;
+
+	if (coins != -1)	//	Add taxed coins
+		coins += (int) (population * ((bankBuilt > -1) ? 1.1 : 1));
+
+	population = (int)(population * (1.1 + ((farmBuilt > -1) ? .1 : 0)));
+	if (population > size * 10) population = size * 10;
+
+}
+
+int Territory::getPopulation() {
+	return population;
 }
 
 void Territory::receiveTroops(int numAtk, int numDef) {
