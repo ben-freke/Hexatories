@@ -86,6 +86,9 @@ public:
 	*/
 	void initTerritory(std::vector<tile_t>, int, int);
 
+	void addPopulation(int addPop);
+
+	
 	/*
 		Overloaded constructor for when we load a game
 	*/
@@ -95,6 +98,21 @@ public:
 		Return who owns this territory
 	*/
 	int getOwner();
+
+	/*
+		Checks whether a building exists
+	*/
+	int checkBuilding(int type);
+
+	/*
+		Calculates the amount of gold that the territory generates
+	*/
+	int taxTerritory();
+
+	/*
+		Returns the population of the territory
+	*/
+	int getPopulation();
 
 	/*
 		Changes the owner

@@ -23,7 +23,6 @@ class Game {
 	int turnNo = 1;
 
 	player players[2]; // 0 = AI 1 = you
-
 	HexMap map;
 	gameUI ui;
 

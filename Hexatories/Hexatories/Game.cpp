@@ -11,8 +11,7 @@ using namespace std;
 
 void Game::initGame() {
 	newGame();
-	players[0].coins = 1500;
-	players[1].coins = 1500;
+
 }
 
 #pragma region save
@@ -68,7 +67,7 @@ vector<int> Game::getSave() {
 void Game::newGame() {
 
 	territories.clear();
-
+	players[1].coins = 3000;
 	map.initMap(territories, true);	//true so that map will init the territories
 	ui.initUI();
 
@@ -274,12 +273,13 @@ void Game::handleMouseInput(double x, double y, bool click, bool reset) {
 	case gameUI::Section::SEND_TROOPS: {
 
 		if (currTerr == NULL) break;	//If no terr selected
-
+		
 		if (!sendTroopsPressed) {	//If the button hasn't been pressed yet
-			
-			firstTerr = currTerr;	//Remember first terr selected
-			sendTroopsPressed = true;
-			ui.changeButton(0);	//Indent button
+			if (currTerr->getOwner() == 1){
+				firstTerr = currTerr;	//Remember first terr selected
+				sendTroopsPressed = true;
+				ui.changeButton(0);	//Indent button
+			}
 
 		} else if (secondTerr != NULL) {
 
@@ -329,7 +329,7 @@ void Game::handleMouseInput(double x, double y, bool click, bool reset) {
 	}
 
 	case gameUI::Section::BUY_FARM: {
-		if (players[1].coins > 1500){
+		if (players[1].coins >= 1500){
 			map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
 			players[1].coins = players[1].coins - 1500;
 		}
@@ -337,7 +337,7 @@ void Game::handleMouseInput(double x, double y, bool click, bool reset) {
 	}
 
 	case gameUI::Section::BUY_BANK: {
-		if (players[1].coins > 1500){
+		if (players[1].coins >= 1500){
 			map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
 			players[1].coins = players[1].coins - 1500;
 		}
@@ -424,8 +424,17 @@ void Game::draw() {
 
 void Game::nextTurn() {
 	ui.changeText(gameUI::Text::ROUND, ++turnNo);	//increment turn
-	for (unsigned int i = 0; i < territories.size(); i++) 
+ 	for (unsigned int i = 0; i < territories.size(); i++) {
 		territories[i].resetTroops();
+		//p * (1.1 + 0.1f)
+		int territoryTax = territories[i].getPopulation() * (1.1 + (0.1 * territories[i].checkBuilding(1)));
+		int populationIncrease = territories[i].getPopulation() * (1.1 + (0.1 * territories[i].checkBuilding(0)));
+		territories[i].addPopulation(populationIncrease);
+		players[territories[i].getOwner()].coins = players[territories[i].getOwner()].coins + territoryTax;
+	}
+
+	cout << players[1].coins << "\n";
+
 	handleMouseInput(0, 0, false, true);
 }
 
