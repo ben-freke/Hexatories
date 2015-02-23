@@ -126,12 +126,9 @@ public:
 	/*
 		Transfers troops from one territory to another (assuming you have them)
 	*/
-	bool sendTroops(Territory &targetTerr, int numAtk, int numDef);
+	bool sendTroops(Territory &targetTerr, int numAttack, int numDefend);
 
-	/*
-		For attacking territories - needs reworking
-	*/
-	void sendTroopsMoved(Territory &, int, int);
+
 
 	/*
 		Sets used troops to unused

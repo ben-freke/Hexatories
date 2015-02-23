@@ -285,7 +285,7 @@ void Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 			ui.changeButton(-1);	//Resets the button
 
-			firstTerr->sendTroopsMoved(*secondTerr, 1, 5);	//Send troops
+			firstTerr->sendTroops(*secondTerr, 5, 0);	//Send troops
 
 			selectTerr(NULL, firstTerr);	//deselect territories
 			selectTerr(NULL, secondTerr);
