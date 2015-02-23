@@ -38,6 +38,29 @@ void Territory::setOwner(int newOwner) {
 	owner = newOwner;
 }
 
+void Territory::addPopulation(int addPop){
+	population = population + addPop;
+}
+
+int Territory::getPopulation(){
+	return population;
+}
+
+int Territory::checkBuilding(int type){
+	if (type == 0){
+		if (farmBuilt == -1)
+			return 0;
+		else
+			return 1;
+	}
+	else{
+		if (bankBuilt == -1)
+			return 0;
+		else
+			return 1;
+	}
+}
+
 void Territory::getInfo(int *vals) {
 	vals[0] = population;	//pop
 	vals[1] = attackers[0];	//attack
@@ -153,29 +176,6 @@ void Territory::destroyDefenders(int i) {
 
 }
 
-int Territory::getPopulation(){
-	return population;
-}
-
-void Territory::addPopulation(int addPop){
-	population = population +addPop; 
-}
-
-int Territory::checkBuilding(int type){
-	if (type == 0){
-		if (farmBuilt == -1)
-			return 0;
-		else
-			return 1;
-	}
-	else{
-		if (bankBuilt == -1)
-			return 0;
-		else
-			return 1;
-	}
-}
-
 bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend) {
 
 	/*
@@ -245,7 +245,6 @@ bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend)
 		}
 	} 
 }
-
 
 void Territory::resetTroops() {
 	attackers[0] += attackers[1];	//add used attackers to unused
