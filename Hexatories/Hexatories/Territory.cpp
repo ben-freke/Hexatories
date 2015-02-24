@@ -44,6 +44,10 @@ int Territory::getOwner() {
 	return owner;
 }
 
+int Territory::getTerrNo() {
+	return terrNo;
+}
+
 void Territory::setOwner(int newOwner) {
 	owner = newOwner;
 }
@@ -82,6 +86,37 @@ void Territory::setupTiles(vector<tile_t> innerTiles) {
 			border.push_back(innerTiles[i]);
 		}
 	}
+}
+
+void Territory::findNeighbours(vector<tile_t> allTiles) {
+	int x, y, xoff;
+	int xChange[6] = { 0, 0, 1, 1, -1, -1 };	//relative coords for surrounding tiles
+	int yChange[6] = { -1, 1, -1, 0, -1, 0 };
+
+	for (unsigned int i = 0; i < border.size(); i++) {
+
+		x = border[i].x;	//gets the x/y position of the tile we are checking
+		y = border[i].y;
+		xoff = x % 2;	//x offset (every other column is lower by 1/2 and therefore has different surrounding tiles
+
+		vector<tile_t>::iterator it;
+		for (int j = 0; j < 6; j++) {	//Loops through surrounding tiles
+
+			if ((it = find_if(allTiles.begin(), allTiles.end(),	// finds the tile's neighbours
+				findTile(x + xChange[j], y + yChange[j] + xoff * abs(xChange[j])))) != allTiles.end()) {
+
+				if (border[i].terrNo != it->terrNo)	//If different owners
+
+					if (find(neighbours.begin(), neighbours.end(), it->terrNo) == neighbours.end())	//and not already registered neighbour
+						neighbours.push_back(it->terrNo);
+			}
+		}
+
+	}
+}
+
+bool Territory::isNeighbour(Territory terr) {
+	return (find(neighbours.begin(), neighbours.end(), terr.getTerrNo()) != neighbours.end());
 }
 
 void Territory::fillSaveData(string &saveData) {

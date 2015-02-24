@@ -96,6 +96,7 @@ bool Game::loadGame() {
 	ui.initUI();
 	
 	vector<int> buildings[2];	//keeps the territory numbers that have [0] farms and [1] banks built
+	vector<tile_t> allTiles;
 
 	turnNo = save[0];
 	players[0].coins = save[1];
@@ -118,8 +119,7 @@ bool Game::loadGame() {
 
 				tile_t newTile = { save[i++], save[i++], terrNo };	//x, y, terrNo
 				tiles[k].push_back(newTile);
-				map.addToTiles(newTile);	//adds the tile to the maps array of them so that we can get it later (for mouse input)
-
+				allTiles.push_back(newTile);
 			}
 		}
 
@@ -143,8 +143,10 @@ bool Game::loadGame() {
 		territories[terrNo].initTerritory(owner, tiles[0], tiles[1], attackers, defenders, pop, terrNo);	//init territory with read info
 	}
 
-	for (unsigned int i = 0; i < territories.size(); i++)	//updates all territories borders on map
+	for (unsigned int i = 0; i < territories.size(); i++) {
 		map.updateBorder(territories[i], true);
+		territories[i].findNeighbours(allTiles);
+	}
 	
 	for (unsigned int i = 0; i < buildings[0].size(); i++)	// updates all territories with farms
 		map.updateBuilding(&territories[buildings[0][i]], true);
@@ -377,6 +379,9 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 				}
 
 			} else if (secondTerr != NULL) {
+
+				if (!firstTerr->isNeighbour(*secondTerr)) break;
+				
 
 				ui.changeButton(-1);	//Resets the button
 

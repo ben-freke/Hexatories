@@ -107,8 +107,8 @@ tile_t HexMap::pointToTile(double mouseX, double mouseY) {
 	return (*find_if(allTiles.begin(), allTiles.end(), findTile(gridX, gridY)));
 }
 
-void HexMap::addToTiles(tile_t newTile) {
-	allTiles.push_back(newTile);
+void HexMap::addToTiles(vector<tile_t> newTiles) {
+	allTiles = newTiles;
 }
 
 #pragma region openglStuff
@@ -377,6 +377,8 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 		ter[i].initTerritory(tiles, tilesInTerr, owner, i);
 		tiles.clear();
 	}
+	
+	for (int i = 0; i < terrCount; i++) ter[i].findNeighbours(allTiles);
 
 	delete[] mapCode;
 	return terrCount;

@@ -96,7 +96,7 @@ public:
 	/*
 		Adds a tile to allTiles to keep track of all tiles & there territories
 	*/
-	void addToTiles(tile_t);
+	void addToTiles(std::vector<tile_t>);
 
 	/*
 		Updates the VBO from the territory, if true it will add to the vbo, false just update

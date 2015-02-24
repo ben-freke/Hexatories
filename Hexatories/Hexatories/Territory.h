@@ -35,6 +35,7 @@ bool operator==(const tile_t &tile1, const tile_t &tile2);
 class Territory {
 
 	std::vector<tile_t> tiles, border;
+	std::vector<int> neighbours;
 	
 	int attackers[2];	//[0] unused [1] used
 	int defenders[2];
@@ -78,6 +79,8 @@ class Territory {
 	*/
 	std::array<GLint, 32> getTileRect(int, int, int);
 
+	int getTerrNo();
+
 public:
 
 #pragma region otherFuncs
@@ -91,6 +94,9 @@ public:
 	*/
 	void initTerritory(int, std::vector<tile_t>, std::vector<tile_t>, int[], int[], int, int);
 
+	void findNeighbours(std::vector<tile_t>);
+
+	bool isNeighbour(Territory);
 	/*
 		Return who owns this territory
 	*/
