@@ -11,12 +11,12 @@ using namespace std;
 
 void Game::initGame() {
 
-	gameMusic.playAudio("sound.wav");
+	//gameMusic.playAudio("sound.wav");
 	gameMusic.setVolume(100);
 	swordClang.setVolume(100);
 
-	newGame();
-
+	mm.initMenu();
+	//newGame();
 }
 
 #pragma region save
@@ -70,6 +70,15 @@ void Game::newGame() {
 
 	map.initMap(territories, true);	//true so that map will init the territories
 	ui.initUI();
+
+	for (int i = 0; i < 2; i++) {
+		players[i].coins = 250;
+		players[i].score = 0;
+		players[i].population = 0;
+	}
+
+	turnNo = 1;
+
 	updatePlayerInfo();
 }
 
@@ -187,8 +196,12 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 	static bool sendTroopsPressed = false;	//So we know what to do when the button is pressed next
 	static bool settingsOpen = false;
 
+	int ix = (int)x;
+	int iy = (int)y;
+
+#pragma region reset
 	if (reset) {
-		
+
 		if (secondTerr != NULL) selectTerr(NULL, secondTerr);
 		if (currTerr != NULL) selectTerr(NULL, currTerr);
 
@@ -203,26 +216,18 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		if (settingsOpen) {
 			settingsOpen = false;
 			ui.drawSettings(0);
-	}
+		}
 		return false;
 	}
+#pragma endregion
 
-	gameUI::Section sect;
+#pragma region mainMenu
+	if (stage == 1 && click) if (handleMainMenu(ix, iy)) return true;
+	if (stage != 3) return false;
+#pragma endregion
 
-	int ix = (int)x;
-	int iy = (int)y;
-
-	/*
-		Gets the section our mouse coords are within, if it's on the map & is a mouseover highlights the tile 
-	*/
-	if (((sect = ui.pointInBox(ix, iy)) == gameUI::Section::MAP) &! click) {
-		Territory *hTerr;
-		hTerr = getTerritory(ix, iy);
-		highlightTerritory(hTerr);
-		return false;
-	}
-
-	highlightTerritory(NULL);	//Will only reach here if not on map or is a click, therefore get rid of the previously highlighter terr
+#pragma region gameInput
+	gameUI::Section sect = ui.pointInBox(ix, iy);
 
 #pragma region Settings
 	if (settingsOpen) {
@@ -265,16 +270,31 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::EXIT_WINDOWS: {
 			return true;
-			break;
 		}
 
 		case gameUI::Section::EXIT_MAIN: {
+			handleMouseInput(0, 0, false, true);
+			stage = 0;
+			mm.initMenu();
 			break;
 		}
 
 		}
 	} else {
 #pragma endregion
+
+		/*
+		Gets the section our mouse coords are within, if it's on the map & is a mouseover highlights the tile
+		*/
+		if (sect == gameUI::Section::MAP && !click) {
+			Territory *hTerr;
+			hTerr = getTerritory(ix, iy);
+			highlightTerritory(hTerr);
+			return false;
+		}
+
+		highlightTerritory(NULL);	//Will only reach here if not on map or is a click, therefore get rid of the previously highlighter terr
+
 		if (!click) return false;	//Everything beyond this point requires a click
 
 		switch (sect) {	//Based on button pressed
@@ -409,16 +429,57 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 		}
 	}
-	return true;
+	return false;
+#pragma endregion
 }
 
-void Game::handleKeyInput(int key) {
-	switch (key) {
-	case GLFW_KEY_SPACE : {
-		nextTurn();	//Move turn on when space pressed
+bool Game::handleMainMenu(int x, int y) {
+	MainMenu::Section sect = mm.pointInBox(x, y);
+
+	switch (sect) {
+
+	case (MainMenu::Section::NEW_GAME) : {
+		stage = 2;
+		mm.changeScreen(2);
+		return false;
+	}
+
+	case (MainMenu::Section::LOAD_GAME) : {
+		stage = 4;
+		mm.changeScreen(2);
+		return false;
+	}
+
+	case (MainMenu::Section::TUTORIAL) : {
 		break;
 	}
 
+	case (MainMenu::Section::EXIT) : {
+		return true;
+	}
+
+	}
+	return false;
+}
+
+void Game::handleKeyInput(int key) {
+
+	if (key == GLFW_KEY_SPACE) {
+
+		if (stage == 0) {
+			mm.changeScreen(1);
+			stage = 1;
+		}
+		if (stage == 3)
+			nextTurn();	//Move turn on when space pressed
+		if (stage == 2) {
+			newGame();
+			stage = 3;
+		}
+		if (stage == 4) {
+			loadGame();
+			stage = 3;
+		}
 	}
 
 }
@@ -483,8 +544,16 @@ void Game::changeTerritoryColour(Territory &ter, int col) {
 #pragma endregion
 
 void Game::draw() {
-	map.drawMap();
-	ui.drawUI();
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if (stage == 3) {
+		map.drawMap();
+		ui.drawUI();
+	} else {
+		mm.drawMenu();
+	}
 }
 
 void Game::nextTurn() {

@@ -16,6 +16,7 @@
 using namespace std;
 
 Game game;
+bool endGame = false;
 
 /*
 	Passes mouse click input to Game to be processed
@@ -28,9 +29,10 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		double yValue = NULL;
 
 		glfwGetCursorPos(window, &xValue, &yValue);
-		//printf("x: %d, y: %d\n", (int)xValue, (int)yValue);
-		game.handleMouseInput(xValue, yValue, true, false);	// true == clicked (not hover) false = don't reset selected ters
-
+		printf("x: %d, y: %d\n", (int)xValue, (int)yValue);
+		if (game.handleMouseInput(xValue, yValue, true, false)) {	// true == clicked (not hover) false = don't reset selected ters
+			endGame = true;
+		}
 	}
 
 }
@@ -39,7 +41,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	Passes mouse over input to Game to be processed
 */
 void curser_pos_callback(GLFWwindow *window, double x, double y) {
-	
+
 	game.handleMouseInput(x, y, false, false);	// false == mouseover not click, false = don't reset selected ters
 }
 
@@ -145,7 +147,7 @@ int main(void) {
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window))
 	{
-
+		if (endGame) break;
 		_update_fps_counter(window);
 
 		game.draw();

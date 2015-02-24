@@ -60,6 +60,9 @@
     <ClCompile Include="gameUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -113,6 +116,9 @@
     <ClInclude Include="gameUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MainMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\SOIL.lib">
@@ -134,13 +140,25 @@
     <Image Include="tileBorders.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="Textures\attack.png">
-      <Filter>Resource Files\Textures</Filter>
-    </Image>
     <Image Include="Textures\nums.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
     <Image Include="Textures\gui.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="Textures\buttons.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="Textures\mainmenu.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="Textures\mute.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="Textures\settings.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="Textures\bankFarm.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
   </ItemGroup>

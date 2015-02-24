@@ -4,6 +4,7 @@
 #include "Territory.h"
 #include "HexMap.h"
 #include "gameUI.h"
+#include "MainMenu.h"
 #include "Audio.h"
 
 #ifndef __GAME_H
@@ -13,7 +14,6 @@
 	Contains necessary information to remember about a player
 */
 struct player {
-	player() : coins(250){}
 	int coins, score, population;
 };
 
@@ -22,11 +22,13 @@ struct player {
 */
 class Game {
 
-	int turnNo = 1;
+	int turnNo = 1, stage = 0;	//stage is for main menu/game management
 
 	player players[2]; // 0 = AI 1 = you
+
 	HexMap map;
 	gameUI ui;
+	MainMenu mm;
 
 	Audio gameMusic;
 	Audio swordClang;
@@ -91,6 +93,8 @@ class Game {
 	*/
 	void saveGame();
 #pragma endregion
+
+	bool handleMainMenu(int, int);
 
 public:
 

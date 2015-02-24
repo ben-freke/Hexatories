@@ -16,6 +16,7 @@
     <ClCompile Include="HexMap.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Shaders.cpp" />
     <ClCompile Include="Territory.cpp" />
     <ClCompile Include="Textures.cpp" />
@@ -36,6 +37,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="HexMap.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="SOIL.h" />
     <ClInclude Include="Territory.h" />
@@ -46,9 +48,13 @@
     <Library Include="lib\SOIL.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Textures\attack.png" />
+    <Image Include="Textures\bankFarm.png" />
+    <Image Include="Textures\buttons.png" />
     <Image Include="Textures\gui.png" />
+    <Image Include="Textures\mainmenu.png" />
+    <Image Include="Textures\mute.png" />
     <Image Include="Textures\nums.png" />
+    <Image Include="Textures\settings.png" />
     <Image Include="tileBorders.png" />
     <Image Include="wireframe.png" />
   </ItemGroup>
