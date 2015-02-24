@@ -11,7 +11,7 @@ using namespace std;
 
 void Game::initGame() {
 
-	//gameMusic.playAudio("sound.wav");
+	gameMusic.playAudio("sound.wav");
 	gameMusic.setVolume(100);
 	swordClang.setVolume(100);
 
