@@ -60,6 +60,10 @@ void Territory::getInfo(int *vals) {
 	vals[4] = defenders[0] + defenders[1];	//total def
 }
 
+int Territory::getScore() {
+	return population + 2 * (attackers[0] + attackers[1] + defenders[0] + defenders[1]) + size;	//p + 2(d + a) + t
+}
+
 void Territory::setupTiles(vector<tile_t> innerTiles) {
 
 	int x, y, xoff, adjacentTiles;

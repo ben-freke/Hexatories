@@ -121,6 +121,12 @@ public:
 		returns the population
 	*/
 	int getPopulation();
+
+	/*
+		Calculates score from this territory
+	*/
+	int getScore();
+
 #pragma endregion
 
 #pragma region troops
