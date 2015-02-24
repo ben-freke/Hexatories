@@ -475,6 +475,18 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			break;
 		}
 
+		case gameUI::Section::BUY_ATTACK:{
+			players[1].coins = players[1].coins - 100;
+			currTerr->addAttacker();
+			break;
+		}
+
+		case gameUI::Section::BUY_DEFENDER:{
+			players[1].coins = players[1].coins - 100;
+			currTerr->addDefender();
+			break;
+		}
+
 		}
 	}
 	return false;
