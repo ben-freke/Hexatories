@@ -188,7 +188,8 @@ bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend)
 
 	} else {
 
-		if (noDefend != 0) return false;;
+		if (noDefend != 0) return false;
+		if (noAttack == 0) return false;
 
 		if (attackers[0] >= noAttack) {
 
