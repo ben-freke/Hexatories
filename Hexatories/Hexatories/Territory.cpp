@@ -5,13 +5,14 @@
 
 using namespace std;
 #pragma region otherFuncs
-void Territory::initTerritory(vector<tile_t> innerTiles, int tileCount, int own) {
+void Territory::initTerritory(vector<tile_t> innerTiles, int tileCount, int own, int terrNum) {
 
 	if (own != 0) {
 		attackers[0] = 1;
 		defenders[0] = 1;
 	}
 
+	terrNo = terrNum;
 	size = tileCount;
 	owner = own;
 	colour = own;
@@ -20,10 +21,11 @@ void Territory::initTerritory(vector<tile_t> innerTiles, int tileCount, int own)
 }
 
 void Territory::initTerritory(int own, std::vector<tile_t> borders, std::vector<tile_t> inner, int attack[2], 
-	int defence[2], int pop) {
+	int defence[2], int pop, int terrNum) {
 	
 	size = borders.size() + inner.size();
 
+	terrNo = terrNum;
 	owner = own;
 	colour = own;
 	border = borders;
@@ -185,61 +187,61 @@ bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend)
 		attackers[0] -= noAttack;
 		defenders[0] -= noDefend;
 		receivingTerr.receiveTroops(noAttack, noDefend);
-
+		return false;
 	} else {
 
 		if (noDefend != 0) return false;
 		if (noAttack == 0) return false;
 
 		if (attackers[0] >= noAttack) {
+			
+			int attack = noAttack * 15;
+			int defense = receivingTerr.getDefense();
 
-				int attack = noAttack * 15;
-				int defense = receivingTerr.getDefense();
+			int randomBoundaries = (int)(attack * 0.10);
+			int randomValue = rand() % randomBoundaries - (int)(randomBoundaries / 2);
+			int difference = defense - (attack + randomValue);
 
-				int randomBoundaries = (int)(attack * 0.10);
-				int randomValue = rand() % randomBoundaries - (int)(randomBoundaries / 2);
-				int difference = defense - (attack + randomValue);
+			int remainingTroops = (int)ceil(difference / 15);
 
-				int remainingTroops = (int)ceil(difference / 15);
+			/*
+			Calculate remaining troops. There will only be one type of troop remaining, either attackers
+			or defenders. The type of troop remaining is dependant on the outcome of the battle.
+			*/
+			/*
+			The attack has been lost. Only defenders remain.
+			*/
+			if (difference > 0) {
 
 				/*
-				Calculate remaining troops. There will only be one type of troop remaining, either attackers
-				or defenders. The type of troop remaining is dependant on the outcome of the battle.
+				Destroys any lost defenders in the territory
 				*/
+				receivingTerr.destroyDefenders(noAttack);
+				attackers[0] -= noAttack;	//all attackers sent are destroyed
+			}
+			/*
+			Attack has won. All defenders should be destroyed and remaining attackers recorded.
+			*/
+			else {
+				remainingTroops = remainingTroops * -1;
+
 				/*
-				The attack has been lost. Only defenders remain.
+				Destroys any attackers/defenders remaining in the territory
 				*/
-				if (difference > 0) {
+				receivingTerr.destroyDefenders(-1);
+				receivingTerr.destroyAttackers();
 
-					/*
-					Destroys any lost defenders in the territory
-					*/
-					receivingTerr.destroyDefenders(noAttack);
-					attackers[0] -= noAttack;	//all attackers sent are destroyed
-				}
-				/*
-				Attack has won. All defenders should be destroyed and remaining attackers recorded.
-				*/
-				else {
-					remainingTroops = remainingTroops * -1;
+				attackers[0] -= noAttack;	//Destroy lost troops
+				receivingTerr.receiveTroops(remainingTroops, 0);
 
-					/*
-					Destroys any attackers/defenders remaining in the territory
-					*/
-					receivingTerr.destroyDefenders(-1);
-					receivingTerr.destroyAttackers();
+				receivingTerr.setOwner(owner);
 
-					attackers[0] -= noAttack;	//Destroy lost troops
-					receivingTerr.receiveTroops(remainingTroops, 0);
+				cout << "Success in attacking\n";
+			}
 
-					receivingTerr.setOwner(owner);
-
-					cout << "Success in attacking\n";
-				}
-
-			} else {
-				cout << "You do not have enough troops to send\n";
-				return false;
+		} else {
+			cout << "You do not have enough troops to send\n";
+			return false;
 		}
 	} 
 	return true;

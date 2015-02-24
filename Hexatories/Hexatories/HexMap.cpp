@@ -354,17 +354,6 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 	int tilesInTerr;
 	Territory territory;
 
-	/*
-	FOR TESTING:
-	Added so that this loop gives each territory an attack value, but no defense.
-	*/
-	for (int i = 0; i < 10; i++){
-		territory.addAttacker();
-	}
-
-	int foo = -1;
-	territory.incrementTurn(foo);
-
 	tile_t currTile;
 
 	/*
@@ -385,7 +374,7 @@ int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {
 			allTiles.push_back(currTile);
 		}
 		
-		ter[i].initTerritory(tiles, tilesInTerr, owner);
+		ter[i].initTerritory(tiles, tilesInTerr, owner, i);
 		tiles.clear();
 	}
 

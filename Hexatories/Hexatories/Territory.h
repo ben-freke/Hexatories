@@ -39,7 +39,7 @@ class Territory {
 	int attackers[2];	//[0] unused [1] used
 	int defenders[2];
 
-	int population, size, owner, farmBuilt = -1, bankBuilt = -1;
+	int population, size, owner, terrNo, farmBuilt = -1, bankBuilt = -1;
 	int colour, vboPos;
 
 	bool selected = false;	//Used to determine if we should stay highlighted when mouse is off us
@@ -84,12 +84,12 @@ public:
 	/*
 		Normal constructor
 	*/
-	void initTerritory(std::vector<tile_t>, int, int);
+	void initTerritory(std::vector<tile_t>, int, int, int);
 
 	/*
 		Overloaded constructor for when we load a game
 	*/
-	void initTerritory(int, std::vector<tile_t>, std::vector<tile_t>, int[], int[], int);
+	void initTerritory(int, std::vector<tile_t>, std::vector<tile_t>, int[], int[], int, int);
 
 	/*
 		Return who owns this territory

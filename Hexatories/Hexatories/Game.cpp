@@ -100,7 +100,7 @@ bool Game::loadGame() {
 	turnNo = save[0];
 	players[0].coins = save[1];
 	players[1].coins = save[2];
-
+	
 	Territory temp;
 
 	for (unsigned int i = 3; i < save.size(); i) {	//i is incremented as we go as each territory is of a different size
@@ -140,7 +140,7 @@ bool Game::loadGame() {
 		if (farm != -1) buildings[0].push_back(terrNo);
 		if (bank != -1) buildings[1].push_back(terrNo);
 
-		territories[terrNo].initTerritory(owner, tiles[0], tiles[1], attackers, defenders, pop);	//init territory with read info
+		territories[terrNo].initTerritory(owner, tiles[0], tiles[1], attackers, defenders, pop, terrNo);	//init territory with read info
 	}
 
 	for (unsigned int i = 0; i < territories.size(); i++)	//updates all territories borders on map
@@ -380,9 +380,10 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 				ui.changeButton(-1);	//Resets the button
 
+				int secondTerrOriginalOwner = secondTerr->getOwner();
 				if (firstTerr->sendTroops(*secondTerr, numAtkSend, numDefSend)) {	//Send troops
 
-					if (firstTerr->getOwner() != secondTerr->getOwner())
+					if (firstTerr->getOwner() != secondTerrOriginalOwner)
 						swordClang.playAudio("swords.wav", false);
 
 					updatePlayerInfo();
