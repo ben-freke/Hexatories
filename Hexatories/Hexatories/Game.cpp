@@ -11,7 +11,7 @@ using namespace std;
 
 void Game::initGame() {
 
-	gameMusic.playAudio("sound.wav");
+	gameMusic.playAudio("sound.wav", true);
 	gameMusic.setVolume(100);
 	swordClang.setVolume(100);
 
@@ -383,7 +383,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 				if (firstTerr->sendTroops(*secondTerr, numAtkSend, numDefSend)) {	//Send troops
 
 					if (firstTerr->getOwner() != secondTerr->getOwner())
-						swordClang.playAudio("swords.wav");
+						swordClang.playAudio("swords.wav", false);
 
 					updatePlayerInfo();
 				}

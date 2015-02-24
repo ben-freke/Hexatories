@@ -1,15 +1,17 @@
 #include <thread> 
 #include <chrono> 
+#include <string>
 #include <SFML/Audio.hpp>
 #include <SFML/Audio/Sound.hpp>
 #include "Audio.h"
 
-int Audio::playAudio(char* filename) {
+int Audio::playAudio(char* filename, bool loop) {
 
 	buffer.loadFromFile(filename);
 	sound.setBuffer(buffer);
 	
 	sound.play();
+	sound.setLoop(loop);
 
 	return 0;
 }

@@ -11,7 +11,7 @@ public:
 	sf::SoundBuffer buffer;
 	sf::Sound sound;
 
-	int playAudio(char* filename);
+	int playAudio(char* filename, bool loop);
 	void fadeInAudio(int time);
 	void fadeOutAudio(int time);
 	void audioFadeThread(int time, int type);
