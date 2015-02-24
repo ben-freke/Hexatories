@@ -86,6 +86,7 @@ bool Game::loadGame() {
 
 	vector<int> save = getSave();	// save data
 	if (save[0] == -1) {
+		newGame();
 		return false;
 	}
 
