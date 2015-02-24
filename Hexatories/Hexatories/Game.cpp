@@ -307,10 +307,19 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			if (!sendTroopsPressed) {	//If we haven't pressed send troops (we are just selecting a territory)
 
 				Territory *nextTerr = getTerritory(ix, iy);	//Get the clicked on territory
+
 				if (nextTerr == currTerr) nextTerr = NULL;	//If this and previous are the same we want to deselect it
 				selectTerr(nextTerr, currTerr);	//Passing NULL as the first parameter just deselects the second, if not swaps which is selected
 				currTerr = nextTerr;
+
 				updateTerrInfo(currTerr);
+
+				if (numAtkSend > 0 || numDefSend > 0) {
+					numAtkSend = 0;
+					numDefSend = 0;
+					ui.changeText(gameUI::Text::SEND_ATK, 0);
+					ui.changeText(gameUI::Text::SEND_DEF, 0);
+				}
 
 			} else {	//Send troops pressed, we have one territory (to send from) selected, firstTerr
 
@@ -330,6 +339,13 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 					*/
 					ui.changeButton(-1);
 					sendTroopsPressed = false;
+
+					if (numAtkSend > 0 || numDefSend > 0) {
+						numAtkSend = 0;
+						numDefSend = 0;
+						ui.changeText(gameUI::Text::SEND_ATK, 0);
+						ui.changeText(gameUI::Text::SEND_DEF, 0);
+					}
 
 					break;
 				}
@@ -472,18 +488,6 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		case gameUI::Section::SETTINGS: {
 			settingsOpen = true;
 			ui.drawSettings(0);
-			break;
-		}
-
-		case gameUI::Section::BUY_ATTACK:{
-			players[1].coins = players[1].coins - 100;
-			currTerr->addAttacker();
-			break;
-		}
-
-		case gameUI::Section::BUY_DEFENDER:{
-			players[1].coins = players[1].coins - 100;
-			currTerr->addDefender();
 			break;
 		}
 
