@@ -361,6 +361,8 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 				firstTerr->sendTroops(*secondTerr, 5, 0);	//Send troops
 
+				//swordClang.playAudio("swords.wav");
+
 				selectTerr(NULL, firstTerr);	//deselect territories
 				selectTerr(NULL, secondTerr);
 

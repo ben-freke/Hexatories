@@ -255,6 +255,11 @@ void gameUI::drawSettings(int option) {
 
 			for (int i = 0; i < 20; i++) 
 				verts.push_back(rectVerts[i]);
+
+			for (int i = 0; i < 2; i++) {
+				if (muted[i] != 0)
+					drawMute((i + 1) * -1);
+			}
 			
 		} else {
 
@@ -269,48 +274,66 @@ void gameUI::drawSettings(int option) {
 
 			for (int i = 0; i < 6 + 6 * extra; i++)
 				indices.pop_back();
-
+			return;
 		}
-		updateVAO();
-		return;
+	} else {
+		muted[option - 1] = (muted[option - 1] > 0) ? 0 : 1;
+		drawMute(option - 1);
 	}
 
+	updateVAO();
+}
+
+void gameUI::drawMute(int num) {
+	static int pos[2];
+
 	GLint rectVerts[2][20] = {	//Mute background box coords
-		{ 
-		343, 554, 0, 0, 14,
-		361, 554, 1, 0, 14,
-		361, 510, 1, 1, 14,
-		343, 510, 0, 1, 14, 
-		}, 
 		{
-		343, 471, 0, 0, 14,
-		361, 471, 1, 0, 14,
-		361, 427, 1, 1, 14,
-		343, 427, 0, 1, 14,
+			343, 554, 0, 0, 14,
+			361, 554, 1, 0, 14,
+			361, 510, 1, 1, 14,
+			343, 510, 0, 1, 14,
+		},
+		{
+			343, 471, 0, 0, 14,
+			361, 471, 1, 0, 14,
+			361, 427, 1, 1, 14,
+			343, 427, 0, 1, 14,
 		},
 	};
 
-	if (option == 1 || option == 2) {
-		option--;
-		if (muted[option] == 0) {
+	GLushort rectIndices[] = {
+		0, 1, 2,
+		2, 3, 0,
+	};
 
-			muted[option] = verts.size();
-
-			int baseIndex = muted[option] / 5;
-
-			for (int i = 0; i < 20; i++)
-				verts.push_back(rectVerts[option][i]);
-
-			for (int i = 0; i < 6; i++)
-				indices.push_back(rectIndices[i] + baseIndex);
-		} else {
-			verts.erase(verts.begin() + muted[option], verts.begin() + muted[option] + 20);
-			for (int i = 0; i < 6; i++)
-				indices.pop_back();
-			muted[option] = 0;
-		}
+	if (num < 0) {
+		num = abs(num) - 1;
+		pos[num] = 0;
 	}
-	updateVAO();
+
+	if (pos[num] == 0) {
+
+		pos[num] = verts.size();
+
+		int baseIndex = pos[num] / 5;
+
+		for (int i = 0; i < 20; i++)
+			verts.push_back(rectVerts[num][i]);
+
+		for (int i = 0; i < 6; i++)
+			indices.push_back(rectIndices[i] + baseIndex);
+	} else {
+
+		if (pos[num] < pos[(num > 0) ? 0 : 1]) pos[(num > 0) ? 0 : 1] -= 20;
+
+		verts.erase(verts.begin() + pos[num], verts.begin() + pos[num] + 20);
+		for (int i = 0; i < 6; i++)
+			indices.pop_back();
+
+		pos[num] = 0;
+
+	}
 }
 
 #pragma endregion

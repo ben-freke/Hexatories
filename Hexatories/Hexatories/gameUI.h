@@ -74,6 +74,8 @@ public:
 	*/
 	void drawSettings(int);
 
+	void drawMute(int);
+
 	/*
 		Used to swap between send troops, indented send troops & attack button
 	*/
