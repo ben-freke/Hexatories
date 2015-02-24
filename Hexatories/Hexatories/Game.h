@@ -61,6 +61,8 @@ class Game {
 	*/
 	void selectTerr(Territory *, Territory *);
 
+	void updateTerrInfo(Territory *);
+
 	/*
 		Makes a territories border gold (used on mouseover)
 	*/

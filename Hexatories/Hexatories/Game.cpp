@@ -205,10 +205,12 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		if (secondTerr != NULL) selectTerr(NULL, secondTerr);
 		if (currTerr != NULL) selectTerr(NULL, currTerr);
+		if (firstTerr != NULL) selectTerr(NULL, firstTerr);
 
 		currTerr = NULL;
 		firstTerr = NULL;
 		secondTerr = NULL;
+		updateTerrInfo(NULL);
 
 		if (sendTroopsPressed) {
 			ui.changeButton(-1);
@@ -308,6 +310,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 				if (nextTerr == currTerr) nextTerr = NULL;	//If this and previous are the same we want to deselect it
 				selectTerr(nextTerr, currTerr);	//Passing NULL as the first parameter just deselects the second, if not swaps which is selected
 				currTerr = nextTerr;
+				updateTerrInfo(currTerr);
 
 			} else {	//Send troops pressed, we have one territory (to send from) selected, firstTerr
 
@@ -317,13 +320,14 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 				if (secondTerr == firstTerr) {	//If it is the one we wanted to send from
 
 					selectTerr(NULL, firstTerr);	//Deselect it
+					updateTerrInfo(NULL);
 					firstTerr = NULL;	//Reset all territories
 					secondTerr = NULL;
 					currTerr = NULL;
 
 					/*
 						Resets the send troops button to default and resets state
-						*/
+					*/
 					ui.changeButton(-1);
 					sendTroopsPressed = false;
 
@@ -331,7 +335,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 				}
 
 				selectTerr(secondTerr, NULL);	//If valid select the territory
-
+				updateTerrInfo(secondTerr);
 				/*
 					If they have different owners, change button to attack, if not change to send troops (indented)
 					*/
@@ -346,11 +350,12 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::SEND_TROOPS: {
 
-			if (currTerr == NULL) break;	//If no terr selected
+			if (currTerr == NULL && firstTerr == NULL) break;	//If no terr selected
 
 			if (!sendTroopsPressed) {	//If the button hasn't been pressed yet
 				if (currTerr->getOwner() == 2) {
 					firstTerr = currTerr;	//Remember first terr selected
+					currTerr = NULL;
 					sendTroopsPressed = true;
 					ui.changeButton(0);	//Indent button
 				}
@@ -359,22 +364,24 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 				ui.changeButton(-1);	//Resets the button
 
-				firstTerr->sendTroops(*secondTerr, 5, 0);	//Send troops
+				if (firstTerr->sendTroops(*secondTerr, numAtkSend, numDefSend)) {	//Send troops
 
-				//swordClang.playAudio("swords.wav");
+					if (firstTerr->getOwner() != secondTerr->getOwner())
+						swordClang.playAudio("swords.wav");
+
+					updatePlayerInfo();
+				}
 
 				selectTerr(NULL, firstTerr);	//deselect territories
 				selectTerr(NULL, secondTerr);
 
 				firstTerr = NULL;	//reset all territories
 				secondTerr = NULL;
-				currTerr = NULL;
 
 				numAtkSend = 0;	//reset troops to send
 				numDefSend = 0;
 
-				updatePlayerInfo();
-
+				updateTerrInfo(NULL);
 				ui.changeText(gameUI::Text::SEND_ATK, 0);	//update troops to send text
 				ui.changeText(gameUI::Text::SEND_DEF, 0);
 				sendTroopsPressed = false;
@@ -383,45 +390,84 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::ATK_UP: {
-			ui.changeText(gameUI::Text::SEND_ATK, ++numAtkSend);	//Add one to the attack to send text & var
+			if (firstTerr == NULL) break;
+			if (numAtkSend < firstTerr->getAttackers())
+				ui.changeText(gameUI::Text::SEND_ATK, ++numAtkSend);	//Add one to the attack to send text & var
 			break;
 		}
 
 		case gameUI::Section::ATK_DOWN: {
+			if (firstTerr == NULL) break;
 			if (numAtkSend > 0)
 				ui.changeText(gameUI::Text::SEND_ATK, --numAtkSend);	//Take one from the attack to send text & var
 			break;
 		}
 
 		case gameUI::Section::DEF_UP: {
-			ui.changeText(gameUI::Text::SEND_DEF, ++numDefSend);	//Add one to the defence to send text & var
+			if (firstTerr == NULL) break;
+			if (numDefSend < firstTerr->getDefenders())
+				ui.changeText(gameUI::Text::SEND_DEF, ++numDefSend);	//Add one to the defence to send text & var
 			break;
 		}
 
 		case gameUI::Section::DEF_DOWN: {
+			if (firstTerr == NULL) break;
 			if (numDefSend > 0)
 				ui.changeText(gameUI::Text::SEND_DEF, --numDefSend);	//Take one from the attack to send text & var
 			break;
 		}
 
 		case gameUI::Section::BUY_FARM: {
-			if (currTerr->getOwner() == 1) {
+			if (currTerr == NULL) break;
+			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 1500) {
 					map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
 					players[1].coins = players[1].coins - 1500;
+					updatePlayerInfo();
 				}
 			}
 			break;
 		}
 
 		case gameUI::Section::BUY_BANK: {
-			if (currTerr->getOwner() == 1) {
+			if (currTerr == NULL) break;
+			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 1500) {
 					map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
 					players[1].coins = players[1].coins - 1500;
+					updatePlayerInfo();
 				}
-				break;
 			}
+			break;
+		}
+
+		case gameUI::Section::BUY_ATTACK: {
+			if (currTerr == NULL) break;
+			if (currTerr->getOwner() == 2) {
+				if (players[1].coins >= 100) {
+					if (currTerr->addAttacker()) {
+						players[1].coins -= 100;
+						updateTerrInfo(currTerr);
+						updatePlayerInfo();
+					}
+				}
+			}
+			break;
+		}
+
+		case gameUI::Section::BUY_DEFENDER: {
+			if (currTerr == NULL) break;
+			if (currTerr->getOwner() == 2) {
+				if (players[1].coins >= 100) {
+					if (currTerr->addDefender()) {
+						players[1].coins -= 100;
+						updateTerrInfo(currTerr);
+						updatePlayerInfo();
+					}
+				}
+			}
+			break;
+		}
 
 		case gameUI::Section::SETTINGS: {
 			settingsOpen = true;
@@ -429,7 +475,6 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			break;
 		}
 
-		}
 		}
 	}
 	return false;
@@ -499,18 +544,24 @@ Territory *Game::getTerritory(int x, int y) {
 
 void Game::selectTerr(Territory *terr, Territory *prevTerr) {
 
-	int vals[5];
-
 	if (prevTerr != NULL) {	
 		changeTerritoryColour(*prevTerr, -1);	//Default colour (that of the owner)
 		prevTerr->invSelect();	//Not selected anymore
 	}
 
+	if (terr != NULL) {
+		changeTerritoryColour(*terr, 3);	//Change to gold
+		terr->invSelect();	//Selected now
+	}
+}
+
+void Game::updateTerrInfo(Territory *terr) {
+
+	int vals[5];
+	
 	if (terr == NULL) {	//If we aren't selecting a new territory
 		for (int i = 0; i < 5; i++) vals[i] = 0;	//all values are 0
 	} else {
-		changeTerritoryColour(*terr, 3);	//Change to gold
-		terr->invSelect();	//Selected now
 		terr->getInfo(vals);	//get values
 	}
 

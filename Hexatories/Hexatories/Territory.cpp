@@ -6,6 +6,12 @@
 using namespace std;
 #pragma region otherFuncs
 void Territory::initTerritory(vector<tile_t> innerTiles, int tileCount, int own) {
+
+	if (own != 0) {
+		attackers[0] = 1;
+		defenders[0] = 1;
+	}
+
 	size = tileCount;
 	owner = own;
 	colour = own;
@@ -120,12 +126,26 @@ void Territory::fillSaveData(string &saveData) {
 #pragma endregion
  
 #pragma region troops
-void Territory::addAttacker() {
+bool  Territory::addAttacker() {
+	if (population <= 10) return false;
 	attackers[1]++;
+	population--;
+	return true;
 }
 
-void Territory::addDefender() {
+bool Territory::addDefender() {
+	if (population <= 10) return false;
 	defenders[1]++;
+	population--;
+	return true;
+}
+
+int Territory::getAttackers() {
+	return attackers[0];
+}
+
+int Territory::getDefenders() {
+	return defenders[0];
 }
 
 int Territory::getDefense() {
@@ -165,13 +185,11 @@ bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend)
 		attackers[0] -= noAttack;
 		defenders[0] -= noDefend;
 		receivingTerr.receiveTroops(noAttack, noDefend);
-	}
 
+	} else {
 
+		if (noDefend != 0) return false;;
 
-		//Send Defender
-
-	else{
 		if (attackers[0] >= noAttack) {
 
 				int attack = noAttack * 15;
@@ -217,10 +235,13 @@ bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend)
 
 					cout << "Success in attacking\n";
 				}
+
 			} else {
-			cout << "You do not have enough troops to send\n";
+				cout << "You do not have enough troops to send\n";
+				return false;
 		}
 	} 
+	return true;
 }
 
 void Territory::incrementTurn(int &coins) {

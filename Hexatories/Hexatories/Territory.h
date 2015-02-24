@@ -121,12 +121,22 @@ public:
 	/*
 		Adds a used attacker
 	*/
-	void addAttacker();
+	bool addAttacker();
 
 	/*
 		Adds a used defender
 	*/
-	void addDefender();
+	bool addDefender();
+
+	/*
+		Returns attackers available
+	*/
+	int getAttackers();
+
+	/*
+		Returns defenders available
+	*/
+	int getDefenders();
 
 	/*
 		Transfers troops from one territory to another (assuming you have them)
