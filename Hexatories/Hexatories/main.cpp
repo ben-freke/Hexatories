@@ -107,6 +107,8 @@ GLFWwindow* initWindow(void) {
 
 int main(void) {
 	
+	
+
 	srand((unsigned int)time(NULL));
 
 	restart_log();	// Clear the debug log
