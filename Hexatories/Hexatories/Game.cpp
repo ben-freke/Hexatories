@@ -17,7 +17,6 @@ void Game::initGame() {
 	clickSound.setVolume(50);
 
 	mm.initMenu();
-	//newGame();
 }
 
 #pragma region save
@@ -404,7 +403,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 					updatePlayerInfo();
 				}
 
-				if (numAtkSend > 0 | numDefSend > 0){
+				if (numAtkSend > 0 || numDefSend > 0){
 					marchSound.playAudio("mainMarch.wav", false);
 
 				}
