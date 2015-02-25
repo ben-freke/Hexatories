@@ -25,7 +25,10 @@ class Game {
 	MainMenu mm;
 
 	Audio gameMusic;
+	Audio clickSound;
+	Audio marchSound;
 	Audio swordClang;
+	Audio victorySound;
 
 	std::vector<Territory> territories;	//All the territories on the current map
 

@@ -14,6 +14,7 @@ void Game::initGame() {
 	gameMusic.playAudio("title.wav", true);
 	gameMusic.fadeInAudio(10);
 	swordClang.setVolume(100);
+	clickSound.setVolume(50);
 
 	mm.initMenu();
 	//newGame();
@@ -65,7 +66,8 @@ vector<int> Game::getSave() {
 }
 
 void Game::newGame() {
-
+	gameMusic.playAudio("mainBackground.wav", true);
+	gameMusic.setVolume(50);
 	territories.clear();
 
 	map.initMap(territories, true);	//true so that map will init the territories
@@ -83,7 +85,8 @@ void Game::newGame() {
 }
 
 bool Game::loadGame() {
-
+	gameMusic.playAudio("mainBackground.wav", true);
+	gameMusic.setVolume(50);
 	vector<int> save = getSave();	// save data
 	if (save[0] == -1) {
 		newGame();
@@ -252,10 +255,10 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::MUTE_BACK: {
 			ui.drawSettings(1);
-			if (gameMusic.getVolume() == 100) {
+			if (gameMusic.getVolume() > 0) {
 				gameMusic.setVolume(0);
 			} else {
-				gameMusic.setVolume(100);
+				gameMusic.setVolume(50);
 			}
 			break;
 		}
@@ -264,8 +267,11 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			ui.drawSettings(2);
 			if (swordClang.getVolume() == 100) {
 				swordClang.setVolume(0);
+				clickSound.setVolume(0);
 			} else {
 				swordClang.setVolume(100);
+				clickSound.setVolume(50);
+
 			}
 			break;
 		}
@@ -368,9 +374,10 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			break;
 		}
 
-		case gameUI::Section::SEND_TROOPS: {
 
- 			if (currTerr == NULL && firstTerr == NULL) break;	//If no terr selected
+		case gameUI::Section::SEND_TROOPS: {
+			clickSound.playAudio("mainClick.wav", false);
+			if (currTerr == NULL && firstTerr == NULL) break;	//If no terr selected
 
 			if (!sendTroopsPressed) {	//If the button hasn't been pressed yet
 				if (currTerr->getOwner() == 2) {
@@ -390,10 +397,16 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 				int secondTerrOriginalOwner = secondTerr->getOwner();
 				if (firstTerr->sendTroops(*secondTerr, numAtkSend, numDefSend)) {	//Send troops
 
-					if (firstTerr->getOwner() != secondTerrOriginalOwner)
+					if (firstTerr->getOwner() != secondTerrOriginalOwner){
 						swordClang.playAudio("swords.wav", false);
-
+						victorySound.playAudio("territoryWon.wav", false);
+					}
 					updatePlayerInfo();
+				}
+
+				if (numAtkSend > 0 | numDefSend > 0){
+					marchSound.playAudio("mainMarch.wav", false);
+
 				}
 
 				selectTerr(NULL, firstTerr);	//deselect territories
@@ -414,6 +427,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::ATK_UP: {
+			clickSound.playAudio("mainClick.wav", false);
 			if (firstTerr == NULL) break;
 			if (numAtkSend < firstTerr->getAttackers())
 				ui.changeText(gameUI::Text::SEND_ATK, ++numAtkSend);	//Add one to the attack to send text & var
@@ -421,6 +435,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::ATK_DOWN: {
+			clickSound.playAudio("mainClick.wav", false);
 			if (firstTerr == NULL) break;
 			if (numAtkSend > 0)
 				ui.changeText(gameUI::Text::SEND_ATK, --numAtkSend);	//Take one from the attack to send text & var
@@ -428,6 +443,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::DEF_UP: {
+			clickSound.playAudio("mainClick.wav", false);
 			if (firstTerr == NULL) break;
 			if (numDefSend < firstTerr->getDefenders())
 				ui.changeText(gameUI::Text::SEND_DEF, ++numDefSend);	//Add one to the defence to send text & var
@@ -435,6 +451,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::DEF_DOWN: {
+			clickSound.playAudio("mainClick.wav", false);
 			if (firstTerr == NULL) break;
 			if (numDefSend > 0)
 				ui.changeText(gameUI::Text::SEND_DEF, --numDefSend);	//Take one from the attack to send text & var
@@ -442,6 +459,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::BUY_FARM: {
+			clickSound.playAudio("mainClick.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 1500) {
@@ -454,6 +472,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::BUY_BANK: {
+			clickSound.playAudio("mainClick.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 1500) {
@@ -466,6 +485,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::BUY_ATTACK: {
+			clickSound.playAudio("mainClick.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 100) {
@@ -480,6 +500,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::BUY_DEFENDER: {
+			clickSound.playAudio("mainClick.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 100) {
@@ -494,6 +515,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		}
 
 		case gameUI::Section::SETTINGS: {
+			clickSound.playAudio("mainClick.wav", false);
 			settingsOpen = true;
 			ui.drawSettings(0);
 			break;
@@ -511,22 +533,29 @@ bool Game::handleMainMenu(int x, int y) {
 	switch (sect) {
 
 	case (MainMenu::Section::NEW_GAME) : {
+		clickSound.playAudio("mainClick.wav", false);
 		stage = 2;
 		mm.changeScreen(2);
 		return false;
 	}
 
 	case (MainMenu::Section::LOAD_GAME) : {
+		clickSound.playAudio("mainClick.wav", false);
+
 		stage = 4;
 		mm.changeScreen(2);
 		return false;
 	}
 
 	case (MainMenu::Section::TUTORIAL) : {
+		clickSound.playAudio("mainClick.wav", false);
+
 		break;
 	}
 
 	case (MainMenu::Section::EXIT) : {
+		clickSound.playAudio("mainClick.wav", false);
+
 		return true;
 	}
 
@@ -539,16 +568,19 @@ void Game::handleKeyInput(int key) {
 	if (key == GLFW_KEY_SPACE) {
 
 		if (stage == 0) {
+			clickSound.playAudio("mainClick.wav", false);
 			mm.changeScreen(1);
 			stage = 1;
 		}
 		if (stage == 3)
 			nextTurn();	//Move turn on when space pressed
 		if (stage == 2) {
+			clickSound.playAudio("mainClick.wav", false);
 			newGame();
 			stage = 3;
 		}
 		if (stage == 4) {
+			clickSound.playAudio("mainClick.wav", false);
 			loadGame();
 			stage = 3;
 		}
@@ -646,7 +678,7 @@ void Game::nextTurn() {
 			coins = players[owner].coins;
 		
 		if (owner != -1)
-			territories[i].incrementTurn(coins);
+		territories[i].incrementTurn(coins);
 
 		if (owner > 0) {
 			players[owner].coins = coins;
