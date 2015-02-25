@@ -657,17 +657,16 @@ void Game::nextTurn() {
 	handleMouseInput(0, 0, false, true);
 }
 
-void Game::updateScore(int player) {
-
-}
-
 void Game::updatePlayerInfo() {
 
 	players[1].population = 0;
+	players[1].score = players[1].coins;
 
 	for (unsigned int i = 0; i < territories.size(); i++)
-		if (territories[i].getOwner() == 2)
+		if (territories[i].getOwner() == 2) {
 			players[1].population += territories[i].getPopulation();
+			players[1].score += territories[i].getScore();
+		}
 
 	ui.changeText(gameUI::Text::COINS, players[1].coins);
 	ui.changeText(gameUI::Text::TOTAL_POP, players[1].population);
