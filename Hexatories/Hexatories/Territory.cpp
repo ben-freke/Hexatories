@@ -176,7 +176,7 @@ bool  Territory::addAttacker() {
 
 bool Territory::addDefender() {
 	if (population <= 10) return false;
-	defenders[1]++;
+	defenders[0]++;
 	population--;
 	return true;
 }
@@ -284,6 +284,28 @@ bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend)
 		}
 	} 
 	return true;
+}
+
+int isVulnerable(vector<Territory> &all) {
+	vector<int> list;
+	return 0;
+}
+
+bool Territory::getEnemyBorders(vector<Territory> &all, vector<int> &list) {
+
+	bool hasEnemyBorder = false;
+
+	for (unsigned int i = 0; i < neighbours.size(); i++) {
+
+		if (all[neighbours[i]].getOwner() != owner) {
+
+			hasEnemyBorder = true;
+
+			if (find(list.begin(), list.end(), neighbours[i]) != list.end())
+				list.push_back(neighbours[i]);
+		}
+	}
+	return hasEnemyBorder;
 }
 
 void Territory::incrementTurn(int &coins) {

@@ -12,7 +12,7 @@ using namespace std;
 void Game::initGame() {
 
 	gameMusic.playAudio("title.wav", true);
-	gameMusic.setVolume(100);
+	gameMusic.fadeInAudio(10);
 	swordClang.setVolume(100);
 
 	mm.initMenu();
@@ -156,6 +156,8 @@ bool Game::loadGame() {
 
 	updatePlayerInfo();
 	ui.changeText(gameUI::Text::ROUND, turnNo);
+
+	map.addToTiles(allTiles);
 
 	return true;
 }
@@ -368,7 +370,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::SEND_TROOPS: {
 
-			if (currTerr == NULL && firstTerr == NULL) break;	//If no terr selected
+ 			if (currTerr == NULL && firstTerr == NULL) break;	//If no terr selected
 
 			if (!sendTroopsPressed) {	//If the button hasn't been pressed yet
 				if (currTerr->getOwner() == 2) {
@@ -643,8 +645,8 @@ void Game::nextTurn() {
 		if (owner != -1) 
 			coins = players[owner].coins;
 		
-
-		territories[i].incrementTurn(coins);
+		if (owner != -1)
+			territories[i].incrementTurn(coins);
 
 		if (owner > 0) {
 			players[owner].coins = coins;

@@ -6,16 +6,10 @@
 #include "gameUI.h"
 #include "MainMenu.h"
 #include "Audio.h"
+#include "AI.h"
 
 #ifndef __GAME_H
 #define __GAME_H
-
-/*
-	Contains necessary information to remember about a player
-*/
-struct player {
-	int coins, score, population;
-};
 
 /*
 	Runs everything about the game in one way or another

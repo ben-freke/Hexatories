@@ -45,13 +45,7 @@ class Territory {
 
 	bool selected = false;	//Used to determine if we should stay highlighted when mouse is off us
 
-	
 #pragma region troops
-
-	/*
-		Gets the defense of a territory (15 * defenders[1] + pop)
-	*/
-	int getDefense();
 
 	/*
 		Destroys all attackers on a tile (will never need to be x amount)
@@ -151,11 +145,18 @@ public:
 	int getDefenders();
 
 	/*
+	Gets the defense of a territory (15 * defenders[0] + pop)
+	*/
+	int getDefense();
+
+	/*
 		Transfers troops from one territory to another (assuming you have them)
 	*/
 	bool sendTroops(Territory &targetTerr, int numAttack, int numDefend);
 
+	int isVulnerable(std::vector<Territory> &, std::vector<int> &);
 
+	bool getEnemyBorders(std::vector<Territory> &, std::vector<int> &);
 
 	/*
 		Sets used troops to unused
