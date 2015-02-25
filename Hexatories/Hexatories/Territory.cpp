@@ -390,7 +390,7 @@ void Territory::updateBorderVBO(vector<GLint> &verts) {
 	}
 }
 
-void Territory::addBuilding(bool type, vector<GLint> &vertices, vector<GLushort> &indices) {
+bool Territory::addBuilding(bool type, vector<GLint> &vertices, vector<GLushort> &indices) {
 
 	GLushort baseIndex = vertices.size() / 8;
 	GLushort rectIndices[] = {
@@ -429,7 +429,9 @@ void Territory::addBuilding(bool type, vector<GLint> &vertices, vector<GLushort>
 		for (int j = 0; j < 6; j++) {
 			indices.push_back(baseIndex + rectIndices[j]);
 		}
-
+		return true;
+	} else {
+		return false;
 	}
 }
 

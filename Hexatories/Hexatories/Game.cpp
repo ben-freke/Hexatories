@@ -462,9 +462,10 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 1500) {
-					map.updateBuilding(currTerr, true);	//Adds a farm to the territory & map
-					players[1].coins = players[1].coins - 1500;
-					updatePlayerInfo();
+					if (map.updateBuilding(currTerr, true)) {	//Adds a farm to the territory & map
+						players[1].coins = players[1].coins - 1500;
+						updatePlayerInfo();
+					}
 				}
 			}
 			break;
@@ -475,9 +476,10 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 1500) {
-					map.updateBuilding(currTerr, false);	//Adds a bank to the territory & map
-					players[1].coins = players[1].coins - 1500;
-					updatePlayerInfo();
+					if (map.updateBuilding(currTerr, false)) {	//Adds a bank to the territory & map
+						players[1].coins = players[1].coins - 1500;
+						updatePlayerInfo();
+					}
 				}
 			}
 			break;

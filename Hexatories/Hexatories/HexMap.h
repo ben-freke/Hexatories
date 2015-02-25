@@ -106,6 +106,6 @@ public:
 	/*
 		Adds a building to the map (and territory) true = farm, false = bank
 	*/
-	void updateBuilding(Territory *, bool);
+	bool updateBuilding(Territory *, bool);
 };
 #endif

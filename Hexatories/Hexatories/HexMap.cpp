@@ -337,10 +337,11 @@ void HexMap::updateBorder(Territory &ter, bool load) {
 	updateVAO();
 }
 
-void HexMap::updateBuilding(Territory *ter, bool building) {
-	if (ter == NULL) return;
-	ter->addBuilding(building, tileVerts, indices);	// adds building to the terr, true = farm, false = bank
+bool HexMap::updateBuilding(Territory *ter, bool building) {
+	if (ter == NULL) return false;
+	bool val = ter->addBuilding(building, tileVerts, indices);	// adds building to the terr, true = farm, false = bank
 	updateVAO();
+	return val;
 }
 
 int HexMap::setupTerritories(int *mapCode, int mapPos, vector<Territory> &ter) {

@@ -178,7 +178,7 @@ public:
 	/*
 		Adds building to random tile on map
 	*/
-	void addBuilding(bool, std::vector<GLint> &, std::vector<GLushort> &);
+	bool addBuilding(bool, std::vector<GLint> &, std::vector<GLushort> &);
 
 	/*
 		Changes the colour var
