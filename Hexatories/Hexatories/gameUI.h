@@ -15,13 +15,14 @@ class gameUI {
 
 #pragma region openglStuff
 
-	GLint uniforms[5];	//Uniforms for openGL textures
+	GLint uniforms[6];	//Uniforms for openGL textures
 	GLuint vao, vbo, prog;
 
 	std::vector<GLint> verts;	//All vertices
 	std::vector<GLushort> indices;	//Draw order of vertices
 
 	bool settingsOpen = false;
+	int victory = 0; //0 none, 1 you win 2 ai win
 
 	/*
 		Sets up our VAO and loads all textures needed
@@ -55,7 +56,8 @@ public:
 		DEF_UP, DEF_DOWN, BUY_ATTACK, BUY_DEFENDER, 
 		BUY_FARM, BUY_BANK, SETTINGS, MUTE_BACK,
 		MUTE_EFFECTS, SAVE, EXIT_MAIN, EXIT_WINDOWS,
-		SETTINGS_WINDOW, NULL_SEC,
+		SETTINGS_WINDOW, LOST_LOAD, LOST_MAIN, WON_MAIN,
+		NULL_SEC,
 	};	//Different areas requiring mouse input
 
 #pragma region drawing
@@ -75,6 +77,8 @@ public:
 	void drawSettings(int);
 
 	void drawMute(int);
+
+	void drawVictory(bool);
 
 	/*
 		Used to swap between send troops, indented send troops & attack button

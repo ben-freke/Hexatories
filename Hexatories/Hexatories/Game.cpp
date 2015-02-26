@@ -15,7 +15,7 @@ void Game::initGame() {
 	swordClang.setVolume(100);
 	clickSound.setVolume(50);
 
-	mm.initMenu();
+	mm.initMenu(0);
 }
 
 #pragma region save
@@ -206,7 +206,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 	static bool sendTroopsPressed = false;	//So we know what to do when the button is pressed next
 	static bool settingsOpen = false;
 
-	int ix = (int)x;
+ 	int ix = (int)x;
 	int iy = (int)y;
 
 #pragma region reset
@@ -235,11 +235,33 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 #pragma region mainMenu
 	if (stage == 1 && click) if (handleMainMenu(ix, iy)) return true;
-	if (stage != 3) return false;
+	if (stage != 3 && stage != 5) return false;
 #pragma endregion
 
 #pragma region gameInput
 	gameUI::Section sect = ui.pointInBox(ix, iy);
+
+	if (stage == 5 && click) {
+		switch (sect) {
+
+		case gameUI::Section::LOST_LOAD: {
+			handleMouseInput(0, 0, false, true);
+			stage = 4;
+			mm.initMenu(2);
+			loadGame();
+			break;
+		}
+
+		case gameUI::Section::LOST_MAIN:
+		case gameUI::Section::WON_MAIN: {
+			handleMouseInput(0, 0, false, true);
+			stage = 0;
+			mm.initMenu(0);
+			break;
+		}
+		}
+		return false;
+	}
 
 #pragma region Settings
 	if (settingsOpen) {
@@ -289,7 +311,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		case gameUI::Section::EXIT_MAIN: {
 			handleMouseInput(0, 0, false, true);
 			stage = 0;
-			mm.initMenu();
+			mm.initMenu(0);
 			break;
 		}
 
@@ -314,6 +336,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		switch (sect) {	//Based on button pressed
 
 		case gameUI::Section::MAP: {
+			clickSound.playAudio("mainClick.wav", false);
 
 			if (!sendTroopsPressed) {	//If we haven't pressed send troops (we are just selecting a territory)
 
@@ -462,6 +485,10 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			if (firstTerr == NULL) break;
 			if (numDefSend > 0)
 				ui.changeText(gameUI::Text::SEND_DEF, --numDefSend);	//Take one from the attack to send text & var
+			if (numDefSend == 0) {
+				numDefSend = firstTerr->getDefenders();
+				ui.changeText(gameUI::Text::SEND_ATK, numDefSend);
+			}
 			break;
 		}
 
@@ -674,7 +701,7 @@ void Game::draw() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (stage == 3) {
+	if (stage == 3 || stage == 5) {
 		map.drawMap();
 		ui.drawUI();
 	} else {
@@ -709,7 +736,14 @@ void Game::checkVictory() {
 		victory = (players[0].score >= players[1].score) ? 2 : 1;
 	}
 
-	cout << victory << "\n";
+	if (victory == 1) {
+		ui.drawVictory(true);
+	} else if (victory == 2) {
+ 		ui.drawVictory(false);
+	}
+
+	if (victory != 0)
+		stage = 5;
 }
 
 void Game::nextTurn() {
@@ -731,6 +765,8 @@ void Game::nextTurn() {
 	ui.changeText(gameUI::Text::ROUND, ++turnNo);	//increment turn
 
 	checkVictory();
+	if (stage == 5) return;
+
  	for (unsigned int i = 0; i < territories.size(); i++) {
 
 		int owner, coins = -1;

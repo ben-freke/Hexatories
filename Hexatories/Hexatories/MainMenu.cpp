@@ -4,11 +4,11 @@
 
 using namespace std;
 
-void MainMenu::initMenu() {
+void MainMenu::initMenu(int screen) {
 	if (verts.empty()) {
 		setupVAO();
 	} else {
-		changeScreen(0);
+		changeScreen(screen);
 	}
 }
 
@@ -23,7 +23,7 @@ void MainMenu::drawMenu() {
 
 	glUseProgram(prog);
 
-	glUniform1i(uniform, 9);	//Tell gpu which textures to use
+	glUniform1i(uniform, 10);	//Tell gpu which textures to use
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 
@@ -64,7 +64,7 @@ void MainMenu::setupVAO() {
 
 	loadBMP("mainmenu.png", tboMain);
 
-	glActiveTexture(GL_TEXTURE9);	//bind our textures to various slots
+	glActiveTexture(GL_TEXTURE10);	//bind our textures to various slots
 	glBindTexture(GL_TEXTURE_2D, tboMain);
 
 	glActiveTexture(GL_TEXTURE0);	//reset bound slot

@@ -33,7 +33,7 @@ public:
 		NULL_SEC,
 	};	//Different areas requiring mouse input
 
-	void initMenu();
+	void initMenu(int);
 
 	void drawMenu();
 

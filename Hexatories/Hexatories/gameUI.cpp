@@ -28,7 +28,7 @@ void gameUI::drawUI() {
 
 	glUseProgram(prog);
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 6; i++)
 		glUniform1i(uniforms[i], i + 4);	//Tell gpu which textures to use
 
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
@@ -97,13 +97,14 @@ void gameUI::setupVAO() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
 
-	GLuint tboMain, tboNums, tboBut, tboSet, tboMute;	//for our textures
+	GLuint tboMain, tboNums, tboBut, tboSet, tboMute, tboVic;	//for our textures
 	
 	loadBMP("gui.png", tboMain);
 	loadBMP("nums.png", tboNums);
 	loadBMP("buttons.png", tboBut);
 	loadBMP("settings.png", tboSet);
 	loadBMP("mute.png", tboMute);
+	loadBMP("victory.png", tboVic);
 
 	glActiveTexture(GL_TEXTURE4);	//bind our textures to various slots
 	glBindTexture(GL_TEXTURE_2D, tboMain);
@@ -119,6 +120,9 @@ void gameUI::setupVAO() {
 
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, tboMute);
+		
+	glActiveTexture(GL_TEXTURE9);
+	glBindTexture(GL_TEXTURE_2D, tboVic);
 
 	glActiveTexture(GL_TEXTURE0);	//reset bound slot
 
@@ -131,6 +135,7 @@ void gameUI::setupVAO() {
 	uniforms[2] = glGetUniformLocation(prog, "button_tex");
 	uniforms[3] = glGetUniformLocation(prog, "set_tex");
 	uniforms[4] = glGetUniformLocation(prog, "mute_tex");
+	uniforms[5] = glGetUniformLocation(prog, "victory_tex");
 
 	GLint posAttrib = glGetAttribLocation(prog, "position");	//set up our vertex attributes. (px, py, tx, ty, tz)
 	glEnableVertexAttribArray(posAttrib);
@@ -284,6 +289,32 @@ void gameUI::drawSettings(int option) {
 	updateVAO();
 }
 
+void gameUI::drawVictory(bool won) {
+	GLint rectVerts[] = {	//settings box coords
+		137, 593, 0, 0, 15 + (int) won,
+		887, 593, 1, 0, 15 + (int) won,
+		887, 173, 1, 1, 15 + (int) won,
+		137, 173, 0, 1, 15 + (int) won,
+	};
+
+	GLushort rectIndices[] = {
+		0, 1, 2,
+		2, 3, 0,
+	};
+	GLushort baseIndex = verts.size() / 5;
+	for (int i = 0; i < 20; i++)
+		verts.push_back(rectVerts[i]);
+	for (int i = 0; i < 6; i++)
+		indices.push_back(rectIndices[i] + baseIndex);
+
+	if (won) {
+		victory = 1;
+	} else {
+		victory = 2;
+	}
+	updateVAO();
+}
+
 void gameUI::drawMute(int num) {
 	static int pos[2];
 
@@ -390,6 +421,9 @@ const int gameUI::sectionCoords[] = {
 	463, 216, 599, 329,		// exit main
 	653, 199, 783, 324,		// exit windows
 	0, 29, 801, 386,		// settings window
+	219, 342, 357, 442,		// lost load
+	371, 423, 475, 509,		// lost main
+	728, 435, 836, 521,		// won main
 };
 
 gameUI::Section gameUI::pointInBox(int x, int y) {
@@ -397,8 +431,15 @@ gameUI::Section gameUI::pointInBox(int x, int y) {
 	int tx, bx, ty, by, i = 0, max = 44;	// top x, bottom x, top y, bottom y
 	if (settingsOpen) {
 		i = 40;
-		max += 24;
+		max = 68;
+	} else if (victory == 2) {
+		i = 68;
+		max = 76;
+	} else if (victory == 1) {
+		i = 76;
+		max = 80;
 	}
+
 	for (i; i < max; i += 4) {
 
 		tx = sectionCoords[i];
@@ -408,6 +449,6 @@ gameUI::Section gameUI::pointInBox(int x, int y) {
 		if (x >= tx && x <= bx && y >= ty && y <= by) return (gameUI::Section)(i / 4); // just a point in box check
 
 	}
-	return (gameUI::Section)(17);
+	return (gameUI::Section)(20);
 }
 #pragma endregion
