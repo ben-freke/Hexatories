@@ -1,16 +1,8 @@
 #include <stdio.h>
-#include <string>
-#include <vector>
-#include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <SFML/Audio.hpp>
-#include <SFML/Audio/Sound.hpp>
 #include "Log.h"
-#include "Shaders.h"
 #include "Game.h"
-#include "HexMap.h"
-#include "Audio.h"
 
 // (C) Group 16
 using namespace std;
@@ -29,7 +21,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		double yValue = NULL;
 
 		glfwGetCursorPos(window, &xValue, &yValue);
-		printf("x: %d, y: %d\n", (int)xValue, (int)yValue);
 		if (game.handleMouseInput(xValue, yValue, true, false)) {	// true == clicked (not hover) false = don't reset selected ters
 			endGame = true;
 		}

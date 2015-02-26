@@ -23,6 +23,7 @@ class Game {
 	HexMap map;
 	gameUI ui;
 	MainMenu mm;
+	AI ai;
 
 	Audio gameMusic;
 	Audio clickSound;
@@ -94,6 +95,8 @@ class Game {
 #pragma endregion
 
 	bool handleMainMenu(int, int);
+
+	void checkVictory();
 
 public:
 

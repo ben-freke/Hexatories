@@ -26,6 +26,26 @@ struct findTile {
 	}
 };
 
+struct TerrInfo {
+	int attack, defence, population, maxAtk, terrNo;
+	bool farm, bank;
+	std::vector<int> enemyBorders, friendlyBorders;
+
+	bool operator < (const TerrInfo& ti) const {
+		return (population < ti.population);
+	}
+};	//Used for AI
+
+struct findTerr {
+
+	int terrNo;
+	findTerr(int const &terrNum) : terrNo(terrNum) {}
+
+	bool operator()(int const &terrNum) const {
+		return terrNo == terrNum;
+	}
+};
+
 /*
 	Allows use of the == operator on tiles
 */
@@ -137,7 +157,7 @@ public:
 	/*
 		Returns attackers available
 	*/
-	int getAttackers();
+	int getAttackers(bool);
 
 	/*
 		Returns defenders available
@@ -154,9 +174,7 @@ public:
 	*/
 	bool sendTroops(Territory &targetTerr, int numAttack, int numDefend);
 
-	int isVulnerable(std::vector<Territory> &, std::vector<int> &);
-
-	bool getEnemyBorders(std::vector<Territory> &, std::vector<int> &);
+	TerrInfo getAIData(std::vector<Territory> &);
 
 	/*
 		Sets used troops to unused

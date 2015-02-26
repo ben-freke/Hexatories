@@ -10,7 +10,7 @@ int Audio::playAudio(char* filename, bool loop) {
 	buffer.loadFromFile(filename);
 	sound.setBuffer(buffer);
 	
-	sound.play();
+	//sound.play();
 	sound.setLoop(loop);
 
 	return 0;

@@ -61,7 +61,7 @@ void Territory::getInfo(int *vals) {
 }
 
 int Territory::getScore() {
-	return population + 2 * (attackers[0] + attackers[1] + defenders[0] + defenders[1]) + size;	//p + 2(d + a) + t
+	return population + 35 * (attackers[0] + attackers[1] + defenders[0] + defenders[1]) + size * 5;	//p + 2(d + a) + t
 }
 
 void Territory::setupTiles(vector<tile_t> innerTiles) {
@@ -181,8 +181,8 @@ bool Territory::addDefender() {
 	return true;
 }
 
-int Territory::getAttackers() {
-	return attackers[0];
+int Territory::getAttackers(bool all) {
+	return attackers[0] + ((all) ? attackers[1] : 0);
 }
 
 int Territory::getDefenders() {
@@ -275,37 +275,40 @@ bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend)
 
 				receivingTerr.setOwner(owner);
 
-				cout << "Success in attacking\n";
 			}
 
 		} else {
-			cout << "You do not have enough troops to send\n";
 			return false;
 		}
 	} 
 	return true;
 }
 
-int isVulnerable(vector<Territory> &all) {
-	vector<int> list;
-	return 0;
-}
+TerrInfo Territory::getAIData(vector<Territory> &all) {
 
-bool Territory::getEnemyBorders(vector<Territory> &all, vector<int> &list) {
+	TerrInfo thisTerr;
 
-	bool hasEnemyBorder = false;
+	thisTerr.attack = attackers[0] * 15;
+	thisTerr.defence = getDefense();
+	thisTerr.population = population;
+	thisTerr.maxAtk = 0;
+	thisTerr.terrNo = terrNo;
+	thisTerr.bank = (bankBuilt >= 0) ? true : false;
+	thisTerr.farm = (farmBuilt >= 0) ? true : false;
 
 	for (unsigned int i = 0; i < neighbours.size(); i++) {
 
 		if (all[neighbours[i]].getOwner() != owner) {
 
-			hasEnemyBorder = true;
-
-			if (find(list.begin(), list.end(), neighbours[i]) != list.end())
-				list.push_back(neighbours[i]);
+			thisTerr.maxAtk = all[neighbours[i]].getAttackers(true) * 15;
+			thisTerr.enemyBorders.push_back(neighbours[i]);
+			
+		} else {
+			thisTerr.friendlyBorders.push_back(neighbours[i]);
 		}
 	}
-	return hasEnemyBorder;
+
+	return thisTerr;
 }
 
 void Territory::incrementTurn(int &coins) {
@@ -451,7 +454,3 @@ void Territory::invSelect() {
 	selected = !selected;
 }
 #pragma endregion
-
-bool operator==(const tile_t &tile1, const tile_t &tile2) {
-	return ((tile1.x == tile2.x) && (tile1.y == tile2.y));
-}

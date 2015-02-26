@@ -12,7 +12,7 @@ using namespace std;
 void Game::initGame() {
 
 	gameMusic.playAudio("title.wav", true);
-	gameMusic.fadeInAudio(10);
+	gameMusic.fadeInAudio(4);
 	swordClang.setVolume(100);
 	clickSound.setVolume(50);
 
@@ -81,6 +81,7 @@ void Game::newGame() {
 	turnNo = 1;
 
 	updatePlayerInfo();
+	ai.initAI(&territories, &players[0]);
 }
 
 bool Game::loadGame() {
@@ -160,6 +161,7 @@ bool Game::loadGame() {
 	ui.changeText(gameUI::Text::ROUND, turnNo);
 
 	map.addToTiles(allTiles);
+	ai.initAI(&territories, &players[0]);
 
 	return true;
 }
@@ -428,7 +430,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		case gameUI::Section::ATK_UP: {
 			clickSound.playAudio("mainClick.wav", false);
 			if (firstTerr == NULL) break;
-			if (numAtkSend < firstTerr->getAttackers())
+			if (numAtkSend < firstTerr->getAttackers(false))
 				ui.changeText(gameUI::Text::SEND_ATK, ++numAtkSend);	//Add one to the attack to send text & var
 			break;
 		}
@@ -667,8 +669,55 @@ void Game::draw() {
 	}
 }
 
+void Game::checkVictory() {
+	int victory = 0; //0 not finished 1 you win 2 ai win
+	int playersCount = 0, AICount = 0;
+
+	for (unsigned int i = 0; i < territories.size(); i++) {
+		if (territories[i].getOwner() == 1) AICount++;
+		if (territories[i].getOwner() == 2) playersCount++;
+	}
+
+	if (playersCount == 0) victory = 2;
+	if (AICount == 0) victory = 1;
+
+	if (turnNo == 150) {
+		updatePlayerInfo();
+
+		players[0].score = players[0].coins / 2;
+
+		for (unsigned int i = 0; i < territories.size(); i++) {
+			if (territories[i].getOwner() == 1) {
+				players[0].population += territories[i].getPopulation();
+				players[0].score += territories[i].getScore();
+			}
+		}
+
+		victory = (players[0].score >= players[1].score) ? 2 : 1;
+	}
+
+	cout << victory << "\n";
+}
+
 void Game::nextTurn() {
+
+	vector<int> *farmArray = new vector<int>, *bankArray = new vector<int>;
+	vector<int> update = ai.moveAI(farmArray, bankArray);
+
+	for (unsigned int i = 0; i < update.size(); i++)	
+		changeTerritoryColour(territories[update[i]], -1);
+
+	for (unsigned int i = 0; i < (*farmArray).size(); i++)
+		map.updateBuilding(&territories[(*farmArray)[i]], true);
+
+	for (unsigned int i = 0; i < (*bankArray).size(); i++)
+		map.updateBuilding(&territories[(*bankArray)[i]], false);
+
+	delete farmArray, bankArray;
+
 	ui.changeText(gameUI::Text::ROUND, ++turnNo);	//increment turn
+
+	checkVictory();
  	for (unsigned int i = 0; i < territories.size(); i++) {
 
 		int owner, coins = -1;
@@ -679,9 +728,9 @@ void Game::nextTurn() {
 			coins = players[owner].coins;
 		
 		if (owner != -1)
-		territories[i].incrementTurn(coins);
+			territories[i].incrementTurn(coins);
 
-		if (owner > 0) {
+		if (owner >= 0) {
 			players[owner].coins = coins;
 			if (players[owner].coins > 99999) players[owner].coins = 99999;
 		}
@@ -695,7 +744,7 @@ void Game::nextTurn() {
 void Game::updatePlayerInfo() {
 
 	players[1].population = 0;
-	players[1].score = players[1].coins;
+	players[1].score = players[1].coins / 2;
 
 	for (unsigned int i = 0; i < territories.size(); i++)
 		if (territories[i].getOwner() == 2) {

@@ -13,17 +13,25 @@ struct player {
 
 class AI {
 
-	std::vector<Territory> allTerrs;
-	std::vector<int> owned, enemyBorders, borders;
+	std::vector<Territory> *allTerrs;
+	std::vector<int> toUpdateTerrNo, *farmArray, *bankArray;
+	std::vector<TerrInfo> ourTerrs, ourVuln, theirVuln, ourSafe, theirSafe, enemyBorders, borders, inners;
 
-	player me;
+	player *ai;
+
+	int banks, farms;
 
 	void fillArrays();
+	void findReinforceTerrs(int &, std::vector<int> &, TerrInfo &, std::vector<TerrInfo> &, bool);
+	void findAttackTerrs(int &, std::vector<int> &, TerrInfo &, std::vector<TerrInfo> &, std::vector<TerrInfo> &);
+	void attack(std::vector<TerrInfo> &);
 	void handleDefence();
+	void handleAttack();
+	void addBuildings();
 
 public:
-	void initAI(std::vector<Territory> &, player &);
-	std::vector<Territory> moveAI();
+	void initAI(std::vector<Territory> *, player *);
+	std::vector<int> moveAI(std::vector<int> *, std::vector<int> *);
 };
 
 #endif
