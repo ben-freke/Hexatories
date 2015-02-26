@@ -10,6 +10,7 @@ void gameUI::initUI() {
 
 	verts.clear();	//Reset openGL arrays in case of restarted game
 	indices.clear();
+	victory = 0;
 
 	mainOverlay();	//set up main overlay
 	initText();	//add text
