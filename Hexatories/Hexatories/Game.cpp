@@ -564,7 +564,7 @@ bool Game::handleMainMenu(int x, int y) {
 		clickSound.playAudio("mainClick.wav", false);
 
 		/*************************************************/
-		ShellExecute(NULL, "open", "http://youtube.com", NULL, NULL, SW_SHOWNORMAL);	
+		ShellExecute(NULL, "open", "", NULL, NULL, SW_SHOWNORMAL);	
 		/*************************************************/
 		break;
 	}

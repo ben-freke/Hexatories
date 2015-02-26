@@ -141,8 +141,8 @@ void AI::handleDefence() {
 		if (r != 1) {
 			if (difference > 0) {	//Buy defenders
 				def = ourVuln[i].population - 10;
-				if (def > (*ai).coins / 100) {
-					def = (*ai).coins / 100;
+				if (def > (*ai).coins / 50) {
+					def = (*ai).coins / 50;
 				}
 
 				if (difference - def < 0) {
@@ -262,8 +262,8 @@ void AI::attack(vector<TerrInfo> &toAttack) {
 				Territory &tt = (*allTerrs)[touchingTerrs[j].terrNo];
 
 				int buy = touchingTerrs[j].population - 10;
-				if (buy >(*ai).coins / 100) {
-					buy = (*ai).coins / 100;
+				if (buy > (*ai).coins / 50) {
+					buy = (*ai).coins / 50;
 				}
 
 				if (defence - buy < 0) {
@@ -274,7 +274,7 @@ void AI::attack(vector<TerrInfo> &toAttack) {
 				}
 
 				for (int k = 0; k < buy; k++) {
-					(*ai).coins -= 100;
+					(*ai).coins -= 50;
 					tt.addAttacker();
 				}
 				if (defence == 0) break;
@@ -313,7 +313,7 @@ void AI::handleAttack() {
 
 void AI::addBuildings() {
 
-	int totalBuildings = (*ai).coins / 1500;
+	int totalBuildings = (*ai).coins / 500;
 	int maxBanks = (int)(totalBuildings / 2), maxFarms = (int)ceil(totalBuildings / 2);
 
 	if (farms < maxFarms) {
@@ -339,7 +339,7 @@ void AI::addBuildings() {
 		if (maxBanks > 0) {
 			if (!inners[i].bank) {
  				(*bankArray).push_back(inners[i].terrNo);
-				(*ai).coins -= 1500;
+				(*ai).coins -= 500;
 				maxBanks--;
 			} 
 		} else {
@@ -350,7 +350,7 @@ void AI::addBuildings() {
 		if (maxFarms > 0) {
 			if (!inners[i].farm) {
 				(*farmArray).push_back(inners[i].terrNo);
-				(*ai).coins -= 1500;
+				(*ai).coins -= 500;
 				maxFarms--;
 			}
 		} else {
