@@ -74,7 +74,7 @@ void Game::newGame() {
 	ui.initUI();
 
 	for (int i = 0; i < 2; i++) {
-		players[i].coins = 600;
+		players[i].coins = 250;
 		players[i].score = 0;
 		players[i].population = 0;
 	}
