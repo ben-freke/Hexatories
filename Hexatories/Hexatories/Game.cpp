@@ -474,8 +474,10 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		case gameUI::Section::ATK_DOWN: {
 			clickSound.playAudio("mainClick.wav", false);
 			if (firstTerr == NULL) break;
-			if (numAtkSend > 0)
+			if (numAtkSend > 0) {
 				ui.changeText(gameUI::Text::SEND_ATK, --numAtkSend);	//Take one from the attack to send text & var
+				break;
+			}
 			
 			if (numAtkSend == 0){
 				numAtkSend = firstTerr->getAttackers(false);
@@ -496,8 +498,10 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 		case gameUI::Section::DEF_DOWN: {
 			clickSound.playAudio("mainClick.wav", false);
 			if (firstTerr == NULL) break;
-			if (numDefSend > 0)
+			if (numDefSend > 0) {
 				ui.changeText(gameUI::Text::SEND_DEF, --numDefSend);	//Take one from the attack to send text & var
+				break;
+			}
 			if (numDefSend == 0) {
 				numDefSend = firstTerr->getDefenders();
 				ui.changeText(gameUI::Text::SEND_ATK, numDefSend);
