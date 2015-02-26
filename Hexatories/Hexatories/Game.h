@@ -32,6 +32,7 @@ class Game {
 	Audio marchSound;
 	Audio swordClang;
 	Audio victorySound;
+	Audio saveAudio;
 
 	std::vector<Territory> territories;	//All the territories on the current map
 
