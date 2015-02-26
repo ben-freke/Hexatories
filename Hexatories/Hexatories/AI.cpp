@@ -222,7 +222,7 @@ void AI::handleDefence() {
 
 					if (find_if(ourVuln[i].friendlyBorders.begin(), ourVuln[i].friendlyBorders.end(), findTerr(ourSafe[j].terrNo)) !=
 						ourVuln[i].friendlyBorders.end()) {	//if our vulnerable terr shares a border with a safe
-						(*allTerrs)[ourSafe[i].terrNo].sendTroops((*allTerrs)[ourVuln[i - 1].terrNo], noAtk, 0);			
+						(*allTerrs)[ourVuln[i].terrNo].sendTroops((*allTerrs)[ourSafe[j].terrNo], noAtk, 0);			
 					}
 				}
 			}
