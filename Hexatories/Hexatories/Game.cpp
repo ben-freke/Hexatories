@@ -74,7 +74,7 @@ void Game::newGame() {
 	ui.initUI();
 
 	for (int i = 0; i < 2; i++) {
-		players[i].coins = 250;
+		players[i].coins = 600;
 		players[i].score = 0;
 		players[i].population = 0;
 	}
@@ -292,14 +292,27 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			if (swordClang.getVolume() == 100) {
 				swordClang.setVolume(0);
 				clickSound.setVolume(0);
+				gongSound.setVolume(0);
+				coinSound.setVolume(0);
+				clickSound.setVolume(0);
+				marchSound.setVolume(0);
+				swordClang.setVolume(0);
+				victorySound.setVolume(0);
 			} else {
 				swordClang.setVolume(100);
-				clickSound.setVolume(50);
+				clickSound.setVolume(100);
+				gongSound.setVolume(100);
+				coinSound.setVolume(100);
+				clickSound.setVolume(100);
+				marchSound.setVolume(100);
+				swordClang.setVolume(100);
+				victorySound.setVolume(100);
 			}
 			break;
 		}
 
 		case gameUI::Section::SAVE: {
+			saveAudio.playAudio("save.wav", false);
 			saveGame();
 			break;
 		}
@@ -494,11 +507,11 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::BUY_FARM: {
 			clickSound.playAudio("mainClick.wav", false);
-			clickSound.playAudio("coin.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 500) {
 					if (map.updateBuilding(currTerr, true)) {	//Adds a farm to the territory & map
+						clickSound.playAudio("coin.wav", false);
 						players[1].coins = players[1].coins - 500;
 						updatePlayerInfo();
 					}
@@ -509,11 +522,11 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::BUY_BANK: {
 			clickSound.playAudio("mainClick.wav", false);
-			clickSound.playAudio("coin.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 500) {
 					if (map.updateBuilding(currTerr, false)) {	//Adds a bank to the territory & map
+						clickSound.playAudio("coin.wav", false);
 						players[1].coins = players[1].coins - 500;
 						updatePlayerInfo();
 					}
@@ -524,11 +537,11 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::BUY_ATTACK: {
 			clickSound.playAudio("mainClick.wav", false);
-			clickSound.playAudio("coin.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 50) {
 					if (currTerr->addAttacker()) {
+						clickSound.playAudio("coin.wav", false);
 						players[1].coins -= 50;
 						updateTerrInfo(currTerr);
 						updatePlayerInfo();
@@ -540,11 +553,11 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::BUY_DEFENDER: {
 			clickSound.playAudio("mainClick.wav", false);
-			clickSound.playAudio("coin.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
 				if (players[1].coins >= 50) {
 					if (currTerr->addDefender()) {
+						clickSound.playAudio("coin.wav", false);
 						players[1].coins -= 50;
 						updateTerrInfo(currTerr);
 						updatePlayerInfo();
