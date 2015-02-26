@@ -141,7 +141,7 @@ int main(void) {
 	while (!glfwWindowShouldClose(window))
 	{
 		if (endGame) break;
-		_update_fps_counter(window);
+		//_update_fps_counter(window);
 
 		game.draw();
 		

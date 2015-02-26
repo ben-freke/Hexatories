@@ -1,5 +1,5 @@
 #include "AI.h"
-
+#include <time.h> 
 using namespace std;
 
 void AI::initAI(vector<Territory> *all, player *me) {
@@ -8,15 +8,27 @@ void AI::initAI(vector<Territory> *all, player *me) {
 }
 
 vector<int> AI::moveAI(vector<int> *farmsToBuild, vector<int> *banksToBuild) {
+	
+	/*
+		Added this in to make it easier for the player (as it's sooooo hard without it)
+		so the AI only had a 50% chance of making a move each turn. 
+	*/
+	
+	srand(time(NULL));
+	int random = rand() % 9999 + 1;
+	if ((random % 3)==0){
+	
+		
+		farmArray = farmsToBuild;
+		bankArray = banksToBuild;
 
-	farmArray = farmsToBuild;
-	bankArray = banksToBuild;
-
-	fillArrays();
-	handleDefence();
-	handleAttack();
-	addBuildings();
-	return toUpdateTerrNo;
+		fillArrays();
+		handleDefence();
+		handleAttack();
+		addBuildings();
+		return toUpdateTerrNo;
+	}
+	
 }
 
 void AI::fillArrays() {
