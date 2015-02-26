@@ -234,7 +234,7 @@ bool Territory::sendTroops(Territory &receivingTerr, int noAttack, int noDefend)
 
 		if (attackers[0] >= noAttack) {
 			
-			int attack = noAttack * 15;
+  			int attack = noAttack * 15;
 			int defense = receivingTerr.getDefense();
 
 			int randomBoundaries = (int)(attack * 0.10);

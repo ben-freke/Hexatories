@@ -16,7 +16,7 @@ vector<int> AI::moveAI(vector<int> *farmsToBuild, vector<int> *banksToBuild) {
 	
 	srand(time(NULL));
 	int random = rand() % 9999 + 1;
-	if ((random % 3)==0){
+	if ((random % 2)==0){
 	
 		
 		farmArray = farmsToBuild;

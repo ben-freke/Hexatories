@@ -25,6 +25,8 @@ class Game {
 	MainMenu mm;
 	AI ai;
 
+	Audio gongSound;
+	Audio coinSound;
 	Audio gameMusic;
 	Audio clickSound;
 	Audio marchSound;

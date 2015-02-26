@@ -65,6 +65,8 @@ vector<int> Game::getSave() {
 }
 
 void Game::newGame() {
+	gongSound.playAudio("gong.wav", false);
+
 	gameMusic.playAudio("mainBackground.wav", true);
 	gameMusic.setVolume(50);
 	territories.clear();
@@ -440,6 +442,12 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			if (firstTerr == NULL) break;
 			if (numAtkSend > 0)
 				ui.changeText(gameUI::Text::SEND_ATK, --numAtkSend);	//Take one from the attack to send text & var
+			
+			if (numAtkSend == 0){
+				numAtkSend = firstTerr->getAttackers(false);
+				ui.changeText(gameUI::Text::SEND_ATK, numAtkSend);
+			}
+			
 			break;
 		}
 
@@ -461,11 +469,12 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::BUY_FARM: {
 			clickSound.playAudio("mainClick.wav", false);
+			clickSound.playAudio("coin.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
-				if (players[1].coins >= 1500) {
+				if (players[1].coins >= 500) {
 					if (map.updateBuilding(currTerr, true)) {	//Adds a farm to the territory & map
-						players[1].coins = players[1].coins - 1500;
+						players[1].coins = players[1].coins - 500;
 						updatePlayerInfo();
 					}
 				}
@@ -475,11 +484,12 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::BUY_BANK: {
 			clickSound.playAudio("mainClick.wav", false);
+			clickSound.playAudio("coin.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
-				if (players[1].coins >= 1500) {
+				if (players[1].coins >= 500) {
 					if (map.updateBuilding(currTerr, false)) {	//Adds a bank to the territory & map
-						players[1].coins = players[1].coins - 1500;
+						players[1].coins = players[1].coins - 500;
 						updatePlayerInfo();
 					}
 				}
@@ -489,11 +499,12 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::BUY_ATTACK: {
 			clickSound.playAudio("mainClick.wav", false);
+			clickSound.playAudio("coin.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
-				if (players[1].coins >= 100) {
+				if (players[1].coins >= 50) {
 					if (currTerr->addAttacker()) {
-						players[1].coins -= 100;
+						players[1].coins -= 50;
 						updateTerrInfo(currTerr);
 						updatePlayerInfo();
 					}
@@ -504,11 +515,12 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 
 		case gameUI::Section::BUY_DEFENDER: {
 			clickSound.playAudio("mainClick.wav", false);
+			clickSound.playAudio("coin.wav", false);
 			if (currTerr == NULL) break;
 			if (currTerr->getOwner() == 2) {
-				if (players[1].coins >= 100) {
+				if (players[1].coins >= 50) {
 					if (currTerr->addDefender()) {
-						players[1].coins -= 100;
+						players[1].coins -= 50;
 						updateTerrInfo(currTerr);
 						updatePlayerInfo();
 					}
@@ -700,7 +712,7 @@ void Game::checkVictory() {
 }
 
 void Game::nextTurn() {
-
+	gongSound.playAudio("gong.wav", false);
 	vector<int> *farmArray = new vector<int>, *bankArray = new vector<int>;
 	vector<int> update = ai.moveAI(farmArray, bankArray);
 
