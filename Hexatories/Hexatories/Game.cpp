@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <math.h>
-#include <chrono>
+#include <Windows.h>
 #include "Game.h"
 #include "Shaders.h"
 #include "Textures.h"
@@ -564,6 +563,9 @@ bool Game::handleMainMenu(int x, int y) {
 	case (MainMenu::Section::TUTORIAL) : {
 		clickSound.playAudio("mainClick.wav", false);
 
+		/*************************************************/
+		ShellExecute(NULL, "open", "http://youtube.com", NULL, NULL, SW_SHOWNORMAL);	
+		/*************************************************/
 		break;
 	}
 
