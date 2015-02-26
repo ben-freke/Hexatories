@@ -274,7 +274,6 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			} else {
 				swordClang.setVolume(100);
 				clickSound.setVolume(50);
-
 			}
 			break;
 		}

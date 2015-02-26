@@ -1,5 +1,4 @@
 #include "AI.h"
-#include <time.h> 
 using namespace std;
 
 void AI::initAI(vector<Territory> *all, player *me) {
@@ -8,26 +7,15 @@ void AI::initAI(vector<Territory> *all, player *me) {
 }
 
 vector<int> AI::moveAI(vector<int> *farmsToBuild, vector<int> *banksToBuild) {
-	
-	/*
-		Added this in to make it easier for the player (as it's sooooo hard without it)
-		so the AI only had a 50% chance of making a move each turn. 
-	*/
-	
-	srand(time(NULL));
-	int random = rand() % 9999 + 1;
-	if ((random % 2)==0){
-	
-		
-		farmArray = farmsToBuild;
-		bankArray = banksToBuild;
 
-		fillArrays();
-		handleDefence();
-		handleAttack();
-		addBuildings();
-		return toUpdateTerrNo;
-	}
+	farmArray = farmsToBuild;
+	bankArray = banksToBuild;
+
+	fillArrays();
+	handleDefence();
+	handleAttack();
+	addBuildings();
+	return toUpdateTerrNo;
 	
 }
 
@@ -149,20 +137,22 @@ void AI::handleDefence() {
 		vector<int> reinforcingTerrs;
 
 		findReinforceTerrs(difference, reinforcingTerrs, ourVuln[i], ourSafe, false);
+		int r = rand() % 2;
+		if (r != 1) {
+			if (difference > 0) {	//Buy defenders
+				def = ourVuln[i].population - 10;
+				if (def > (*ai).coins / 100) {
+					def = (*ai).coins / 100;
+				}
 
-		if (difference > 0) {	//Buy defenders
-			def = ourVuln[i].population - 10;
-			if (def > (*ai).coins / 100) {
-				def = (*ai).coins / 100;
+				if (difference - def < 0) {
+					def = difference;
+					difference = 0;
+				} else {
+					difference -= def;
+				}
+				reinforcingTerrs.push_back(-def);
 			}
-
-			if (difference - def < 0) {
-				def = difference;
-				difference = 0;
-			} else {
-				difference -= def;
-			}
-			reinforcingTerrs.push_back(-def);
 		}
 
 		if (difference > 0) {
@@ -292,21 +282,24 @@ void AI::attack(vector<TerrInfo> &toAttack) {
 		}
 
 		defence = (int)(ceil(toAttack[i].defence / 15) + 1);
-		for (unsigned j = 0; j < attackingTerrs.size(); j++) {
+		int r = rand() % 3;
+		if (r != 2) {
+			for (unsigned j = 0; j < attackingTerrs.size(); j++) {
 
-			Territory &terr = (*allTerrs)[attackingTerrs[j]];
-			int atk = terr.getAttackers(false);
+				Territory &terr = (*allTerrs)[attackingTerrs[j]];
+				int atk = terr.getAttackers(false);
 
-			if (defence <= atk) {
-				atk = defence;
-				defence = 0;
-			} else {
-				defence -= atk;
+				if (defence <= atk) {
+					atk = defence;
+					defence = 0;
+				} else {
+					defence -= atk;
+				}
+
+				if (attackNow)
+					terr.sendTroops((*allTerrs)[toAttack[i].terrNo], atk, 0);
+				if ((*allTerrs)[toAttack[i].terrNo].getOwner() == 1) sucess = true;
 			}
-
-			if (attackNow)
-				terr.sendTroops((*allTerrs)[toAttack[i].terrNo], atk, 0);
-			if ((*allTerrs)[toAttack[i].terrNo].getOwner() == 1) sucess = true;
 		}
 
 		if (sucess) toUpdateTerrNo.push_back(toAttack[i].terrNo);
