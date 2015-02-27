@@ -504,7 +504,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			}
 			if (numDefSend == 0) {
 				numDefSend = firstTerr->getDefenders();
-				ui.changeText(gameUI::Text::SEND_ATK, numDefSend);
+				ui.changeText(gameUI::Text::SEND_DEF, numDefSend);
 			}
 			break;
 		}
