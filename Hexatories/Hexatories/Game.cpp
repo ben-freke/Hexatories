@@ -437,6 +437,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 					if (firstTerr->getOwner() != secondTerrOriginalOwner){
 						swordClang.playAudio("swords.wav", false);
 						victorySound.playAudio("territoryWon.wav", false);
+						checkVictory();
 					}
 					updatePlayerInfo();
 				}
