@@ -11,7 +11,7 @@ using namespace std;
 void Game::initGame() {
 
 	gameMusic.playAudio("title.wav", true);
-	gameMusic.fadeInAudio(4);
+	gameMusic.fadeInAudio(3);
 	swordClang.setVolume(100);
 	clickSound.setVolume(50);
 
@@ -67,7 +67,6 @@ void Game::newGame() {
 	gongSound.playAudio("gong.wav", false);
 
 	gameMusic.playAudio("mainBackground.wav", true);
-	gameMusic.setVolume(50);
 	territories.clear();
 
 	map.initMap(territories, true);	//true so that map will init the territories
@@ -257,6 +256,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			handleMouseInput(0, 0, false, true);
 			stage = 0;
 			mm.initMenu(0);
+			gameMusic.playAudio("title.wav", true);
 			break;
 		}
 		}
@@ -325,6 +325,7 @@ bool Game::handleMouseInput(double x, double y, bool click, bool reset) {
 			handleMouseInput(0, 0, false, true);
 			stage = 0;
 			mm.initMenu(0);
+			gameMusic.playAudio("title.wav", true);
 			break;
 		}
 
@@ -608,9 +609,8 @@ bool Game::handleMainMenu(int x, int y) {
 	case (MainMenu::Section::TUTORIAL) : {
 		clickSound.playAudio("mainClick.wav", false);
 
-		/*************************************************/
-		ShellExecute(NULL, "open", "", NULL, NULL, SW_SHOWNORMAL);	
-		/*************************************************/
+		ShellExecute(NULL, "open", "https://www.youtube.com/watch?v=BWfxBpkp2Yo", NULL, NULL, SW_SHOWNORMAL);	
+		gameMusic.setVolume(0);
 		break;
 	}
 

@@ -309,6 +309,7 @@ void AI::attack(vector<TerrInfo> &toAttack) {
 void AI::handleAttack() {
 	attack(theirVuln);
 	attack(enemyBorders);
+	attack(theirSafe);
 }
 
 void AI::addBuildings() {
