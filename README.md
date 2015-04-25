@@ -8,6 +8,7 @@ This game is licenced under the MIT License
 The MIT License (MIT)
 
 Copyright (c) 2015 Ben Freke, Ben Sandison, Mike Suffiled, Jack Steel and Nik Filminov
+
 http://www.benfreke.com/?p=116
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
