@@ -3,7 +3,7 @@ Hexatories is a single player strategy game, based in medieval times. You play a
 
 More information on the game can be found at http://www.benfreke.com/?p=116
 
-This game is lisenced under the MIT License
+This game is licenced under the MIT License
 
 The MIT License (MIT)
 
